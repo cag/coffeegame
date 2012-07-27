@@ -1,0 +1,117 @@
+<!DOCTYPE html>  <html> <head>   <title>sprite.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="audio.html">                 audio.coffee               </a>                                           <a class="source" href="entity.html">                 entity.coffee               </a>                                           <a class="source" href="game.html">                 game.coffee               </a>                                           <a class="source" href="geometry.html">                 geometry.coffee               </a>                                           <a class="source" href="input.html">                 input.coffee               </a>                                           <a class="source" href="loader.html">                 loader.coffee               </a>                                           <a class="source" href="main.html">                 main.coffee               </a>                                           <a class="source" href="map.html">                 map.coffee               </a>                                           <a class="source" href="physics.html">                 physics.coffee               </a>                                           <a class="source" href="sprite.html">                 sprite.coffee               </a>                                           <a class="source" href="test.html">                 test.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               sprite.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="p">[</span><span class="s1">&#39;jquery&#39;</span><span class="p">,</span> <span class="s1">&#39;./util&#39;</span><span class="p">],</span> <span class="nf">($, util) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Similar to the map module, sprites are loaded via JSON from
+a directory with a name.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">url_prefix = </span><span class="s1">&#39;sprites/&#39;</span>
+    <span class="nv">url_suffix = </span><span class="s1">&#39;.json&#39;</span>
+    
+    <span class="nv">Sprite: </span><span class="k">class</span>
+        <span class="nv">constructor: </span><span class="nf">(@name, onload) -&gt;</span>
+            <span class="vi">@loaded = </span><span class="kc">false</span>
+            <span class="nv">cb_target = </span><span class="k">this</span>
+            <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span> <span class="nx">url_prefix</span> <span class="o">+</span> <span class="nx">@name</span> <span class="o">+</span> <span class="nx">url_suffix</span><span class="p">,</span>
+                <span class="p">(</span><span class="nf">(data) -&gt;</span> <span class="nx">cb_target</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="nx">onload</span><span class="p">);</span> <span class="k">return</span><span class="p">)</span>
+            <span class="k">return</span>
+        </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>The sprite JSON format is as follows:</p>
+
+<pre><code>{
+  "spritesheet": FILENAME,
+  "frames": [
+    {
+      "pos": [X, Y],
+      "size": [W, H],
+      "offset": [OFFX, OFFY]
+    },
+    ...
+  ],
+  "animations": {
+    NAME: {
+      "frames": [[INDEX, DURATION], ...],
+      "loop": LOOP
+    },
+    ...
+  }
+}
+</code></pre>
+
+<p>Note: <code>FILENAME</code> is a string containing the name of the
+image to be used as the spritesheet, <code>[X, Y]</code> gives the
+top-left corner of the frame described in the spritesheet,
+<code>[W, H]</code> is the size of the frame, <code>[OFFX, OFFY]</code> is the
+offset of the top left corner of the frame from the position
+of the sprite (around which drawing flipped versions will
+be based), <code>NAME</code> is a string naming an animation, <code>INDEX</code>
+refers to the index of a frame, <code>DURATION</code> is how long that
+frame should stay onscreen in seconds, and <code>LOOP</code> is true
+or false depending on whether the animation should loop.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nv">load: </span><span class="nf">(json_data, onload) -&gt;</span>
+            <span class="p">{</span><span class="nx">frames</span><span class="p">,</span> <span class="nx">animations</span><span class="p">}</span> <span class="o">=</span> <span class="nx">json_data</span>
+            
+            <span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">animation</span> <span class="k">of</span> <span class="nx">animations</span>
+                <span class="nv">duration = </span><span class="mi">0</span>
+                <span class="k">for</span> <span class="nx">frame</span> <span class="k">in</span> <span class="nx">animation</span><span class="p">.</span><span class="nx">frames</span>
+                    <span class="nx">duration</span> <span class="o">+=</span> <span class="nx">frame</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="nx">animations</span><span class="p">[</span><span class="nx">name</span><span class="p">].</span><span class="nv">duration = </span><span class="nx">duration</span>
+            
+            <span class="vi">@animations = </span><span class="nx">animations</span>
+            <span class="nv">sprite = </span><span class="k">this</span>
+            
+            <span class="nv">image = </span><span class="k">new</span> <span class="nx">Image</span><span class="p">()</span>
+            <span class="nv">image.onload = </span><span class="o">-&gt;</span>
+                <span class="nx">sprite</span><span class="p">.</span><span class="nx">setupFrames</span> <span class="nx">image</span><span class="p">,</span> <span class="nx">frames</span>
+                <span class="vi">@loaded = </span><span class="kc">true</span>
+                <span class="nx">onload</span><span class="o">?</span><span class="p">()</span>
+            <span class="nv">image.src = </span><span class="nx">url_prefix</span> <span class="o">+</span> <span class="nx">json_data</span><span class="p">.</span><span class="nx">spritesheet</span>
+            <span class="k">return</span>
+        
+        <span class="nv">setupFrames: </span><span class="nf">(img, frames) -&gt;</span>
+            <span class="nv">grabFrame = </span><span class="nf">(frame) -&gt;</span>
+                <span class="nv">fw = </span><span class="nx">frame</span><span class="p">.</span><span class="nx">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="nv">fh = </span><span class="nx">frame</span><span class="p">.</span><span class="nx">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="nv">fcanvas = </span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span> <span class="s1">&#39;canvas&#39;</span>
+                <span class="nv">fcanvas.width = </span><span class="nx">fw</span>
+                <span class="nv">fcanvas.height = </span><span class="nx">fh</span>
+                <span class="nv">fctx = </span><span class="nx">fcanvas</span><span class="p">.</span><span class="nx">getContext</span> <span class="s1">&#39;2d&#39;</span>
+                <span class="nx">fctx</span><span class="p">.</span><span class="nx">drawImage</span> <span class="nx">img</span><span class="p">,</span> <span class="nx">frame</span><span class="p">.</span><span class="nx">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">frame</span><span class="p">.</span><span class="nx">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="nx">fw</span><span class="p">,</span> <span class="nx">fh</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">fw</span><span class="p">,</span> <span class="nx">fh</span>
+                
+                <span class="k">return</span> <span class="nx">fcanvas</span>
+            
+            <span class="vi">@frames = </span><span class="p">(</span><span class="nx">grabFrame</span> <span class="nx">frame</span> <span class="k">for</span> <span class="nx">frame</span> <span class="k">in</span> <span class="nx">frames</span><span class="p">)</span>
+            <span class="vi">@frame_offsets = </span><span class="p">(</span><span class="nx">frame</span><span class="p">.</span><span class="nx">offset</span> <span class="k">for</span> <span class="nx">frame</span> <span class="k">in</span> <span class="nx">frames</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="nv">startAnimation: </span><span class="nf">(anim_name) -&gt;</span>
+            <span class="vi">@current_animation = </span><span class="nx">@animations</span><span class="p">[</span><span class="nx">anim_name</span><span class="p">]</span>
+            <span class="vi">@animation_start_time = </span><span class="nx">util</span><span class="p">.</span><span class="nx">time</span><span class="p">()</span>
+            <span class="k">return</span>
+        
+        <span class="nv">draw: </span><span class="nf">(context, x, y, flip_h) -&gt;</span>
+            <span class="nv">cur_anim = </span><span class="nx">@current_animation</span>
+            <span class="nv">cur_anim_dur = </span><span class="nx">cur_anim</span><span class="p">.</span><span class="nx">duration</span>
+            <span class="nv">frame_index = </span><span class="o">-</span><span class="mi">1</span>
+            <span class="nv">anim_time = </span><span class="nx">util</span><span class="p">.</span><span class="nx">time</span><span class="p">()</span> <span class="o">-</span> <span class="nx">@animation_start_time</span>
+            
+            <span class="k">if</span> <span class="nx">cur_anim</span><span class="p">.</span><span class="nx">loop</span>
+                <span class="nx">anim_time</span> <span class="o">%=</span> <span class="nx">cur_anim_dur</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="nx">anim_time</span> <span class="o">&gt;</span> <span class="nx">cur_anim_dur</span>
+                <span class="nv">anim_time = </span><span class="nx">cur_anim_dur</span>
+            
+            <span class="k">for</span> <span class="nx">frame</span> <span class="k">in</span> <span class="nx">cur_anim</span><span class="p">.</span><span class="nx">frames</span>
+                <span class="nx">anim_time</span> <span class="o">-=</span> <span class="nx">frame</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nx">anim_time</span> <span class="o">&lt;=</span> <span class="mi">0</span>
+                    <span class="nv">frame_index = </span><span class="nx">frame</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">break</span>
+            
+            <span class="nv">frame_img = </span><span class="nx">@frames</span><span class="p">[</span><span class="nx">frame_index</span><span class="p">]</span>
+            <span class="nv">frame_offset = </span><span class="nx">@frame_offsets</span><span class="p">[</span><span class="nx">frame_index</span><span class="p">]</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">translate</span> <span class="p">(</span><span class="nx">x</span> <span class="o">+</span> <span class="p">.</span><span class="mi">5</span><span class="p">)</span> <span class="o">|</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="p">(</span><span class="nx">y</span> <span class="o">+</span> <span class="p">.</span><span class="mi">5</span><span class="p">)</span> <span class="o">|</span> <span class="mi">0</span>
+            <span class="nx">context</span><span class="p">.</span><span class="nx">transform</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="k">if</span> <span class="nx">flip_h</span>
+            <span class="nx">context</span><span class="p">.</span><span class="nx">drawImage</span> <span class="nx">frame_img</span><span class="p">,</span>
+                <span class="nx">frame_offset</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">frame_offset</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">restore</span><span class="p">()</span>
+            
+            <span class="k">return</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

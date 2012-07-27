@@ -1,0 +1,17 @@
+{
+  "spritesheet": "test_sprite.png",
+  "frames": [
+    { "pos": [0, 0], "size": [5, 15], "offset": [-2, -9] },
+    { "pos": [6, 0], "size": [9, 15], "offset": [-4, -9] }
+  ],
+  "animations": {
+    "idle": {
+      "frames": [[0, 1]],
+      "loop": false
+    },
+    "walk": {
+      "frames": [[0, 0.25], [1, 0.25]],
+      "loop": true
+    }
+  }
+}

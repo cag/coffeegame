@@ -1,0 +1,584 @@
+<!DOCTYPE html>  <html> <head>   <title>map.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="audio.html">                 audio.coffee               </a>                                           <a class="source" href="entity.html">                 entity.coffee               </a>                                           <a class="source" href="game.html">                 game.coffee               </a>                                           <a class="source" href="geometry.html">                 geometry.coffee               </a>                                           <a class="source" href="input.html">                 input.coffee               </a>                                           <a class="source" href="loader.html">                 loader.coffee               </a>                                           <a class="source" href="main.html">                 main.coffee               </a>                                           <a class="source" href="map.html">                 map.coffee               </a>                                           <a class="source" href="physics.html">                 physics.coffee               </a>                                           <a class="source" href="sprite.html">                 sprite.coffee               </a>                                           <a class="source" href="test.html">                 test.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               map.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="p">[</span><span class="s1">&#39;jquery&#39;</span><span class="p">,</span> <span class="s1">&#39;./game&#39;</span><span class="p">,</span> <span class="s1">&#39;./entity&#39;</span><span class="p">,</span> <span class="s1">&#39;./geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;./util&#39;</span><span class="p">],</span>
+  <span class="nf">($, game, entity, geometry, util) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>If <code>layers_cached</code> is true, then tiles will be cached in blocks
+of <code>layer_cache_factor</code> square and the blocks will be drawn
+instead of tiles.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">layers_cached = </span><span class="kc">true</span>
+    <span class="nv">layer_cache_factor = </span><span class="mi">16</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Change this to load maps from elsewhere.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">url_prefix = </span><span class="s1">&#39;maps/&#39;</span>
+    <span class="nv">url_suffix = </span><span class="s1">&#39;.json&#39;</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Comparison helper functions for sorting entities.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">byLeftBound = </span><span class="nf">(ent_a, ent_b) -&gt;</span>
+        <span class="k">return</span> <span class="nx">ent_a</span><span class="p">.</span><span class="nx">x</span> <span class="o">+</span> <span class="nx">ent_a</span><span class="p">.</span><span class="nx">shape</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span>
+            <span class="nx">ent_b</span><span class="p">.</span><span class="nx">x</span> <span class="o">-</span> <span class="nx">ent_b</span><span class="p">.</span><span class="nx">shape</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    
+    <span class="nv">byBottomBound = </span><span class="nf">(ent_a, ent_b) -&gt;</span>
+        <span class="k">return</span> <span class="nx">ent_a</span><span class="p">.</span><span class="nx">y</span> <span class="o">+</span> <span class="nx">ent_a</span><span class="p">.</span><span class="nx">shape</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span>
+            <span class="nx">ent_b</span><span class="p">.</span><span class="nx">y</span> <span class="o">-</span> <span class="nx">ent_b</span><span class="p">.</span><span class="nx">shape</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>This module expects maps created in <a href="http://www.mapeditor.org/">Tiled</a>
+and exported using the JSON option.
+Refer to the <a href="https://github.com/bjorn/tiled/wiki/TMX-Map-Format">TMX Map Format</a>
+for information on how the map format works.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="k">class</span> <span class="nx">TileSet</span>
+        <span class="nv">constructor: </span><span class="nf">(json_data, onload) -&gt;</span>
+            <span class="vi">@name = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">name</span>
+            <span class="vi">@first_gid = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">firstgid</span>
+            <span class="vi">@tile_width = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">tilewidth</span>
+            <span class="vi">@tile_height = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">tileheight</span>
+            <span class="vi">@margin = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">margin</span>
+            <span class="vi">@spacing = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">spacing</span>
+            <span class="vi">@properties = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">properties</span>
+            
+            <span class="nv">tileset = </span><span class="k">this</span>
+            <span class="vi">@image = </span><span class="k">new</span> <span class="nx">Image</span><span class="p">()</span>
+            <span class="vi">@image.onload = </span><span class="o">-&gt;</span>
+                <span class="nv">iw = </span><span class="nx">@naturalWidth</span>
+                <span class="nv">ih = </span><span class="nx">@naturalHeight</span>
+                <span class="k">if</span> <span class="nx">iw</span> <span class="o">isnt</span> <span class="nx">json_data</span><span class="p">.</span><span class="nx">imagewidth</span> <span class="o">or</span>
+                   <span class="nx">ih</span> <span class="o">isnt</span> <span class="nx">json_data</span><span class="p">.</span><span class="nx">imageheight</span>
+                    <span class="k">throw</span> <span class="s1">&#39;tileset &#39;</span> <span class="o">+</span> <span class="nx">tileset</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span>
+                        <span class="s1">&#39; dimension mismatch (&#39;</span> <span class="o">+</span>
+                        <span class="nx">iw</span> <span class="o">+</span> <span class="s1">&#39;x&#39;</span> <span class="o">+</span> <span class="nx">ih</span> <span class="o">+</span> <span class="s1">&#39; vs &#39;</span> <span class="o">+</span>
+                        <span class="nx">@naturalWidth</span> <span class="o">+</span> <span class="s1">&#39;x&#39;</span> <span class="o">+</span> <span class="nx">@naturalHeight</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+                
+                <span class="nx">tileset</span><span class="p">.</span><span class="nx">setupTileMapping</span><span class="p">()</span>
+                <span class="nx">onload</span><span class="o">?</span><span class="p">()</span>
+            <span class="vi">@image.src = </span><span class="nx">url_prefix</span> <span class="o">+</span> <span class="nx">json_data</span><span class="p">.</span><span class="nx">image</span>
+            <span class="k">return</span>
+        
+        <span class="nv">setupTileMapping: </span><span class="o">-&gt;</span>
+            <span class="nv">img = </span><span class="nx">@image</span>
+            <span class="nv">iw = </span><span class="nx">img</span><span class="p">.</span><span class="nx">naturalWidth</span>
+            <span class="nv">ih = </span><span class="nx">img</span><span class="p">.</span><span class="nx">naturalHeight</span>
+            <span class="nv">tw = </span><span class="nx">@tile_width</span>
+            <span class="nv">th = </span><span class="nx">@tile_height</span>
+            
+            <span class="nv">margin = </span><span class="nx">@margin</span>
+            <span class="nv">twps = </span><span class="nx">tw</span> <span class="o">+</span> <span class="nx">@spacing</span>
+            <span class="nv">thps = </span><span class="nx">th</span> <span class="o">+</span> <span class="nx">@spacing</span>
+            
+            <span class="nv">numtx = </span><span class="p">((</span><span class="nx">iw</span> <span class="o">-</span> <span class="nx">margin</span><span class="p">)</span> <span class="o">/</span> <span class="nx">twps</span><span class="p">)</span> <span class="o">|</span> <span class="mi">0</span>
+            <span class="nv">numty = </span><span class="p">((</span><span class="nx">ih</span> <span class="o">-</span> <span class="nx">margin</span><span class="p">)</span> <span class="o">/</span> <span class="nx">thps</span><span class="p">)</span> <span class="o">|</span> <span class="mi">0</span>
+            <span class="vi">@num_tiles = </span><span class="nv">numt = </span><span class="nx">numtx</span> <span class="o">*</span> <span class="nx">numty</span>
+            
+            <span class="nv">grabTile = </span><span class="nf">(xiter, yiter) -&gt;</span>
+                <span class="nv">tcanvas = </span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span> <span class="s1">&#39;canvas&#39;</span>
+                <span class="nv">tcanvas.width = </span><span class="nx">tw</span>
+                <span class="nv">tcanvas.height = </span><span class="nx">th</span>
+                
+                <span class="nv">sx = </span><span class="nx">margin</span> <span class="o">+</span> <span class="nx">xiter</span> <span class="o">*</span> <span class="nx">twps</span>
+                <span class="nv">sy = </span><span class="nx">margin</span> <span class="o">+</span> <span class="nx">yiter</span> <span class="o">*</span> <span class="nx">thps</span>
+                
+                <span class="nv">tctx = </span><span class="nx">tcanvas</span><span class="p">.</span><span class="nx">getContext</span> <span class="s1">&#39;2d&#39;</span>
+                <span class="nx">tctx</span><span class="p">.</span><span class="nx">drawImage</span> <span class="nx">img</span><span class="p">,</span> <span class="nx">sx</span><span class="p">,</span> <span class="nx">sy</span><span class="p">,</span> <span class="nx">tw</span><span class="p">,</span> <span class="nx">th</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">tw</span><span class="p">,</span> <span class="nx">th</span>
+                
+                <span class="k">return</span> <span class="nx">tcanvas</span>
+            
+            <span class="vi">@tiles = </span><span class="p">(</span><span class="nx">grabTile</span> <span class="nx">i</span> <span class="o">%</span> <span class="nx">numtx</span><span class="p">,</span> <span class="p">(</span><span class="nx">i</span> <span class="err">/ numtx) | 0 \</span>
+                <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">numt</span><span class="p">])</span>
+            
+            <span class="k">return</span>
+        
+        <span class="nv">hasGID: </span><span class="nf">(gid) -&gt;</span> <span class="nx">@first_gid</span> <span class="o">&lt;=</span> <span class="nx">gid</span> <span class="o">&lt;</span> <span class="nx">@first_gid</span> <span class="o">+</span> <span class="nx">@num_tiles</span>
+        
+        <span class="nv">drawTile: </span><span class="nf">(context, gid, flip_h, flip_v, flip_d, x, y) -&gt;</span>
+            <span class="nv">idx = </span><span class="nx">gid</span> <span class="o">-</span> <span class="nx">@first_gid</span>
+            <span class="nv">tw = </span><span class="nx">@tile_width</span>
+            <span class="nv">th = </span><span class="nx">@tile_height</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">translate</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span>
+            <span class="nx">context</span><span class="p">.</span><span class="nx">transform</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">tw</span><span class="p">,</span> <span class="mi">0</span> <span class="k">if</span> <span class="nx">flip_h</span>
+            <span class="nx">context</span><span class="p">.</span><span class="nx">transform</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">th</span> <span class="k">if</span> <span class="nx">flip_v</span>
+            <span class="nx">context</span><span class="p">.</span><span class="nx">transform</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="k">if</span> <span class="nx">flip_d</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">drawImage</span> <span class="nx">@tiles</span><span class="p">[</span><span class="nx">idx</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">restore</span><span class="p">()</span>
+            <span class="k">return</span>
+    
+    <span class="k">class</span> <span class="nx">Layer</span>
+        <span class="nv">constructor: </span><span class="nf">(json_data, @map) -&gt;</span>
+            <span class="vi">@name = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">name</span>
+            <span class="vi">@type = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">type</span>
+            <span class="vi">@properties = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">properties</span>
+            <span class="vi">@visible = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">visible</span>
+            <span class="vi">@opacity = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">opacity</span>
+            <span class="vi">@x = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">x</span>
+            <span class="vi">@y = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">y</span>
+            <span class="vi">@width = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">width</span>
+            <span class="vi">@height = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">height</span>
+            <span class="k">return</span>
+    
+    <span class="k">class</span> <span class="nx">TileLayer</span> <span class="k">extends</span> <span class="nx">Layer</span>
+        <span class="nv">constructor: </span><span class="nf">(json_data, map) -&gt;</span>
+            <span class="k">super</span> <span class="nx">json_data</span><span class="p">,</span> <span class="nx">map</span>
+            
+            <span class="nx">unless</span> <span class="nx">@type</span> <span class="o">is</span> <span class="s1">&#39;tilelayer&#39;</span>
+                <span class="k">throw</span> <span class="s2">&quot;can&#39;t construct TileLayer from #{@type} layer&quot;</span>
+            
+            <span class="nv">parseGID = </span><span class="nf">(gid) -&gt;</span>
+                <span class="nv">flip_h = </span><span class="kc">false</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>Javascript uses 32-bit signed bitwise ops, but
+values are written to json unsigned in Tiled.</p>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="k">if</span> <span class="nx">gid</span> <span class="o">&gt;</span> <span class="mi">2147483648</span>
+                    <span class="nv">flip_h = </span><span class="kc">true</span>
+                    <span class="nx">gid</span> <span class="o">-=</span> <span class="mi">2147483648</span>
+                <span class="nv">flip_v = </span><span class="k">if</span> <span class="nx">gid</span> <span class="o">&amp;</span> <span class="mi">1073741824</span> <span class="k">then</span> <span class="kc">true</span> <span class="k">else</span> <span class="kc">false</span>
+                <span class="nv">flip_d = </span><span class="k">if</span> <span class="nx">gid</span> <span class="o">&amp;</span> <span class="mi">536870912</span> <span class="k">then</span> <span class="kc">true</span> <span class="k">else</span> <span class="kc">false</span>
+                <span class="nx">gid</span> <span class="o">&amp;=</span> <span class="o">~</span><span class="mi">1610612736</span>
+                <span class="p">[</span><span class="nx">gid</span><span class="p">,</span> <span class="nx">flip_h</span><span class="p">,</span> <span class="nx">flip_v</span><span class="p">,</span> <span class="nx">flip_d</span><span class="p">]</span>
+            
+            <span class="nv">width = </span><span class="nx">@width</span>
+            <span class="nv">height = </span><span class="nx">@height</span>
+            <span class="vi">@data = </span><span class="p">(</span><span class="nx">parseGID</span><span class="p">(</span><span class="nx">json_data</span><span class="p">.</span><span class="nx">data</span><span class="p">[</span><span class="nx">i</span> <span class="o">+</span> <span class="nx">j</span> <span class="o">*</span> <span class="nx">width</span><span class="p">])</span> <span class="o">\</span>
+                <span class="k">for</span> <span class="nx">j</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">height</span><span class="p">]</span> <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">width</span><span class="p">])</span>
+            </pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>Parallax can be set in tile layer properties in Tiled.</p>             </td>             <td class="code">               <div class="highlight"><pre>            <span class="k">if</span> <span class="nx">@properties</span><span class="o">?</span><span class="p">.</span><span class="nx">parallax</span><span class="o">?</span>
+                <span class="vi">@parallax = </span><span class="o">+</span><span class="nx">@properties</span><span class="p">.</span><span class="nx">parallax</span>
+            <span class="k">else</span>
+                <span class="vi">@parallax = </span><span class="mi">1</span>
+            
+            <span class="k">return</span>
+        
+        <span class="nv">buildCache: </span><span class="o">-&gt;</span>
+            <span class="nv">layer = </span><span class="k">this</span>
+            <span class="nv">lcf = </span><span class="nx">layer_cache_factor</span>
+            <span class="nv">w = </span><span class="nx">@width</span>
+            <span class="nv">h = </span><span class="nx">@height</span>
+            <span class="nv">tw = </span><span class="nx">@map</span><span class="p">.</span><span class="nx">tilewidth</span>
+            <span class="nv">th = </span><span class="nx">@map</span><span class="p">.</span><span class="nx">tileheight</span>
+            <span class="vi">@cache_width = </span><span class="nv">cw = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">w</span> <span class="err">/ lcf)</span>
+            <span class="vi">@cache_height = </span><span class="nv">ch = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">(</span><span class="nx">h</span> <span class="err">/ lcf)</span>
+            
+            <span class="nv">cacheBlock = </span><span class="nf">(bi, bj) -&gt;</span>
+                <span class="nv">nbx = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">lcf</span><span class="p">,</span> <span class="nx">w</span> <span class="o">-</span> <span class="nx">bi</span>
+                <span class="nv">nby = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">lcf</span><span class="p">,</span> <span class="nx">h</span> <span class="o">-</span> <span class="nx">bj</span>
+                
+                <span class="nv">canvas = </span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span> <span class="s1">&#39;canvas&#39;</span>
+                <span class="nv">canvas.width = </span><span class="nx">tw</span> <span class="o">*</span> <span class="nx">nbx</span>
+                <span class="nv">canvas.height = </span><span class="nx">th</span> <span class="o">*</span> <span class="nx">nby</span>
+                
+                <span class="nv">context = </span><span class="nx">canvas</span><span class="p">.</span><span class="nx">getContext</span> <span class="s1">&#39;2d&#39;</span>
+                <span class="nx">layer</span><span class="p">.</span><span class="nx">drawRaw</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">bi</span><span class="p">,</span> <span class="nx">bi</span> <span class="o">+</span> <span class="nx">nbx</span><span class="p">,</span> <span class="nx">bj</span><span class="p">,</span> <span class="nx">bj</span> <span class="o">+</span> <span class="nx">nby</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+                
+                <span class="k">return</span> <span class="nx">canvas</span>
+            
+            <span class="vi">@cache = </span><span class="p">(</span><span class="nx">cacheBlock</span> <span class="nx">i</span> <span class="o">*</span> <span class="nx">lcf</span><span class="p">,</span> <span class="nx">j</span> <span class="o">*</span> <span class="nx">lcf</span> <span class="o">\</span>
+                <span class="k">for</span> <span class="nx">j</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">ch</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span> <span class="o">\</span>
+                    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">cw</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span><span class="p">)</span>
+            
+            <span class="k">return</span>
+        
+        <span class="nv">drawRaw: </span><span class="nf">(context, lowtx, hightx, lowty, highty, dx, dy) -&gt;</span>
+            <span class="nv">map = </span><span class="nx">@map</span>
+            <span class="nv">tw = </span><span class="nx">map</span><span class="p">.</span><span class="nx">tilewidth</span>
+            <span class="nv">th = </span><span class="nx">map</span><span class="p">.</span><span class="nx">tileheight</span>
+            <span class="nv">data = </span><span class="nx">@data</span>
+            <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="nx">lowtx</span><span class="p">...</span><span class="nx">hightx</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span>
+                <span class="k">for</span> <span class="nx">j</span> <span class="k">in</span> <span class="p">[</span><span class="nx">lowty</span><span class="p">...</span><span class="nx">highty</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span>
+                    <span class="nv">datum = </span><span class="nx">data</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="nx">j</span><span class="p">]</span>
+                    <span class="nx">map</span><span class="p">.</span><span class="nx">drawTile</span> <span class="nx">context</span><span class="p">,</span>
+                        <span class="nx">datum</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">datum</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">datum</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nx">datum</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+                        <span class="nx">dx</span> <span class="o">+</span> <span class="p">(</span><span class="nx">i</span> <span class="o">-</span> <span class="nx">lowtx</span><span class="p">)</span> <span class="o">*</span> <span class="nx">tw</span><span class="p">,</span>
+                        <span class="nx">dy</span> <span class="o">+</span> <span class="p">(</span><span class="nx">j</span> <span class="o">-</span> <span class="nx">lowty</span><span class="p">)</span> <span class="o">*</span> <span class="nx">th</span>
+            <span class="k">return</span>
+        
+        <span class="nv">draw: </span><span class="nf">(context, targx, targy) -&gt;</span>
+            <span class="nv">map = </span><span class="nx">@map</span>
+            <span class="nv">cam = </span><span class="nx">map</span><span class="p">.</span><span class="nx">camera</span>
+            <span class="nv">cambounds = </span><span class="nx">cam</span><span class="p">.</span><span class="nx">shape</span><span class="p">.</span><span class="nx">bounds_offsets</span>
+            
+            <span class="nv">tw = </span><span class="nx">map</span><span class="p">.</span><span class="nx">tilewidth</span>
+            <span class="nv">th = </span><span class="nx">map</span><span class="p">.</span><span class="nx">tileheight</span>
+            
+            <span class="nv">mlcamxwp = </span><span class="nx">cam</span><span class="p">.</span><span class="nx">x</span> <span class="o">*</span> <span class="nx">@parallax</span> <span class="o">-</span> <span class="nx">@x</span> <span class="o">*</span> <span class="nx">tw</span>
+            <span class="nv">mlcamywp = </span><span class="nx">cam</span><span class="p">.</span><span class="nx">y</span> <span class="o">*</span> <span class="nx">@parallax</span> <span class="o">-</span> <span class="nx">@y</span> <span class="o">*</span> <span class="nx">th</span>
+            
+            <span class="nv">w = </span><span class="nx">cambounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="nx">cambounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="nv">h = </span><span class="nx">cambounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="nx">cambounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            
+            <span class="nv">destx = </span><span class="nx">targx</span> <span class="o">-</span> <span class="nx">mlcamxwp</span>
+            <span class="nv">desty = </span><span class="nx">targy</span> <span class="o">-</span> <span class="nx">mlcamywp</span>
+            
+            <span class="nv">mlsx = </span><span class="nx">mlcamxwp</span> <span class="o">+</span> <span class="nx">cambounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="nv">mlsy = </span><span class="nx">mlcamywp</span> <span class="o">+</span> <span class="nx">cambounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>
+            <span class="nx">cam</span><span class="p">.</span><span class="nx">shapeSubpath</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">targx</span> <span class="o">-</span> <span class="nx">cam</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">targy</span> <span class="o">-</span> <span class="nx">cam</span><span class="p">.</span><span class="nx">y</span>
+            <span class="nx">context</span><span class="p">.</span><span class="nx">clip</span><span class="p">()</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">globalAlpha</span> <span class="o">*=</span> <span class="nx">@opacity</span>
+            
+            <span class="k">if</span> <span class="nx">layers_cached</span>
+                <span class="nv">cache = </span><span class="nx">@cache</span>
+                <span class="nv">lcf = </span><span class="nx">layer_cache_factor</span>
+                <span class="nv">bw = </span><span class="nx">tw</span> <span class="o">*</span> <span class="nx">lcf</span>
+                <span class="nv">bh = </span><span class="nx">th</span> <span class="o">*</span> <span class="nx">lcf</span>
+                <span class="nv">lowbx = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="nx">mlsx</span> <span class="err">/ bw) | 0</span>
+                <span class="nv">highbx = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">@cache_width</span><span class="p">,</span>
+                    <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">((</span><span class="nx">mlsx</span> <span class="o">+</span> <span class="nx">w</span><span class="p">)</span> <span class="o">/</span> <span class="nx">bw</span><span class="p">)</span>
+                <span class="nv">lowby = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="nx">mlsy</span> <span class="err">/ bh) | 0</span>
+                <span class="nv">highby = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">@cache_height</span><span class="p">,</span>
+                    <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">((</span><span class="nx">mlsy</span> <span class="o">+</span> <span class="nx">h</span><span class="p">)</span> <span class="o">/</span> <span class="nx">bh</span><span class="p">)</span>
+                
+                <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="nx">lowbx</span><span class="p">...</span><span class="nx">highbx</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span>
+                    <span class="k">for</span> <span class="nx">j</span> <span class="k">in</span> <span class="p">[</span><span class="nx">lowby</span><span class="p">...</span><span class="nx">highby</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span>
+                        <span class="nx">context</span><span class="p">.</span><span class="nx">drawImage</span> <span class="nx">cache</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="nx">j</span><span class="p">],</span>
+                            <span class="p">(.</span><span class="mi">5</span> <span class="o">+</span> <span class="nx">destx</span> <span class="o">+</span> <span class="nx">i</span> <span class="o">*</span> <span class="nx">bw</span><span class="p">)</span> <span class="o">|</span> <span class="mi">0</span><span class="p">,</span>
+                            <span class="p">(.</span><span class="mi">5</span> <span class="o">+</span> <span class="nx">desty</span> <span class="o">+</span> <span class="nx">j</span> <span class="o">*</span> <span class="nx">bh</span><span class="p">)</span> <span class="o">|</span> <span class="mi">0</span>
+            <span class="k">else</span>
+                <span class="nv">lowtx = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="nx">mlsx</span> <span class="err">/ tw) | 0</span>
+                <span class="nv">hightx = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">@width</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">((</span><span class="nx">mlsx</span> <span class="o">+</span> <span class="nx">w</span><span class="p">)</span> <span class="o">/</span> <span class="nx">tw</span><span class="p">)</span>
+                <span class="nv">lowty = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="nx">mlsy</span> <span class="err">/ th) | 0</span>
+                <span class="nv">highty = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">@height</span><span class="p">,</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">ceil</span><span class="p">((</span><span class="nx">mlsy</span> <span class="o">+</span> <span class="nx">h</span><span class="p">)</span> <span class="o">/</span> <span class="nx">th</span><span class="p">)</span>
+                
+                <span class="nx">@drawRaw</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">lowtx</span><span class="p">,</span> <span class="nx">hightx</span><span class="p">,</span> <span class="nx">lowty</span><span class="p">,</span> <span class="nx">highty</span><span class="p">,</span>
+                    <span class="p">(.</span><span class="mi">5</span> <span class="o">+</span> <span class="nx">destx</span> <span class="o">+</span> <span class="nx">lowtx</span> <span class="o">*</span> <span class="nx">tw</span><span class="p">)</span> <span class="o">|</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="p">(.</span><span class="mi">5</span> <span class="o">+</span> <span class="nx">desty</span> <span class="o">+</span> <span class="nx">lowty</span> <span class="o">*</span> <span class="nx">th</span><span class="p">)</span> <span class="o">|</span> <span class="mi">0</span>
+                
+            <span class="nx">context</span><span class="p">.</span><span class="nx">restore</span><span class="p">()</span>
+            <span class="k">return</span>
+    
+    <span class="k">class</span> <span class="nx">ObjectLayer</span> <span class="k">extends</span> <span class="nx">Layer</span>
+        <span class="nv">constructor: </span><span class="nf">(json_data, map) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>Bitmasks are created from a comma-separated list of
+integers from 0-31. They are used to determine collision
+groups for zones and obstruction groups.</p>             </td>             <td class="code">               <div class="highlight"><pre>            <span class="nv">tryMakingBitmaskFromString = </span><span class="nf">(bitmask_str) -&gt;</span>
+                <span class="k">if</span> <span class="nx">bitmask_str</span><span class="o">?</span>
+                    <span class="k">return</span> <span class="nx">constructBitmask</span> <span class="nx">bitmask_str</span><span class="p">.</span><span class="nx">split</span> <span class="s1">&#39;,&#39;</span>
+                <span class="k">return</span> <span class="mi">0</span>
+            
+            <span class="nv">tryGettingCallbackForName = </span><span class="nf">(name) -&gt;</span>
+                <span class="k">if</span> <span class="nx">name</span><span class="o">?</span>
+                    <span class="nv">callback = </span><span class="nx">map</span><span class="p">.</span><span class="nx">script</span><span class="p">[</span><span class="nx">name</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nx">callback</span><span class="o">?</span>
+                        <span class="k">return</span> <span class="nx">callback</span>
+                    <span class="k">else</span>
+                        <span class="k">throw</span> <span class="s2">&quot;missing callback #{name}!&quot;</span>
+                <span class="k">return</span> <span class="kc">null</span>
+            
+            <span class="p">{</span><span class="nx">Point</span><span class="p">,</span> <span class="nx">Aabb</span><span class="p">,</span> <span class="nx">Polyline</span><span class="p">,</span> <span class="nx">Polygon</span><span class="p">}</span> <span class="o">=</span> <span class="nx">geometry</span>
+            <span class="p">{</span><span class="nx">Entity</span><span class="p">}</span> <span class="o">=</span> <span class="nx">entity</span>
+            <span class="p">{</span><span class="nx">constructBitmask</span><span class="p">}</span> <span class="o">=</span> <span class="nx">util</span>
+            
+            <span class="k">super</span> <span class="nx">json_data</span><span class="p">,</span> <span class="nx">map</span>
+            
+            <span class="nx">unless</span> <span class="nx">@type</span> <span class="o">is</span> <span class="s1">&#39;objectgroup&#39;</span>
+                <span class="k">throw</span> <span class="s2">&quot;can&#39;t construct ObjectLayer from #{@type} layer&quot;</span>
+            
+            <span class="nv">objects = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">objects</span>
+            <span class="vi">@entities = </span><span class="p">[]</span>
+            <span class="nv">mapents = </span><span class="nx">map</span><span class="p">.</span><span class="nx">entities</span>
+            
+            <span class="nv">l_collides = </span><span class="nx">tryMakingBitmaskFromString</span> <span class="o">\</span>
+                <span class="nx">@properties</span><span class="o">?</span><span class="p">.</span><span class="nx">collides</span>
+            <span class="nv">l_onCollide = </span><span class="nx">tryGettingCallbackForName</span> <span class="o">\</span>
+                <span class="nx">@properties</span><span class="o">?</span><span class="p">.</span><span class="nx">onCollide</span>
+            
+            <span class="nv">l_obstructs = </span><span class="nx">tryMakingBitmaskFromString</span> <span class="o">\</span>
+                <span class="nx">@properties</span><span class="o">?</span><span class="p">.</span><span class="nx">obstructs</span>
+            <span class="nv">l_onObstruct = </span><span class="nx">tryGettingCallbackForName</span> <span class="o">\</span>
+                <span class="nx">@properties</span><span class="o">?</span><span class="p">.</span><span class="nx">onObstruct</span>
+            
+            <span class="nv">setupEntityWithProperties = </span><span class="nf">(ent, object) -&gt;</span>
+                <span class="nv">ent.onStart = </span><span class="nx">tryGettingCallbackForName</span> <span class="o">\</span>
+                    <span class="nx">object</span><span class="p">.</span><span class="nx">properties</span><span class="o">?</span><span class="p">.</span><span class="nx">onStart</span>
+                </pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>Object level callbacks are preferred over layer
+level callbacks.</p>             </td>             <td class="code">               <div class="highlight"><pre>                
+                <span class="nv">obj_onCollide = </span><span class="nx">tryGettingCallbackForName</span> <span class="o">\</span>
+                    <span class="nx">object</span><span class="p">.</span><span class="nx">properties</span><span class="o">?</span><span class="p">.</span><span class="nx">onCollide</span>
+                
+                <span class="k">if</span> <span class="nx">obj_onCollide</span><span class="o">?</span>
+                    <span class="nv">ent.onCollide = </span><span class="nx">obj_onCollide</span>
+                <span class="k">else</span>
+                    <span class="nv">ent.onCollide = </span><span class="nx">l_onCollide</span>
+                
+                <span class="nv">obj_onObstruct = </span><span class="nx">tryGettingCallbackForName</span> <span class="o">\</span>
+                    <span class="nx">object</span><span class="p">.</span><span class="nx">properties</span><span class="o">?</span><span class="p">.</span><span class="nx">onObstruct</span>
+                
+                <span class="k">if</span> <span class="nx">obj_onObstruct</span><span class="o">?</span>
+                    <span class="nv">ent.onObstruct = </span><span class="nx">obj_onObstruct</span>
+                <span class="k">else</span>
+                    <span class="nv">ent.onObstruct = </span><span class="nx">l_onObstruct</span>
+                </pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>These objects are assumed not to move, so they
+may act as static obstructions/zones.</p>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nv">ent.static = </span><span class="kc">true</span>
+                </pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <p>Bitmasks from the object and layer are combined.</p>             </td>             <td class="code">               <div class="highlight"><pre>                <span class="nv">obj_collides = </span><span class="nx">tryMakingBitmaskFromString</span> <span class="o">\</span>
+                    <span class="nx">object</span><span class="p">.</span><span class="nx">properties</span><span class="o">?</span><span class="p">.</span><span class="nx">collides</span>
+                <span class="nv">ent.collides = </span><span class="nx">l_collides</span> <span class="o">|</span> <span class="nx">obj_collides</span>
+                
+                <span class="nv">obj_obstructs = </span><span class="nx">tryMakingBitmaskFromString</span> <span class="o">\</span>
+                    <span class="nx">object</span><span class="p">.</span><span class="nx">properties</span><span class="o">?</span><span class="p">.</span><span class="nx">obstructs</span>
+                <span class="nv">ent.obstructs = </span><span class="nx">l_obstructs</span> <span class="o">|</span> <span class="nx">obj_obstructs</span>
+                
+                <span class="k">return</span>
+            
+            <span class="k">for</span> <span class="nx">object</span> <span class="k">in</span> <span class="nx">objects</span>
+                <span class="nv">objx = </span><span class="nx">object</span><span class="p">.</span><span class="nx">x</span>
+                <span class="nv">objy = </span><span class="nx">object</span><span class="p">.</span><span class="nx">y</span>
+                <span class="nv">objw = </span><span class="nx">object</span><span class="p">.</span><span class="nx">width</span>
+                <span class="nv">objh = </span><span class="nx">object</span><span class="p">.</span><span class="nx">height</span>
+                
+                <span class="k">if</span> <span class="nx">object</span><span class="p">.</span><span class="nx">polygon</span><span class="o">?</span>
+                    <span class="nv">ent = </span><span class="k">new</span> <span class="nx">Entity</span> <span class="nx">objx</span><span class="p">,</span> <span class="nx">objy</span><span class="p">,</span>
+                        <span class="k">new</span> <span class="nx">Polygon</span> <span class="p">([</span><span class="nx">point</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">point</span><span class="p">.</span><span class="nx">y</span><span class="p">]</span> <span class="o">\</span>
+                            <span class="k">for</span> <span class="nx">point</span> <span class="k">in</span> <span class="nx">object</span><span class="p">.</span><span class="nx">polygon</span><span class="p">)</span>
+                <span class="k">else</span> <span class="k">if</span> <span class="nx">object</span><span class="p">.</span><span class="nx">polyline</span><span class="o">?</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <p>Polylines are modeled as multiple polygons.</p>             </td>             <td class="code">               <div class="highlight"><pre>                    <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">object</span><span class="p">.</span><span class="nx">polyline</span><span class="p">.</span><span class="nx">length</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span>
+                        <span class="nv">point_a = </span><span class="nx">object</span><span class="p">.</span><span class="nx">polyline</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+                        <span class="nv">point_b = </span><span class="nx">object</span><span class="p">.</span><span class="nx">polyline</span><span class="p">[</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                        <span class="nv">ent = </span><span class="k">new</span> <span class="nx">Entity</span> <span class="nx">objx</span><span class="p">,</span> <span class="nx">objy</span><span class="p">,</span>
+                            <span class="k">new</span> <span class="nx">Polygon</span> <span class="p">[[</span><span class="nx">point_a</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">point_a</span><span class="p">.</span><span class="nx">y</span><span class="p">],</span>
+                                <span class="p">[</span><span class="nx">point_b</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">point_b</span><span class="p">.</span><span class="nx">y</span><span class="p">]]</span>
+                        
+                        <span class="nx">setupEntityWithProperties</span> <span class="nx">ent</span><span class="p">,</span> <span class="nx">object</span>
+                        <span class="nx">@addEntity</span> <span class="nx">ent</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span> <span class="k">if</span> <span class="nx">objw</span> <span class="o">is</span> <span class="mi">0</span> <span class="o">and</span> <span class="nx">objh</span> <span class="o">is</span> <span class="mi">0</span>
+                    <span class="nv">ent = </span><span class="k">new</span> <span class="nx">Entity</span> <span class="nx">objx</span><span class="p">,</span> <span class="nx">objy</span><span class="p">,</span> <span class="k">new</span> <span class="nx">Point</span>
+                <span class="k">else</span>
+                    <span class="nv">objhwx = </span><span class="p">.</span><span class="mi">5</span> <span class="o">*</span> <span class="nx">objw</span>
+                    <span class="nv">objhwy = </span><span class="p">.</span><span class="mi">5</span> <span class="o">*</span> <span class="nx">objh</span>
+                    <span class="nv">ent = </span><span class="k">new</span> <span class="nx">Entity</span> <span class="nx">objx</span> <span class="o">+</span> <span class="nx">objhwx</span><span class="p">,</span> <span class="nx">objy</span> <span class="o">+</span> <span class="nx">objhwy</span><span class="p">,</span>
+                        <span class="k">new</span> <span class="nx">Aabb</span> <span class="p">[</span><span class="nx">objhwx</span><span class="p">,</span> <span class="nx">objhwy</span><span class="p">]</span>
+                
+                <span class="nx">setupEntityWithProperties</span> <span class="nx">ent</span><span class="p">,</span> <span class="nx">object</span>
+                <span class="nx">@addEntity</span> <span class="nx">ent</span>
+            
+            <span class="nx">@entities</span><span class="p">.</span><span class="nx">sort</span> <span class="nx">byBottomBound</span>
+            <span class="vi">@onStart = </span><span class="nx">tryGettingCallbackForName</span> <span class="nx">@properties</span><span class="o">?</span><span class="p">.</span><span class="nx">onStart</span>
+            <span class="k">return</span>
+        
+        <span class="nv">addEntity: </span><span class="nf">(ent) -&gt;</span>
+            <span class="nv">ent.layer = </span><span class="k">this</span>
+            <span class="nv">ent.map = </span><span class="nx">@map</span>
+            <span class="nx">@entities</span><span class="p">.</span><span class="nx">push</span> <span class="nx">ent</span>
+            <span class="nx">@map</span><span class="p">.</span><span class="nx">entities</span><span class="p">.</span><span class="nx">push</span> <span class="nx">ent</span>
+        
+        <span class="nv">draw: </span><span class="nf">(context, targx, targy) -&gt;</span>
+            <span class="nv">map = </span><span class="nx">@map</span>
+            <span class="nv">cam = </span><span class="nx">map</span><span class="p">.</span><span class="nx">camera</span>
+            
+            <span class="nv">xoff = </span><span class="nx">targx</span> <span class="o">-</span> <span class="nx">cam</span><span class="p">.</span><span class="nx">x</span> <span class="o">-</span> <span class="nx">@x</span> <span class="o">*</span> <span class="nx">map</span><span class="p">.</span><span class="nx">tilewidth</span>
+            <span class="nv">yoff = </span><span class="nx">targy</span> <span class="o">-</span> <span class="nx">cam</span><span class="p">.</span><span class="nx">y</span> <span class="o">-</span> <span class="nx">@y</span> <span class="o">*</span> <span class="nx">map</span><span class="p">.</span><span class="nx">tileheight</span>
+            
+            <span class="nv">ents = </span><span class="nx">@entities</span>
+            <span class="nx">util</span><span class="p">.</span><span class="nx">persistentSort</span> <span class="nx">ents</span><span class="p">,</span> <span class="nx">byBottomBound</span>
+            <span class="k">for</span> <span class="nx">ent</span> <span class="k">in</span> <span class="nx">ents</span>
+                <span class="nx">ent</span><span class="p">.</span><span class="nx">draw</span><span class="o">?</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">xoff</span><span class="p">,</span> <span class="nx">yoff</span>
+            <span class="k">return</span>
+        
+        <span class="nv">debugDraw: </span><span class="nf">(context, targx, targy) -&gt;</span>
+            <span class="nv">map = </span><span class="nx">@map</span>
+            <span class="nv">cam = </span><span class="nx">map</span><span class="p">.</span><span class="nx">camera</span>
+            <span class="nv">cambounds = </span><span class="nx">cam</span><span class="p">.</span><span class="nx">shape</span><span class="p">.</span><span class="nx">bounds_offsets</span>
+            <span class="nv">camlx = </span><span class="nx">cam</span><span class="p">.</span><span class="nx">x</span> <span class="o">+</span> <span class="nx">cambounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="nv">camly = </span><span class="nx">cam</span><span class="p">.</span><span class="nx">y</span> <span class="o">+</span> <span class="nx">cambounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="nv">w = </span><span class="nx">cambounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="nx">cambounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="nv">h = </span><span class="nx">cambounds</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="nx">cambounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="nv">destx = </span><span class="nx">targx</span> <span class="o">+</span> <span class="nx">cambounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="nv">desty = </span><span class="nx">targy</span> <span class="o">+</span> <span class="nx">cambounds</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            
+            <span class="nv">xoff = </span><span class="nx">destx</span> <span class="o">-</span> <span class="nx">camlx</span> <span class="o">-</span> <span class="nx">@x</span> <span class="o">*</span> <span class="nx">@map</span><span class="p">.</span><span class="nx">tilewidth</span>
+            <span class="nv">yoff = </span><span class="nx">desty</span> <span class="o">-</span> <span class="nx">camly</span> <span class="o">-</span> <span class="nx">@y</span> <span class="o">*</span> <span class="nx">@map</span><span class="p">.</span><span class="nx">tileheight</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
+            <span class="nx">context</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>
+            <span class="nx">context</span><span class="p">.</span><span class="nx">globalAlpha</span> <span class="o">*=</span> <span class="p">.</span><span class="mi">75</span>
+            
+            <span class="k">for</span> <span class="nx">ent</span> <span class="k">in</span> <span class="nx">@entities</span>
+                <span class="k">if</span> <span class="nx">ent</span><span class="p">.</span><span class="nx">boundsIntersects</span> <span class="nx">cam</span>
+                    <span class="nx">ent</span><span class="p">.</span><span class="nx">shapeSubpath</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">xoff</span><span class="p">,</span> <span class="nx">yoff</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">stroke</span><span class="p">()</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">restore</span><span class="p">()</span>
+            <span class="k">return</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <p>Maps are loaded from a URL containing <code>@name</code> and callbacks are
+searched for inside of the <code>@script</code> passed.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">Map: </span><span class="k">class</span>
+        <span class="nv">constructor: </span><span class="nf">(@name, @script, onload) -&gt;</span>
+            <span class="vi">@loaded = </span><span class="kc">false</span>
+            <span class="vi">@entities = </span><span class="p">[]</span>
+            <span class="nv">cb_target = </span><span class="k">this</span>
+            <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span> <span class="nx">url_prefix</span> <span class="o">+</span> <span class="nx">@name</span> <span class="o">+</span> <span class="nx">url_suffix</span><span class="p">,</span>
+                <span class="p">(</span><span class="nf">(data) -&gt;</span> <span class="nx">cb_target</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="nx">onload</span><span class="p">);</span> <span class="k">return</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="nv">load: </span><span class="nf">(json_data, onload) -&gt;</span>
+            <span class="nx">unless</span> <span class="nx">json_data</span><span class="p">.</span><span class="nx">orientation</span> <span class="o">is</span> <span class="s1">&#39;orthogonal&#39;</span>
+                <span class="k">throw</span> <span class="s2">&quot;orientation #{orientation} not supported&quot;</span>
+            
+            <span class="vi">@width = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">width</span>
+            <span class="vi">@height = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">height</span>
+            <span class="vi">@tilewidth = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">tilewidth</span>
+            <span class="vi">@tileheight = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">tileheight</span>
+            <span class="vi">@orientation = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">orientation</span>
+            <span class="vi">@properties = </span><span class="nx">json_data</span><span class="p">.</span><span class="nx">properties</span>
+            
+            <span class="nv">map = </span><span class="k">this</span>
+            
+            <span class="nv">createLayer = </span><span class="nf">(data) -&gt;</span>
+                <span class="p">{</span><span class="nx">type</span><span class="p">}</span> <span class="o">=</span> <span class="nx">data</span>
+                <span class="k">if</span> <span class="nx">type</span> <span class="o">is</span> <span class="s1">&#39;tilelayer&#39;</span>
+                    <span class="k">new</span> <span class="nx">TileLayer</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">map</span>
+                <span class="k">else</span> <span class="k">if</span> <span class="nx">type</span> <span class="o">is</span> <span class="s1">&#39;objectgroup&#39;</span>
+                    <span class="k">new</span> <span class="nx">ObjectLayer</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">map</span>
+                <span class="k">else</span>
+                    <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span> <span class="s2">&quot;unknown layer type #{type} requested&quot;</span>
+                    <span class="k">new</span> <span class="nx">Layer</span> <span class="nx">data</span><span class="p">,</span> <span class="nx">map</span>
+            
+            <span class="vi">@layers = </span><span class="p">(</span><span class="nx">createLayer</span> <span class="nx">l</span> <span class="k">for</span> <span class="nx">l</span> <span class="k">in</span> <span class="nx">json_data</span><span class="p">.</span><span class="nx">layers</span><span class="p">)</span>
+            
+            <span class="p">{</span><span class="nx">tilesets</span><span class="p">}</span> <span class="o">=</span> <span class="nx">json_data</span>
+            <span class="nv">tileset_load_total = </span><span class="nx">tilesets</span><span class="p">.</span><span class="nx">length</span>
+            <span class="nv">tileset_load_count = </span><span class="mi">0</span>
+            <span class="nv">ts_load_cb = </span><span class="o">-&gt;</span>
+                <span class="k">if</span> <span class="o">++</span><span class="nx">tileset_load_count</span> <span class="o">&gt;=</span> <span class="nx">tileset_load_total</span>
+                    <span class="nx">map</span><span class="p">.</span><span class="nx">buildLayerCaches</span><span class="p">()</span> <span class="k">if</span> <span class="nx">layers_cached</span>
+                    <span class="nv">map.loaded = </span><span class="kc">true</span>
+                    <span class="nx">onload</span><span class="o">?</span><span class="p">()</span>
+                <span class="k">return</span>
+            
+            <span class="vi">@tilesets = </span><span class="p">(</span><span class="k">new</span> <span class="nx">TileSet</span> <span class="nx">ts</span><span class="p">,</span> <span class="nx">ts_load_cb</span> <span class="k">for</span> <span class="nx">ts</span> <span class="k">in</span> <span class="nx">tilesets</span><span class="p">)</span>
+            
+            <span class="nx">@entities</span><span class="p">.</span><span class="nx">sort</span> <span class="nx">byLeftBound</span>
+            <span class="k">return</span>
+        
+        <span class="nv">buildLayerCaches: </span><span class="o">-&gt;</span>
+            <span class="k">for</span> <span class="nx">layer</span> <span class="k">in</span> <span class="nx">@layers</span> <span class="k">when</span> <span class="nx">layer</span><span class="p">.</span><span class="nx">type</span> <span class="o">is</span> <span class="s1">&#39;tilelayer&#39;</span>
+                <span class="nx">layer</span><span class="p">.</span><span class="nx">buildCache</span><span class="p">()</span>
+            <span class="k">return</span>
+        
+        <span class="nv">drawTile: </span><span class="nf">(context, gid, flip_h, flip_v, flip_d, x, y) -&gt;</span>
+            <span class="k">for</span> <span class="nx">tileset</span> <span class="k">in</span> <span class="nx">@tilesets</span>
+                <span class="k">if</span> <span class="nx">tileset</span><span class="p">.</span><span class="nx">hasGID</span> <span class="nx">gid</span>
+                    <span class="nx">tileset</span><span class="p">.</span><span class="nx">drawTile</span> <span class="nx">context</span><span class="p">,</span>
+                        <span class="nx">gid</span><span class="p">,</span> <span class="nx">flip_h</span><span class="p">,</span> <span class="nx">flip_v</span><span class="p">,</span> <span class="nx">flip_d</span><span class="p">,</span> <span class="nx">x</span><span class="p">,</span> <span class="nx">y</span>
+                    <span class="k">break</span>
+            <span class="k">return</span>
+        
+        <span class="nv">doCollisions: </span><span class="o">-&gt;</span>
+            <span class="nv">ents = </span><span class="nx">@entities</span>
+            <span class="nx">util</span><span class="p">.</span><span class="nx">persistentSort</span> <span class="nx">ents</span><span class="p">,</span> <span class="nx">byLeftBound</span>
+            <span class="nv">j = </span><span class="mi">0</span>
+            <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">...</span><span class="nx">ents</span><span class="p">.</span><span class="nx">length</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span>
+                <span class="nv">enti = </span><span class="nx">@entities</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+                
+                <span class="k">while</span> <span class="nx">j</span> <span class="o">&lt;</span> <span class="nx">i</span> <span class="o">and</span>
+                  <span class="nx">ents</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">x</span> <span class="o">+</span> <span class="nx">ents</span><span class="p">[</span><span class="nx">j</span><span class="p">].</span><span class="nx">shape</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span>
+                  <span class="nx">enti</span><span class="p">.</span><span class="nx">x</span> <span class="o">+</span> <span class="nx">enti</span><span class="p">.</span><span class="nx">shape</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="o">++</span><span class="nx">j</span>
+                
+                <span class="k">for</span> <span class="nx">k</span> <span class="k">in</span> <span class="p">[</span><span class="nx">j</span><span class="p">...</span><span class="nx">i</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span>
+                    <span class="nx">@doCollision</span> <span class="nx">enti</span><span class="p">,</span> <span class="nx">@entities</span><span class="p">[</span><span class="nx">k</span><span class="p">]</span>
+            
+            <span class="k">return</span>
+        
+        <span class="nv">doCollision: </span><span class="nf">(ent_a, ent_b) -&gt;</span>
+            <span class="k">return</span> <span class="k">if</span> <span class="nx">ent_a</span><span class="p">.</span><span class="nx">static</span> <span class="o">and</span> <span class="nx">ent_b</span><span class="p">.</span><span class="nx">static</span>
+            
+            <span class="nv">can_collide = </span><span class="p">(</span><span class="nx">ent_a</span><span class="p">.</span><span class="nx">collides</span> <span class="o">&amp;</span> <span class="nx">ent_b</span><span class="p">.</span><span class="nx">collides</span><span class="p">)</span>
+            <span class="nv">can_obstruct = </span><span class="p">(</span><span class="nx">ent_a</span><span class="p">.</span><span class="nx">obstructs</span> <span class="o">&amp;</span> <span class="nx">ent_b</span><span class="p">.</span><span class="nx">obstructs</span><span class="p">)</span>
+            
+            <span class="k">return</span> <span class="nx">unless</span> <span class="nx">can_collide</span> <span class="o">or</span> <span class="nx">can_obstruct</span>
+            
+            <span class="nv">collision_info = </span><span class="nx">ent_a</span><span class="p">.</span><span class="nx">intersects</span> <span class="nx">ent_b</span>
+            
+            <span class="k">if</span> <span class="nx">collision_info</span>
+                <span class="p">[</span><span class="nx">pen_amt</span><span class="p">,</span> <span class="nx">pen_dir</span><span class="p">]</span> <span class="o">=</span> <span class="nx">collision_info</span>
+                
+                <span class="nv">neg_collision_info = </span>
+                    <span class="p">[</span><span class="nx">pen_amt</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="nx">pen_dir</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="nx">pen_dir</span><span class="p">[</span><span class="mi">1</span><span class="p">]]]</span>
+                
+                <span class="nx">ent_a</span><span class="p">.</span><span class="nx">onCollide</span><span class="o">?</span> <span class="nx">ent_b</span><span class="p">,</span> <span class="nx">collision_info</span>
+                <span class="nx">ent_b</span><span class="p">.</span><span class="nx">onCollide</span><span class="o">?</span> <span class="nx">ent_a</span><span class="p">,</span> <span class="nx">neg_collision_info</span>
+                
+                <span class="k">if</span> <span class="nx">can_obstruct</span>
+                    <span class="nv">proj_x = </span><span class="nx">pen_amt</span> <span class="o">*</span> <span class="nx">pen_dir</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="nv">proj_y = </span><span class="nx">pen_amt</span> <span class="o">*</span> <span class="nx">pen_dir</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nx">ent_a</span><span class="p">.</span><span class="nx">static</span>
+                        <span class="nx">ent_b</span><span class="p">.</span><span class="nx">x</span> <span class="o">+=</span> <span class="nx">proj_x</span>
+                        <span class="nx">ent_b</span><span class="p">.</span><span class="nx">y</span> <span class="o">+=</span> <span class="nx">proj_y</span>
+                    <span class="k">else</span> <span class="k">if</span> <span class="nx">ent_b</span><span class="p">.</span><span class="nx">static</span>
+                        <span class="nx">ent_a</span><span class="p">.</span><span class="nx">x</span> <span class="o">-=</span> <span class="nx">proj_x</span>
+                        <span class="nx">ent_a</span><span class="p">.</span><span class="nx">y</span> <span class="o">-=</span> <span class="nx">proj_y</span>
+                    <span class="k">else</span></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <p>For now, splits the resolution 50-50 between
+dynamic objects.</p>             </td>             <td class="code">               <div class="highlight"><pre>                        <span class="nv">rat = </span><span class="p">.</span><span class="mi">5</span>
+                        <span class="nv">notrat = </span><span class="mi">1</span> <span class="o">-</span> <span class="nx">rat</span>
+                        
+                        <span class="nx">ent_a</span><span class="p">.</span><span class="nx">x</span> <span class="o">-=</span> <span class="nx">rat</span> <span class="o">*</span> <span class="nx">proj_x</span>
+                        <span class="nx">ent_a</span><span class="p">.</span><span class="nx">y</span> <span class="o">-=</span> <span class="nx">rat</span> <span class="o">*</span> <span class="nx">proj_y</span>
+                        <span class="nx">ent_b</span><span class="p">.</span><span class="nx">x</span> <span class="o">+=</span> <span class="nx">notrat</span> <span class="o">*</span> <span class="nx">proj_x</span>
+                        <span class="nx">ent_b</span><span class="p">.</span><span class="nx">y</span> <span class="o">+=</span> <span class="nx">notrat</span> <span class="o">*</span> <span class="nx">proj_y</span>
+                    
+                    <span class="nx">ent_a</span><span class="p">.</span><span class="nx">onObstruct</span><span class="o">?</span> <span class="nx">ent_b</span><span class="p">,</span> <span class="nx">collision_info</span>
+                    <span class="nx">ent_b</span><span class="p">.</span><span class="nx">onObstruct</span><span class="o">?</span> <span class="nx">ent_a</span><span class="p">,</span> <span class="nx">neg_collision_info</span>
+            <span class="k">return</span>
+        
+        <span class="nv">start: </span><span class="o">-&gt;</span>
+            <span class="k">for</span> <span class="nx">layer</span> <span class="k">in</span> <span class="nx">@layers</span>
+                <span class="nx">layer</span><span class="p">.</span><span class="nx">onStart</span><span class="o">?</span> <span class="nx">layer</span>
+            <span class="k">for</span> <span class="nx">ent</span> <span class="k">in</span> <span class="nx">@entities</span>
+                <span class="nx">ent</span><span class="p">.</span><span class="nx">onStart</span><span class="o">?</span> <span class="nx">ent</span>
+            <span class="k">return</span>
+        
+        <span class="nv">update: </span><span class="nf">(dt) -&gt;</span>
+            <span class="k">for</span> <span class="nx">ent</span> <span class="k">in</span> <span class="nx">@entities</span>
+                <span class="nx">ent</span><span class="p">.</span><span class="nx">update</span><span class="o">?</span> <span class="nx">dt</span>
+            <span class="nx">@doCollisions</span><span class="p">()</span>
+            <span class="k">return</span>
+        
+        <span class="nv">draw: </span><span class="nf">(context, targx, targy) -&gt;</span>
+            <span class="k">for</span> <span class="nx">layer</span> <span class="k">in</span> <span class="nx">@layers</span>
+                <span class="nx">layer</span><span class="p">.</span><span class="nx">draw</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">targx</span><span class="p">,</span> <span class="nx">targy</span>
+            <span class="k">return</span>
+        
+        <span class="nv">debugDraw: </span><span class="nf">(context, targx, targy) -&gt;</span>
+            <span class="nv">cam = </span><span class="nx">@camera</span>
+            <span class="nv">xoff = </span><span class="nx">targx</span> <span class="o">-</span> <span class="nx">cam</span><span class="p">.</span><span class="nx">x</span>
+            <span class="nv">yoff = </span><span class="nx">targy</span> <span class="o">-</span> <span class="nx">cam</span><span class="p">.</span><span class="nx">y</span>
+            
+            <span class="nv">found_first = </span><span class="kc">false</span>
+            <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">@entities</span><span class="p">.</span><span class="nx">length</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span>
+                <span class="nv">ent = </span><span class="nx">@entities</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nx">ent</span><span class="p">.</span><span class="nx">boundsIntersects</span> <span class="nx">cam</span>
+                    <span class="nx">ent</span><span class="p">.</span><span class="nx">shapeSubpath</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">xoff</span><span class="p">,</span> <span class="nx">yoff</span>
+                    <span class="nv">found_first = </span><span class="kc">true</span>
+                <span class="k">else</span> <span class="k">if</span> <span class="nx">found_first</span> <span class="o">and</span> <span class="nx">cam</span><span class="p">.</span><span class="nx">boundsLeftOf</span> <span class="nx">ent</span>
+                    <span class="k">break</span>
+            
+            <span class="k">for</span> <span class="nx">layer</span> <span class="k">in</span> <span class="nx">@layers</span> <span class="k">when</span> <span class="nx">layer</span><span class="p">.</span><span class="nx">type</span> <span class="o">is</span> <span class="s1">&#39;objectgroup&#39;</span>
+                <span class="nx">layer</span><span class="p">.</span><span class="nx">debugDraw</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">targx</span><span class="p">,</span> <span class="nx">targy</span>
+            
+            <span class="k">return</span>
+    </pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>               <p>A scene for running a map.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">MapScene: </span><span class="k">class</span>
+        <span class="nv">constructor: </span><span class="nf">(@map) -&gt;</span>
+        
+        <span class="nv">start: </span><span class="o">-&gt;</span>
+            <span class="k">throw</span> <span class="s2">&quot;#{@map.name} not loaded!&quot;</span> <span class="nx">unless</span> <span class="nx">@map</span><span class="p">.</span><span class="nx">loaded</span>
+            <span class="p">{</span><span class="nx">Entity</span><span class="p">}</span> <span class="o">=</span> <span class="nx">entity</span>
+            <span class="p">{</span><span class="nx">Aabb</span><span class="p">}</span> <span class="o">=</span> <span class="nx">geometry</span>
+            </pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>               <p>Camera is initially positioned at the origin.</p>             </td>             <td class="code">               <div class="highlight"><pre>            <span class="vi">@map.camera = </span><span class="k">new</span> <span class="nx">Entity</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="k">new</span> <span class="nx">Aabb</span> <span class="p">[.</span><span class="mi">5</span> <span class="o">*</span> <span class="nx">game</span><span class="p">.</span><span class="nx">width</span><span class="p">(),</span> <span class="p">.</span><span class="mi">5</span> <span class="o">*</span> <span class="nx">game</span><span class="p">.</span><span class="nx">height</span><span class="p">()]</span>
+            
+            <span class="nx">@map</span><span class="p">.</span><span class="nx">entities</span><span class="p">.</span><span class="nx">push</span> <span class="nx">@map</span><span class="p">.</span><span class="nx">camera</span>
+            
+            <span class="nx">@map</span><span class="p">.</span><span class="nx">start</span><span class="p">()</span>
+            
+            <span class="k">return</span>
+        
+        <span class="nv">end: </span><span class="o">-&gt;</span>
+        
+        <span class="nv">update: </span><span class="nf">(dt) -&gt;</span>
+            <span class="nx">@map</span><span class="p">.</span><span class="nx">update</span> <span class="nx">dt</span>
+            <span class="k">return</span>
+        
+        <span class="nv">draw: </span><span class="nf">(context) -&gt;</span>
+            <span class="nv">gw = </span><span class="nx">game</span><span class="p">.</span><span class="nx">width</span><span class="p">()</span>
+            <span class="nv">gh = </span><span class="nx">game</span><span class="p">.</span><span class="nx">height</span><span class="p">()</span>
+            <span class="nv">hgw = </span><span class="p">.</span><span class="mi">5</span> <span class="o">*</span> <span class="nx">gw</span>
+            <span class="nv">hgh = </span><span class="p">.</span><span class="mi">5</span> <span class="o">*</span> <span class="nx">gh</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">clearRect</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">gw</span><span class="p">,</span> <span class="nx">gh</span>
+            <span class="nx">context</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>
+            
+            <span class="nx">@map</span><span class="p">.</span><span class="nx">draw</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">hgw</span><span class="p">,</span> <span class="nx">hgh</span>
+            <span class="nx">@map</span><span class="p">.</span><span class="nx">debugDraw</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">hgw</span><span class="p">,</span> <span class="nx">hgh</span>
+            
+            <span class="k">return</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

@@ -1,0 +1,112 @@
+<!DOCTYPE html>  <html> <head>   <title>test.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="audio.html">                 audio.coffee               </a>                                           <a class="source" href="entity.html">                 entity.coffee               </a>                                           <a class="source" href="game.html">                 game.coffee               </a>                                           <a class="source" href="geometry.html">                 geometry.coffee               </a>                                           <a class="source" href="input.html">                 input.coffee               </a>                                           <a class="source" href="loader.html">                 loader.coffee               </a>                                           <a class="source" href="main.html">                 main.coffee               </a>                                           <a class="source" href="map.html">                 map.coffee               </a>                                           <a class="source" href="physics.html">                 physics.coffee               </a>                                           <a class="source" href="sprite.html">                 sprite.coffee               </a>                                           <a class="source" href="test.html">                 test.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               test.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="p">[</span><span class="s1">&#39;./util&#39;</span><span class="p">,</span> <span class="s1">&#39;./input&#39;</span><span class="p">,</span> <span class="s1">&#39;./game&#39;</span><span class="p">,</span> <span class="s1">&#39;./geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;./entity&#39;</span><span class="p">,</span> <span class="s1">&#39;./physics&#39;</span><span class="p">],</span>
+  <span class="nf">(util, input, game, geometry, entity, physics) -&gt;</span>
+    <span class="nv">test_sprite = </span><span class="kc">null</span>
+    <span class="nv">test_sound = </span><span class="kc">null</span>
+    
+    <span class="nv">handleLayerObs = </span><span class="nf">(other, info) -&gt;</span>
+        <span class="k">return</span>
+    
+    <span class="nv">setTestSprite: </span><span class="nf">(sprite) -&gt;</span>
+        <span class="nv">test_sprite = </span><span class="nx">sprite</span>
+        <span class="k">return</span>
+    
+    <span class="nv">setTestSound: </span><span class="nf">(sound) -&gt;</span>
+        <span class="nv">test_sound = </span><span class="nx">sound</span>
+        <span class="k">return</span>
+    
+    <span class="nv">handlePlayerStart: </span><span class="nf">(player) -&gt;</span>
+        <span class="p">{</span><span class="nx">Entity</span><span class="p">}</span> <span class="o">=</span> <span class="nx">entity</span>
+        <span class="p">{</span><span class="nx">Aabb</span><span class="p">,</span> <span class="nx">dotProduct</span><span class="p">}</span> <span class="o">=</span> <span class="nx">geometry</span>
+        <span class="p">{</span><span class="nx">constructBitmask</span><span class="p">}</span> <span class="o">=</span> <span class="nx">util</span>
+        
+        <span class="nv">testPlayer = </span><span class="k">new</span> <span class="nx">Entity</span> <span class="nx">player</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">player</span><span class="p">.</span><span class="nx">y</span><span class="p">,</span>
+            <span class="k">new</span> <span class="nx">Aabb</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+        
+        <span class="nv">testPlayer.obstructs = </span><span class="nx">constructBitmask</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="nv">testPlayer.collides = </span><span class="nx">constructBitmask</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="nv">testPlayer.damping = </span><span class="p">.</span><span class="mi">99</span>
+        
+        <span class="nv">testPlayer.last_x = </span><span class="nx">testPlayer</span><span class="p">.</span><span class="nx">x</span>
+        <span class="nv">testPlayer.last_y = </span><span class="nx">testPlayer</span><span class="p">.</span><span class="nx">y</span>
+        
+        <span class="nv">testPlayer.update = </span><span class="nf">(dt) -&gt;</span>
+            <span class="nv">accel = </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            
+            <span class="k">if</span> <span class="nx">@grounded</span>
+                <span class="k">if</span> <span class="nx">input</span><span class="p">.</span><span class="nx">jump</span><span class="p">.</span><span class="nx">pressed</span>
+                    <span class="vi">@damping = </span><span class="p">.</span><span class="mi">995</span>
+                    <span class="nv">h_accel = </span><span class="mi">100</span>
+                    
+                    <span class="nv">v = </span><span class="nx">physics</span><span class="p">.</span><span class="nx">getVelocity</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">dt</span><span class="p">)</span>
+                    <span class="nx">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">200</span>
+                    <span class="nx">physics</span><span class="p">.</span><span class="nx">setVelocity</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">v</span><span class="p">,</span> <span class="nx">dt</span><span class="p">)</span>
+                    
+                    <span class="vi">@grounded = </span><span class="kc">false</span>
+                    
+                    <span class="nx">test_sound</span><span class="p">.</span><span class="nx">play</span><span class="p">()</span>
+                <span class="k">else</span>
+                    <span class="vi">@damping = </span><span class="p">.</span><span class="mi">5</span>
+                    <span class="nv">h_accel = </span><span class="mi">2000</span>
+            <span class="k">else</span>
+                <span class="k">if</span> <span class="nx">@last_y</span> <span class="o">&gt;</span> <span class="nx">@y</span> <span class="o">and</span> <span class="nx">input</span><span class="p">.</span><span class="nx">jump</span><span class="p">.</span><span class="nx">released</span>
+                    <span class="vi">@last_y = </span><span class="p">.</span><span class="mi">5</span> <span class="o">*</span> <span class="p">(</span><span class="nx">@last_y</span> <span class="o">-</span> <span class="nx">@y</span><span class="p">)</span> <span class="o">+</span> <span class="nx">@y</span>
+                <span class="vi">@damping = </span><span class="p">.</span><span class="mi">995</span>
+                <span class="nv">h_accel = </span><span class="mi">100</span>
+            
+            <span class="k">if</span> <span class="nx">input</span><span class="p">.</span><span class="nx">left</span><span class="p">.</span><span class="nx">state</span>
+                <span class="nx">accel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <span class="nx">h_accel</span>
+            <span class="k">if</span> <span class="nx">input</span><span class="p">.</span><span class="nx">right</span><span class="p">.</span><span class="nx">state</span>
+                <span class="nx">accel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="nx">h_accel</span>
+            
+            <span class="k">if</span> <span class="nx">@grounded</span> <span class="o">and</span>
+              <span class="p">(</span><span class="nx">dotProduct</span> <span class="nx">@ground_normal</span><span class="p">,</span> <span class="nx">accel</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span>
+                <span class="nx">accel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="nx">accel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nx">@ground_normal</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span>
+                    <span class="nx">@ground_normal</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            
+            <span class="k">if</span> <span class="o">not</span> <span class="nx">@grounded</span> <span class="o">or</span> <span class="nx">accel</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">isnt</span> <span class="mi">0</span> <span class="o">or</span>
+              <span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">@last_x</span> <span class="o">-</span> <span class="nx">@x</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">1</span>
+                <span class="nx">accel</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">400</span>
+                <span class="vi">@grounded = </span><span class="kc">false</span>
+            
+            <span class="vi">@acceleration = </span><span class="nx">accel</span>
+            <span class="nx">physics</span><span class="p">.</span><span class="nx">integrate</span> <span class="k">this</span><span class="p">,</span> <span class="nx">dt</span>
+            <span class="k">return</span>
+        
+        <span class="nv">testPlayer.onObstruct = </span><span class="nf">(other, info) -&gt;</span>
+            <span class="nv">normal = </span><span class="nx">info</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nx">normal</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span> <span class="nx">normal</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="vi">@grounded = </span><span class="kc">true</span>
+                <span class="vi">@ground_normal = </span><span class="nx">normal</span>
+            <span class="k">return</span>
+        
+        <span class="nx">test_sprite</span><span class="p">.</span><span class="nx">startAnimation</span> <span class="s1">&#39;walk&#39;</span>
+        <span class="nv">testPlayer.sprite = </span><span class="nx">test_sprite</span>
+        
+        <span class="nv">testPlayer.draw = </span><span class="nf">(context, xoff, yoff) -&gt;</span>
+            <span class="nx">@sprite</span><span class="p">.</span><span class="nx">draw</span><span class="p">(</span><span class="nx">context</span><span class="p">,</span> <span class="nx">@x</span> <span class="o">+</span> <span class="nx">xoff</span><span class="p">,</span> <span class="nx">@y</span> <span class="o">+</span> <span class="nx">yoff</span><span class="p">,</span> <span class="kc">true</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="nx">player</span><span class="p">.</span><span class="nx">layer</span><span class="p">.</span><span class="nx">addEntity</span> <span class="nx">testPlayer</span>
+        <span class="nv">player.map.camera.update = </span><span class="nf">(dt) -&gt;</span>
+            <span class="vi">@x = </span><span class="nx">testPlayer</span><span class="p">.</span><span class="nx">x</span>
+            <span class="vi">@y = </span><span class="nx">testPlayer</span><span class="p">.</span><span class="nx">y</span>
+            <span class="k">return</span>
+        <span class="k">return</span>
+    
+    <span class="nv">handleLayerObs: </span><span class="nx">handleLayerObs</span>
+    
+    <span class="nv">handleObs1: </span><span class="nf">(other, info) -&gt;</span>
+        <span class="nx">handleLayerObs</span> <span class="nx">other</span><span class="p">,</span> <span class="nx">info</span>
+        <span class="k">return</span>
+    
+    <span class="nv">handleZoneCollide: </span><span class="nf">(other, info) -&gt;</span>
+        <span class="k">return</span>
+    
+    <span class="nv">handleZone1Collide: </span><span class="nf">(other, info) -&gt;</span>
+        <span class="k">return</span>
+    
+    <span class="nv">handleLayerStart: </span><span class="nf">(layer) -&gt;</span>
+        <span class="k">return</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
