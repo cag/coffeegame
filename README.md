@@ -88,7 +88,7 @@ Open up a terminal instance and type:
 
 `cake` will first do a CoffeeScript compile of `src`, and then it will
 run `r.js` to optimize `js/main.js` (which is compiled from
-`src/main.coffee`). This will be put into and Uglified `game.js` file,
+`src/main.coffee`). This will be put into an Uglified `game.js` file,
 which you can then test using the [index](http://localhost:8000/) page.
 
 Then put on your web server your assets (images, sounds, and sprite and
