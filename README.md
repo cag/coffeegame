@@ -111,7 +111,7 @@ Windows
 
 Unfortunately, `cake` doesn't seem to work well on Windows. Open
 `watch.sh` for `cake watch` and `build.sh` for `cake build` instead.
-You will need to have git installed so that the scripts open up in a
+You will need to have git installed so that the scripts open up in
 git's `sh` type emulator.
 
 Audio
