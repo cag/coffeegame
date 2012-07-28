@@ -35,10 +35,10 @@ Now check the *Common* section.
 
 ### Common
 
-Theoretically this should work for Windows and Mac as well once node.js
-is installed. I've only tested this on Ubuntu so far.
+Theoretically this should work for Mac as well once node.js is
+installed. I've only tested this on Windows and Ubuntu so far.
 
-Open up your handy terminal and
+Open up your handy console or terminal and
 [install CoffeeScript](http://coffeescript.org/#installation):
 
     npm install -g coffee-script
