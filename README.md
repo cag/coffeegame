@@ -25,7 +25,7 @@ also want to have [git](http://git-scm.com/downloads/) installed.
 ### Ubuntu
 
 node.js is available with the `nodejs` package. Install it using the
-package manager of your source.
+package manager of your choice.
 
 If you want to generate documentation as you develop, you will want to
 grab Pygments via the `python-pygments` package, assuming you're
