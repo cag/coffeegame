@@ -11,8 +11,16 @@ Setup
 [jQuery](http://jquery.com/),
 [RequireJS](http://requirejs.org/),
 [Tiled](http://www.mapeditor.org/), and optionally
-[Python](http://python.org/) and
+[Python 2.x](http://python.org/) and
 [Docco](http://jashkenas.github.com/docco/).
+
+Python 3 unfortunately does not seem to support Pygments at the moment
+so using Docco relies on having a recent version of Python 2.x.
+
+### Windows
+
+Install node.js from the node.js website using the installer. You will
+also want to have [git](http://git-scm.com/downloads/) installed.
 
 ### Ubuntu
 
@@ -20,8 +28,8 @@ node.js is available with the `nodejs` package. Install it using the
 package manager of your source.
 
 If you want to generate documentation as you develop, you will want to
-grab Pygments via the `python-pygments` or `python3-pygments` package,
-depending on which version of Python you're running.
+grab Pygments via the `python-pygments` package, assuming you're
+running Python 2.x.
 
 Now check the *Common* section.
 
@@ -61,6 +69,10 @@ this one liner:
 
     python -m SimpleHTTPServer
 
+For Python 3, use:
+
+    python -m http.server
+
 Python will start serving files from that directory to localhost
 port:8000.
 
@@ -93,6 +105,14 @@ which you can then test using the [index](http://localhost:8000/) page.
 
 Then put on your web server your assets (images, sounds, and sprite and
 map JSONs), `index.html`, `game.js`, and `require.js`.
+
+Windows
+-------
+
+Unfortunately, `cake` doesn't seem to work well on Windows. Open
+`watch.sh` for `cake watch` and `build.sh` for `cake build` instead.
+You will need to have git installed so that the scripts open up in a
+git's `sh` type emulator.
 
 Audio
 -----
