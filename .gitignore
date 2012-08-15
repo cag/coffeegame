@@ -1,0 +1,4 @@
+# ignore JavaScript files compiled from CoffeeScript
+js/*.js
+game.js
+

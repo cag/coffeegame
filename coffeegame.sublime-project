@@ -1,0 +1,10 @@
+{
+	"folders":
+	[
+		{
+			"path": "/home/alan/code/coffeescript/coffeegame",
+            "folder_exclude_patterns": ["docs", "js"],
+            "file_exclude_patterns": ["require.js", "*.png", "*.ogg", "*.tmx", "*.sublime-workspace"]
+		}
+	]
+}

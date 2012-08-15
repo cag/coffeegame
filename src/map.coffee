@@ -1,14 +1,15 @@
 define ['jquery', './game', './entity', './geometry', './util'],
   ($, game, entity, geometry, util) ->
+    # A prefix and suffix applied to names passed into map constructors
+    # so that it loads from the right place.
+    url_prefix = 'assets/'
+    url_suffix = '.json'
+    
     # If `layers_cached` is true, then tiles will be cached in blocks
     # of `layer_cache_factor` square and the blocks will be drawn
     # instead of tiles.
     layers_cached = true
     layer_cache_factor = 16
-    
-    # Change this to load maps from elsewhere.
-    url_prefix = 'maps/'
-    url_suffix = '.json'
     
     # Comparison helper functions for sorting entities.
     byLeftBound = (ent_a, ent_b) ->
@@ -546,6 +547,7 @@ define ['jquery', './game', './entity', './geometry', './util'],
             for ent in @entities
                 ent.update? dt
             @doCollisions()
+            @camera.post_update? dt
             return
         
         draw: (context, targx, targy) ->
@@ -575,6 +577,7 @@ define ['jquery', './game', './entity', './geometry', './util'],
     # A scene for running a map.
     MapScene: class
         constructor: (@map) ->
+            return
         
         start: ->
             throw "#{@map.name} not loaded!" unless @map.loaded
@@ -588,7 +591,6 @@ define ['jquery', './game', './entity', './geometry', './util'],
             @map.entities.push @map.camera
             
             @map.start()
-            
             return
         
         end: ->
@@ -607,7 +609,7 @@ define ['jquery', './game', './entity', './geometry', './util'],
             context.beginPath()
             
             @map.draw context, hgw, hgh
-            @map.debugDraw context, hgw, hgh
+            #@map.debugDraw context, hgw, hgh
             
             return
 

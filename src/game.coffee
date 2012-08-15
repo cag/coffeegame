@@ -6,10 +6,10 @@ define ['./util', './input', './audio'], (util, input, audio) ->
     
     current_scene = null
     
-    # The last frame's delta time is cached in case variable-time
-    # updating is used so the time-corrected Verlet integration works.
+    # Stores the last delta time
     last_dt = null
-    inv_last_dt = null
+    
+    # If delta time is fixed, this is set
     fixed_dt = null
     
     # A clamp is placed on delta time so tunneling may be avoided with
@@ -26,22 +26,26 @@ define ['./util', './input', './audio'], (util, input, audio) ->
         input.handleKeyUp event.keyCode
         return
     
-    # Input state is resolved before each update call on the scene.
+    # Update call.
     update = (dt) ->
         input.update()
         current_scene.update dt
         return
     
+    # Draw call.
     draw = ->
         current_scene.draw context
         return
+    
+    # Canvas instance.
+    canvas: -> canvas
     
     # Canvas dimensions.
     width: -> canvas_w
     height: -> canvas_h
     
+    # Last delta time.
     lastDt: -> last_dt
-    invLastDt: -> inv_last_dt
     
     # Switch scene to new scene.
     switchScene: (new_scene) ->
@@ -60,31 +64,30 @@ define ['./util', './input', './audio'], (util, input, audio) ->
         
         if fdt?
             fixed_dt = fdt
-            last_dt = fixed_dt
-            inv_last_dt = 1 / fixed_dt
+            last_dt = fdt
         else if dtc?
             dt_clamp = dtc
-            last_dt = dt_clamp
-            inv_last_dt = 1 / dt_clamp
+            last_dt = dtc
         else
             last_dt = 1 / 60
-            inv_last_dt = 60
         
+        container = (document.getElementById 'game') or document.body
         canvas = document.createElement 'canvas'
+        
         canvas.width = canvas_w = width
         canvas.height = canvas_h = height
-        canvas.tabIndex = 1
+        
+        container.appendChild canvas
         
         context = canvas.getContext '2d'
         
-        document.body.appendChild canvas
-        
-        canvas.focus()
+        container.tabIndex = 0
+        container.focus()
         
         input.init()
         
-        canvas.addEventListener 'keydown', handleKeyDown, false
-        canvas.addEventListener 'keyup', handleKeyUp, false
+        container.addEventListener 'keydown', handleKeyDown, false
+        container.addEventListener 'keyup', handleKeyUp, false
         
         audio.init()
         return
@@ -115,10 +118,8 @@ define ['./util', './input', './audio'], (util, input, audio) ->
             else
                 update dt
                 last_dt = dt
-                inv_last_dt = 1 / dt
             draw()
         
         current_scene.start()
         gameLoop()
         return
-

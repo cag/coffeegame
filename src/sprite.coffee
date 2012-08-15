@@ -1,26 +1,32 @@
-define ['jquery', './util'], ($, util) ->
+define ['jquery'], ($) ->
     # Similar to the map module, sprites are loaded via JSON from
-    # a directory with a name.
-    url_prefix = 'sprites/'
+    # a url constructed from @name.
+    url_prefix = 'assets/'
     url_suffix = '.json'
     
     Sprite: class
         constructor: (@name, onload) ->
             @loaded = false
             cb_target = this
-            $.getJSON url_prefix + @name + url_suffix,
-                ((data) -> cb_target.load(data, onload); return)
+            $.getJSON url_prefix + @name + url_suffix, (data) ->
+                try
+                    cb_target.load(data, onload)
+                catch e
+                    throw 'could not load sprite ' +
+                        url_prefix + cb_target.name + url_suffix
+                return
             return
         
         # The sprite JSON format is as follows:
         #
         #     {
         #       "spritesheet": FILENAME,
+        #       "offset": [SOFFX, SOFFY],
         #       "frames": [
         #         {
         #           "pos": [X, Y],
         #           "size": [W, H],
-        #           "offset": [OFFX, OFFY]
+        #           "offset": [FOFFX, FOFFY]
         #         },
         #         ...
         #       ],
@@ -34,9 +40,10 @@ define ['jquery', './util'], ($, util) ->
         #     }
         #
         # Note: `FILENAME` is a string containing the name of the
-        # image to be used as the spritesheet, `[X, Y]` gives the
+        # image which contains the spritesheet, `[SOFFX, SOFFY]` is
+        # the offset of the spritesheet in the image, `[X, Y]` is the
         # top-left corner of the frame described in the spritesheet,
-        # `[W, H]` is the size of the frame, `[OFFX, OFFY]` is the
+        # `[W, H]` is the size of the frame, `[FOFFX, FOFFY]` is the
         # offset of the top left corner of the frame from the position
         # of the sprite (around which drawing flipped versions will
         # be based), `NAME` is a string naming an animation, `INDEX`
@@ -44,7 +51,7 @@ define ['jquery', './util'], ($, util) ->
         # frame should stay onscreen in seconds, and `LOOP` is true
         # or false depending on whether the animation should loop.
         load: (json_data, onload) ->
-            {frames, animations} = json_data
+            {offset, frames, animations} = json_data
             
             for name, animation of animations
                 duration = 0
@@ -57,13 +64,14 @@ define ['jquery', './util'], ($, util) ->
             
             image = new Image()
             image.onload = ->
-                sprite.setupFrames image, frames
+                sprite.setupFrames image, offset, frames
                 @loaded = true
                 onload?()
+                return
             image.src = url_prefix + json_data.spritesheet
             return
         
-        setupFrames: (img, frames) ->
+        setupFrames: (img, offset, frames) ->
             grabFrame = (frame) ->
                 fw = frame.size[0]
                 fh = frame.size[1]
@@ -71,7 +79,9 @@ define ['jquery', './util'], ($, util) ->
                 fcanvas.width = fw
                 fcanvas.height = fh
                 fctx = fcanvas.getContext '2d'
-                fctx.drawImage img, frame.pos[0], frame.pos[1],
+                fctx.drawImage img,
+                    offset[0] + frame.pos[0],
+                    offset[1] + frame.pos[1],
                     fw, fh, 0, 0, fw, fh
                 
                 return fcanvas
@@ -80,16 +90,21 @@ define ['jquery', './util'], ($, util) ->
             @frame_offsets = (frame.offset for frame in frames)
             return
         
-        startAnimation: (anim_name) ->
+        startAnimation: (anim_name, anim_speed = 1) ->
             @current_animation = @animations[anim_name]
-            @animation_start_time = util.time()
+            @animation_time = 0
+            @animation_speed = anim_speed
+            return
+        
+        update: (dt) ->
+            @animation_time += dt * @animation_speed
             return
         
         draw: (context, x, y, flip_h) ->
             cur_anim = @current_animation
             cur_anim_dur = cur_anim.duration
             frame_index = -1
-            anim_time = util.time() - @animation_start_time
+            anim_time = @animation_time
             
             if cur_anim.loop
                 anim_time %= cur_anim_dur

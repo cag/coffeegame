@@ -3,10 +3,10 @@ requirejs.config({
     paths: {
         'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min'
     }
-})
+})# if false # Psyche!
 
-require ['jquery', 'game', 'loader', 'map', 'test'],
-  ($, game, loader, map, test) ->
+require ['jquery', 'game', 'loader', 'map', 'demo'],
+  ($, game, loader, map, demo) ->
     $ ->
         # Force jQuery to grab fresh data in its Ajax requests.
         $.ajaxSetup cache: false
@@ -14,16 +14,15 @@ require ['jquery', 'game', 'loader', 'map', 'test'],
         # This is where the game code starts.
         loader_scene = new loader.LoaderScene {
                 maps:
-                    test: { name: 'test', script: test }
+                    demo: { name: 'demo', script: demo }
                 sprites:
-                    test: 'test_sprite'
-                sounds:
-                    test: 'sounds/jump.wav'
-            }, ((loaded) ->
-                test.setTestSprite loaded.sprites.test
-                test.setTestSound loaded.sounds.test
-                game.switchScene new map.MapScene loaded.maps.test
-                return)
+                    player: 'player'
+                sounds: {}
+            }, (loaded) ->
+                demo.setPlayerSprite loaded.sprites.player
+                demo_scene = new map.MapScene loaded.maps.demo
+                game.switchScene demo_scene
+                return
         
         game.init 320, 240, 1 / 60, 1 / 20, loader_scene
         game.run()

@@ -1,7 +1,4 @@
 define ->
-    time_offset = 0
-    time_seen = 0
-    
     # An implementation of insertion sort
     insertionSort = (ary, cmp = (a, b) ->
                     if a < b then -1 else if a == b then 0 else 1) ->
@@ -14,7 +11,7 @@ define ->
             ary[j] = tmp
         return
     
-    # requestAnimationFrame polyfill by Erik Möller
+    # requestAnimationFrame shim by Erik Möller
     # with fixes from Paul Irish and Tino Zijdel.
     #
     # CoffeeScript port by Jacob Rus
@@ -50,16 +47,32 @@ define ->
         
         return
     
-    # An epsilon for things involving real numbers and convergence.
-    EPSILON: 1 / (Math.pow 2, 50)
+    # Performance.now polyfill.
+    # Thanks Tony Gentilcore for the [heads up](http://gent.ilcore.com/2012/06/better-timer-for-javascript.html).
+    pNow = do ->
+        # A monotonic but slightly inaccurate timer in seconds.
+        # Referenced Kevin Reid's implementation.
+        time_offset = 0
+        time_seen = 0
+        fallback = () ->
+            t = Date.now()
+            time_offset += time_seen - t if t < time_seen
+            time_seen = t
+            return (t + time_offset)
+        
+        if performance?
+            return performance.now if performance.now?
+            
+            for vendor in ['ms', 'moz', 'webkit', 'o']
+                pNow = performance[vendor + 'Now']
+                return pNow if pNow?
+        
+        return fallback
     
-    # A monotonic but slightly inaccurate timer in seconds.
-    # Referenced Kevin Reid's implementation.
-    time: ->
-        t = Date.now()
-        time_offset += time_seen - t if t < time_seen
-        time_seen = t
-        return .001 * (t + time_offset)
+    # An epsilon for things involving real numbers and convergence.
+    EPSILON: Math.pow(2, -50)
+    
+    time: -> .001 * pNow.call window.performance
     
     # Insertion sort is used as a sort for arrays which don't change
     # order much between frames.

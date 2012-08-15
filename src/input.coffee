@@ -5,7 +5,9 @@ define ->
         up: 38,
         right: 39,
         down: 40,
-        jump: 90
+        run: 16,
+        jump: 90,
+        debug: 192
     
     init: ->
         for button of @buttons

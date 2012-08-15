@@ -1,0 +1,196 @@
+<!DOCTYPE html>  <html> <head>   <title>demo.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="audio.html">                 audio.coffee               </a>                                           <a class="source" href="demo.html">                 demo.coffee               </a>                                           <a class="source" href="entity.html">                 entity.coffee               </a>                                           <a class="source" href="game.html">                 game.coffee               </a>                                           <a class="source" href="geometry.html">                 geometry.coffee               </a>                                           <a class="source" href="input.html">                 input.coffee               </a>                                           <a class="source" href="loader.html">                 loader.coffee               </a>                                           <a class="source" href="main.html">                 main.coffee               </a>                                           <a class="source" href="map.html">                 map.coffee               </a>                                           <a class="source" href="physics.html">                 physics.coffee               </a>                                           <a class="source" href="sprite.html">                 sprite.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               demo.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="p">[</span><span class="s1">&#39;./input&#39;</span><span class="p">,</span> <span class="s1">&#39;./audio&#39;</span><span class="p">,</span> <span class="s1">&#39;./util&#39;</span><span class="p">,</span> <span class="s1">&#39;./game&#39;</span><span class="p">,</span> <span class="s1">&#39;./geometry&#39;</span><span class="p">,</span> <span class="s1">&#39;./entity&#39;</span><span class="p">,</span> <span class="s1">&#39;./physics&#39;</span><span class="p">],</span>
+  <span class="nf">(input, audio, util, game, geometry, entity, physics) -&gt;</span>
+    <span class="nv">player_sprite = </span><span class="kc">null</span>
+    
+    <span class="nv">setupSky: </span><span class="nf">(layer) -&gt;</span>
+        <span class="nv">layer.draw = </span><span class="nf">(context, targx, targy) -&gt;</span>
+            <span class="nv">cam = </span><span class="nx">@map</span><span class="p">.</span><span class="nx">camera</span>
+            
+            <span class="nx">context</span><span class="p">.</span><span class="nx">beginPath</span><span class="p">()</span>
+            <span class="nx">cam</span><span class="p">.</span><span class="nx">shapeSubpath</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">targx</span> <span class="o">-</span> <span class="nx">cam</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">targy</span> <span class="o">-</span> <span class="nx">cam</span><span class="p">.</span><span class="nx">y</span>
+            <span class="nv">context.fillStyle = </span><span class="s1">&#39;#A5DFEA&#39;</span>
+            <span class="nx">context</span><span class="p">.</span><span class="nx">fill</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="k">return</span>
+    
+    <span class="nv">setPlayerSprite: </span><span class="nf">(sprite) -&gt;</span>
+        <span class="nv">player_sprite = </span><span class="nx">sprite</span>
+        <span class="k">return</span>
+    
+    <span class="nv">handlePlayerStart: </span><span class="nf">(obj) -&gt;</span>
+        <span class="nv">actx = </span><span class="nx">audio</span><span class="p">.</span><span class="nx">getAudioContext</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nx">actx</span><span class="o">?</span>
+            <span class="nv">osc = </span><span class="nx">actx</span><span class="p">.</span><span class="nx">createOscillator</span><span class="p">()</span>
+            <span class="nv">osc.type = </span><span class="nx">osc</span><span class="p">.</span><span class="nx">TRIANGLE</span>
+            
+            <span class="nv">gain = </span><span class="nx">actx</span><span class="p">.</span><span class="nx">createGainNode</span><span class="p">()</span>
+            <span class="nv">gain.gain.value = </span><span class="p">.</span><span class="mi">25</span>
+            
+            <span class="nx">osc</span><span class="p">.</span><span class="nx">connect</span> <span class="nx">gain</span>
+            <span class="nx">gain</span><span class="p">.</span><span class="nx">connect</span> <span class="nx">actx</span><span class="p">.</span><span class="nx">destination</span>
+            
+            <span class="nv">time_ptr = </span><span class="nx">actx</span><span class="p">.</span><span class="nx">currentTime</span>
+            <span class="nv">note_dur = </span><span class="p">.</span><span class="mi">0625</span>
+            <span class="k">for</span> <span class="nx">tuning_factor</span> <span class="k">in</span> <span class="nx">audio</span><span class="p">.</span><span class="nx">ptolemy_tuning_factors</span>
+                <span class="nx">osc</span><span class="p">.</span><span class="nx">frequency</span><span class="p">.</span><span class="nx">setValueAtTime</span> <span class="o">\</span>
+                    <span class="nx">audio</span><span class="p">.</span><span class="nx">ptolemy_c4</span> <span class="o">*</span> <span class="nx">tuning_factor</span><span class="p">,</span>
+                    <span class="nx">time_ptr</span>
+                <span class="nx">time_ptr</span> <span class="o">+=</span> <span class="nx">note_dur</span>
+            
+            <span class="nx">osc</span><span class="p">.</span><span class="nx">frequency</span><span class="p">.</span><span class="nx">setValueAtTime</span> <span class="o">\</span>
+                <span class="nx">audio</span><span class="p">.</span><span class="nx">ptolemy_c4</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="nx">time_ptr</span>
+            
+            <span class="nx">time_ptr</span> <span class="o">+=</span> <span class="nx">note_dur</span>
+            <span class="nx">osc</span><span class="p">.</span><span class="nx">noteOn</span> <span class="nx">actx</span><span class="p">.</span><span class="nx">currentTime</span>
+            <span class="nx">osc</span><span class="p">.</span><span class="nx">noteOff</span> <span class="nx">time_ptr</span>
+        
+        <span class="nv">player = </span><span class="k">new</span> <span class="nx">entity</span><span class="p">.</span><span class="nx">Entity</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">x</span><span class="p">,</span> <span class="nx">obj</span><span class="p">.</span><span class="nx">y</span><span class="p">,</span>
+            <span class="k">new</span> <span class="nx">geometry</span><span class="p">.</span><span class="nx">Aabb</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">]</span>
+        
+        <span class="nx">player_sprite</span><span class="p">.</span><span class="nx">startAnimation</span> <span class="s1">&#39;idle&#39;</span>
+        <span class="nv">player.sprite = </span><span class="nx">player_sprite</span>
+        
+        <span class="nv">player.obstructs = </span><span class="nx">util</span><span class="p">.</span><span class="nx">constructBitmask</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="nv">walk_vel_threshold = </span><span class="mi">2</span>
+        <span class="nv">walk_accel = </span><span class="mi">512</span>
+        <span class="nv">grounded_damping = </span><span class="p">.</span><span class="mi">25</span>
+        <span class="nv">jump_vel = </span><span class="o">-</span><span class="mi">64</span>
+        <span class="nv">jump_release_factor = </span><span class="p">.</span><span class="mi">5</span>
+        <span class="nv">aerial_move_accel = </span><span class="mi">48</span>
+        <span class="nv">aerial_damping = </span><span class="p">.</span><span class="mi">984375</span>
+        <span class="nv">wall_slide_damping = </span><span class="p">.</span><span class="mi">875</span>
+        <span class="nv">wall_jump_angle = </span><span class="p">.</span><span class="mi">25</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span>
+        <span class="nv">wall_jump_speed = </span><span class="o">-</span><span class="mi">128</span>
+        <span class="nv">gravity = </span><span class="mi">160</span>
+        
+        <span class="nv">cos_wja = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">cos</span> <span class="nx">wall_jump_angle</span>
+        <span class="nv">sin_wja = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">sin</span> <span class="nx">wall_jump_angle</span>
+        
+        <span class="nv">player.update = </span><span class="nf">(dt) -&gt;</span>
+            <span class="nv">v = </span><span class="nx">@velocity</span> <span class="o">or</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="nv">a = </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            
+            <span class="nv">x_spd = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">@x</span> <span class="o">-</span> <span class="p">(</span><span class="nx">@last_x</span> <span class="o">or</span> <span class="nx">@x</span><span class="p">))</span> <span class="o">/</span> <span class="nx">game</span><span class="p">.</span><span class="nx">lastDt</span><span class="p">()</span>
+            
+            <span class="nv">sprite = </span><span class="nx">@sprite</span>
+            <span class="nv">state = </span><span class="nx">@state</span>
+            <span class="nv">switchStateTo = </span><span class="nf">(name) -&gt;</span>
+                <span class="k">if</span> <span class="nx">state</span> <span class="o">isnt</span> <span class="nx">name</span>
+                    <span class="nx">sprite</span><span class="p">.</span><span class="nx">startAnimation</span> <span class="nx">name</span>
+                    <span class="nv">state = </span><span class="nx">name</span>
+                <span class="k">return</span>
+            
+            <span class="k">if</span> <span class="nx">input</span><span class="p">.</span><span class="nx">left</span><span class="p">.</span><span class="nx">state</span> <span class="o">and</span> <span class="o">not</span> <span class="nx">input</span><span class="p">.</span><span class="nx">right</span><span class="p">.</span><span class="nx">state</span>
+                <span class="vi">@facing_left = </span><span class="kc">true</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="nx">input</span><span class="p">.</span><span class="nx">right</span><span class="p">.</span><span class="nx">state</span> <span class="o">and</span> <span class="o">not</span> <span class="nx">input</span><span class="p">.</span><span class="nx">left</span><span class="p">.</span><span class="nx">state</span>
+                <span class="vi">@facing_left = </span><span class="kc">false</span>
+            
+            <span class="nv">moving_forward = </span><span class="nx">@facing_left</span> <span class="o">and</span>
+                <span class="nx">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="nx">walk_vel_threshold</span> <span class="o">or</span>
+                <span class="o">not</span> <span class="nx">@facing_left</span> <span class="o">and</span> <span class="nx">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nx">walk_vel_threshold</span>
+            
+            <span class="k">if</span> <span class="nx">@grounded</span>
+                <span class="k">if</span> <span class="o">not</span> <span class="nx">moving_forward</span> <span class="o">or</span> <span class="nx">@against_wall</span>
+                    <span class="nx">switchStateTo</span> <span class="s1">&#39;idle&#39;</span>
+                <span class="k">else</span>
+                    <span class="nx">switchStateTo</span> <span class="s1">&#39;walk&#39;</span>
+                    <span class="nv">sprite.animation_speed = </span><span class="nx">x_spd</span> <span class="o">*</span> <span class="p">.</span><span class="mi">125</span>
+                
+                <span class="k">if</span> <span class="nx">input</span><span class="p">.</span><span class="nx">jump</span><span class="p">.</span><span class="nx">pressed</span>
+                    <span class="nx">switchStateTo</span> <span class="s1">&#39;jump&#39;</span>
+                    <span class="nx">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nx">jump_vel</span>
+                    <span class="vi">@damping = </span><span class="nx">aerial_damping</span>
+                <span class="k">else</span>
+                    <span class="k">if</span> <span class="nx">input</span><span class="p">.</span><span class="nx">left</span><span class="p">.</span><span class="nx">state</span>
+                        <span class="nx">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <span class="nx">walk_accel</span>
+                    <span class="k">if</span> <span class="nx">input</span><span class="p">.</span><span class="nx">right</span><span class="p">.</span><span class="nx">state</span>
+                        <span class="nx">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="nx">walk_accel</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="nx">geometry</span><span class="p">.</span><span class="nx">dotProduct</span> <span class="nx">a</span><span class="p">,</span> <span class="nx">@ground_normal</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span>
+                        <span class="nx">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-=</span> <span class="nx">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nx">@ground_normal</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span>
+                            <span class="nx">@ground_normal</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    
+                    <span class="vi">@damping = </span><span class="nx">grounded_damping</span>
+            <span class="k">else</span>
+                <span class="k">if</span> <span class="nx">input</span><span class="p">.</span><span class="nx">left</span><span class="p">.</span><span class="nx">state</span>
+                    <span class="nx">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-=</span> <span class="nx">aerial_move_accel</span>
+                <span class="k">if</span> <span class="nx">input</span><span class="p">.</span><span class="nx">right</span><span class="p">.</span><span class="nx">state</span>
+                    <span class="nx">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="nx">aerial_move_accel</span>
+                <span class="nx">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="nx">gravity</span>
+                <span class="k">if</span> <span class="nx">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="o">and</span> <span class="nx">input</span><span class="p">.</span><span class="nx">jump</span><span class="p">.</span><span class="nx">released</span>
+                    <span class="nx">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*=</span> <span class="nx">jump_release_factor</span>
+                <span class="k">else</span>
+                    <span class="vi">@damping = </span><span class="nx">aerial_damping</span>
+                    <span class="k">if</span> <span class="nx">@sliding</span> <span class="o">and</span> <span class="nx">input</span><span class="p">.</span><span class="nx">jump</span><span class="p">.</span><span class="nx">pressed</span>
+                        <span class="k">if</span> <span class="nx">@wall_normal</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                            <span class="nx">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nx">wall_jump_speed</span> <span class="o">*</span>
+                                <span class="nx">geometry</span><span class="p">.</span><span class="nx">dotProduct</span> <span class="nx">@wall_normal</span><span class="p">,</span>
+                                <span class="p">[</span><span class="nx">cos_wja</span><span class="p">,</span> <span class="o">-</span><span class="nx">sin_wja</span><span class="p">]</span>
+                            <span class="nx">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nx">wall_jump_speed</span> <span class="o">*</span>
+                                <span class="nx">geometry</span><span class="p">.</span><span class="nx">dotProduct</span> <span class="nx">@wall_normal</span><span class="p">,</span>
+                                <span class="p">[</span><span class="nx">sin_wja</span><span class="p">,</span> <span class="nx">cos_wja</span><span class="p">]</span>
+                        <span class="k">else</span> <span class="k">if</span> <span class="nx">@wall_normal</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span>
+                            <span class="nx">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nx">wall_jump_speed</span> <span class="o">*</span>
+                                <span class="nx">geometry</span><span class="p">.</span><span class="nx">dotProduct</span> <span class="nx">@wall_normal</span><span class="p">,</span>
+                                <span class="p">[</span><span class="nx">cos_wja</span><span class="p">,</span> <span class="nx">sin_wja</span><span class="p">]</span>
+                            <span class="nx">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nx">wall_jump_speed</span> <span class="o">*</span>
+                                <span class="nx">geometry</span><span class="p">.</span><span class="nx">dotProduct</span> <span class="nx">@wall_normal</span><span class="p">,</span>
+                                <span class="p">[</span><span class="o">-</span><span class="nx">sin_wja</span><span class="p">,</span> <span class="nx">cos_wja</span><span class="p">]</span>
+                        <span class="k">else</span>
+                            <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span> <span class="s1">&#39;wall jump strangeness&#39;</span>
+                        <span class="nx">switchStateTo</span> <span class="s1">&#39;wall jump&#39;</span>
+                    <span class="k">else</span> <span class="k">if</span> <span class="nx">@against_wall</span> <span class="o">and</span> <span class="nx">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                        <span class="vi">@damping = </span><span class="nx">wall_slide_damping</span>
+                        <span class="nx">switchStateTo</span> <span class="s1">&#39;wall slide&#39;</span>
+                    <span class="k">else</span> <span class="k">if</span> <span class="nx">@sliding</span>
+                        <span class="nx">switchStateTo</span> <span class="s1">&#39;slide&#39;</span>
+                    <span class="k">else</span> <span class="k">if</span> <span class="nx">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                        <span class="nx">switchStateTo</span> <span class="s1">&#39;fall&#39;</span>
+            
+            <span class="k">if</span> <span class="nx">@grounded</span> <span class="o">and</span>
+              <span class="p">(</span><span class="nx">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">isnt</span> <span class="mi">0</span> <span class="o">or</span> <span class="nx">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="nx">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+=</span> <span class="nx">gravity</span>
+                <span class="vi">@grounded = </span><span class="kc">false</span>
+            
+            <span class="vi">@sliding = </span><span class="kc">false</span>
+            <span class="vi">@against_wall = </span><span class="kc">false</span>
+            
+            <span class="vi">@acceleration = </span><span class="nx">a</span>
+            <span class="vi">@velocity = </span><span class="nx">v</span>
+            <span class="vi">@last_x = </span><span class="nx">@x</span>
+            <span class="nx">physics</span><span class="p">.</span><span class="nx">integrate</span> <span class="k">this</span><span class="p">,</span> <span class="nx">dt</span>
+            
+            <span class="vi">@state = </span><span class="nx">state</span>
+            <span class="nx">sprite</span><span class="p">.</span><span class="nx">update</span> <span class="nx">dt</span>
+            <span class="k">return</span>
+        
+        <span class="nv">player.onCollide = </span><span class="nf">(other, info) -&gt;</span>
+            <span class="p">[</span><span class="nx">pen_amt</span><span class="p">,</span> <span class="nx">pen_dir</span><span class="p">]</span> <span class="o">=</span> <span class="nx">info</span>
+            <span class="k">if</span> <span class="nx">pen_dir</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span> <span class="nx">pen_dir</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="vi">@grounded = </span><span class="kc">true</span>
+                <span class="vi">@ground_normal = </span><span class="nx">pen_dir</span>
+            <span class="k">else</span> <span class="k">if</span> <span class="nx">pen_dir</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+                <span class="vi">@sliding = </span><span class="kc">true</span>
+                <span class="vi">@wall_normal = </span><span class="nx">pen_dir</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nx">left</span><span class="p">.</span><span class="nx">state</span> <span class="o">and</span>
+                  <span class="nx">pen_dir</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span> <span class="nx">pen_dir</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">or</span>
+                  <span class="p">(</span><span class="nx">input</span><span class="p">.</span><span class="nx">right</span><span class="p">.</span><span class="nx">state</span> <span class="o">and</span>
+                  <span class="nx">pen_dir</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span> <span class="nx">pen_dir</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="vi">@against_wall = </span><span class="kc">true</span>
+            <span class="k">return</span>
+        
+        <span class="nv">player.draw = </span><span class="nf">(context, offx, offy) -&gt;</span>
+            <span class="nx">@sprite</span><span class="p">.</span><span class="nx">draw</span> <span class="nx">context</span><span class="p">,</span> <span class="nx">@x</span> <span class="o">+</span> <span class="nx">offx</span><span class="p">,</span> <span class="nx">@y</span> <span class="o">+</span> <span class="nx">offy</span><span class="p">,</span> <span class="nx">@facing_left</span>
+            <span class="k">return</span>
+        
+        <span class="nx">obj</span><span class="p">.</span><span class="nx">layer</span><span class="p">.</span><span class="nx">addEntity</span> <span class="nx">player</span>
+        
+        <span class="nv">obj.map.camera.post_update = </span><span class="nf">(dt) -&gt;</span>
+            <span class="vi">@x = </span><span class="nx">player</span><span class="p">.</span><span class="nx">x</span>
+            <span class="vi">@y = </span><span class="nx">player</span><span class="p">.</span><span class="nx">y</span>
+            <span class="k">return</span>
+        
+        <span class="k">return</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

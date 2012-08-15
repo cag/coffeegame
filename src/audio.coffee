@@ -1,4 +1,9 @@
-define ->
+define ['./util'], (util) ->
+    # A prefix and suffix applied to names passed into sound
+    # constructors so that they load from the right place.
+    url_prefix = 'assets/'
+    url_suffix = '.wav'
+    
     # Thanks Boris Smus for the [Web Audio tutorial](http://www.html5rocks.com/en/tutorials/webaudio/intro/).
     do ->
         w = window
@@ -21,13 +26,13 @@ define ->
     
     # The `Sound` class handles loading sound buffers and playing them.
     Sound: class
-        constructor: (url, onload) ->
+        constructor: (@name, onload) ->
             unless audio_context?
                 onload?()
                 return
             
             request = new XMLHttpRequest
-            request.open 'GET', url, true
+            request.open 'GET', url_prefix + @name + url_suffix, true
             request.responseType = 'arraybuffer'
             
             obj = this
@@ -55,4 +60,11 @@ define ->
                 source.noteOn delay + audio_context.currentTime
                 return source
             return null
+    
+    # Ptolemy's intense diatonic tuning in A440 has a C4 of 264 Hz
+    ptolemy_c4: 264
+    ptolemy_tuning_factors: [1, 9/8, 5/4, 4/3, 3/2, 5/3, 15/8]
+    
+    # Pythagorean tuning in A440 has a C4 of 260.741 Hz
+    pythagorean_c4: 260.741
 

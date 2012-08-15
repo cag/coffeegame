@@ -130,10 +130,9 @@ With regards to making *coffeegame*, I'd like to shower the following
 people with my gratitude:
 
 *   Jeremy Ashkenas for CoffeeScript
-*   Jonathan "lonesock" Dummer for a Time-Corrected Verlet
-    integration [tutorial](http://lonesock.net/article/verlet.html)
 *   Paul Irish, Erik Möller, Jacob Rus, and Tino Zijdel for a
     CoffeeScript `requestAnimationFrame` polyfill
+*   Tony Gentilcore for the [`Performance.now` shim](http://gent.ilcore.com/2012/06/better-timer-for-javascript.html).
 *   Thorbjørn Lindeijer for Tiled
 *   Kevin Reid for a monotonic timer implementation reference
 *   Boris Smus for a useful [Web Audio tutorial](http://www.html5rocks.com/en/tutorials/webaudio/intro/)
@@ -147,8 +146,6 @@ people with my gratitude:
 
 I'd like to thank everyone who has ever taught me stuff, jammed with
 me, or just plain hung out with me. Your time is precious to me.
-
-Last but not least, I'd like to thank my mom.
 
 **Thank you.**
 

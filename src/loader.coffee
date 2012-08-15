@@ -9,7 +9,7 @@ define ['./map', './sprite', './audio'], (map, sprite, audio) ->
     #             SPRITEVAR: SPRITENAME,
     #             ...
     #         sounds:
-    #             SOUNDVAR: SOUNDURL,
+    #             SOUNDVAR: SOUNDNAME,
     #             ...
     #     }
     #
