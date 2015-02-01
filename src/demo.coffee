@@ -18,32 +18,32 @@ define ['./input', './audio', './util', './game', './geometry', './entity', './p
         return
     
     handlePlayerStart: (obj) ->
-        actx = audio.getAudioContext()
-        if actx?
-            osc = actx.createOscillator()
-            osc.type = osc.TRIANGLE
+        # actx = audio.getAudioContext()
+        # if actx?
+        #     osc = actx.createOscillator()
+        #     osc.type = osc.TRIANGLE
             
-            gain = actx.createGainNode()
-            gain.gain.value = .25
+        #     gain = actx.createGainNode()
+        #     gain.gain.value = .25
             
-            osc.connect gain
-            gain.connect actx.destination
+        #     osc.connect gain
+        #     gain.connect actx.destination
             
-            time_ptr = actx.currentTime
-            note_dur = .03125
-            for tuning_factor in audio.ptolemy_tuning_factors
-                osc.frequency.setValueAtTime \
-                    .125 * audio.ptolemy_c4 * tuning_factor,
-                    time_ptr
-                time_ptr += note_dur
+        #     time_ptr = actx.currentTime
+        #     note_dur = .03125
+        #     for tuning_factor in audio.ptolemy_tuning_factors
+        #         osc.frequency.setValueAtTime \
+        #             .125 * audio.ptolemy_c4 * tuning_factor,
+        #             time_ptr
+        #         time_ptr += note_dur
             
-            osc.frequency.setValueAtTime \
-                audio.ptolemy_c4 * .25,
-                time_ptr
+        #     osc.frequency.setValueAtTime \
+        #         audio.ptolemy_c4 * .25,
+        #         time_ptr
             
-            time_ptr += note_dur
-            osc.noteOn actx.currentTime
-            osc.noteOff time_ptr
+        #     time_ptr += note_dur
+        #     osc.noteOn actx.currentTime
+        #     osc.noteOff time_ptr
         
         player = new entity.Entity obj.x, obj.y,
             new geometry.Aabb [2, 11]
