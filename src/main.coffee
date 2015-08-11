@@ -5,8 +5,9 @@ requirejs.config({
     }
 })# if false # Psyche!
 
-require ['jquery', 'game', 'loader', 'map', 'demo'],
-  ($, game, loader, map, demo) ->
+require ['jquery', './cg', './demo'],
+  ($, cg, demo) ->
+    {game, loader, map} = cg
     $ ->
         # Force jQuery to grab fresh data in its Ajax requests.
         $.ajaxSetup cache: false

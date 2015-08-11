@@ -1,6 +1,6 @@
 fs = require 'fs'
 
-{print} = require 'util'
+print = console.log
 {spawn} = require 'child_process'
 
 outdir = 'js'
@@ -11,6 +11,24 @@ writeProcessData = (proc) ->
     proc.stdout.on 'data', (data) ->
         print data.toString()
     return
+
+bootstrapLib = (callback) ->
+    cgfiles = fs.readdir 'src/cg', (err, files) ->
+        if err?
+            process.stderr.write err
+        else
+            pattern = /\.coffee$/
+            sources = (file[..-8] for file in files when pattern.test file)
+            srcstr = '# This is an auto-generated source file.\ndefine [' \
+                + (("'cg/#{source}'" for source in sources).join ', ') + '], (' \
+                + ((source for source in sources).join ', ') + ') ->\n' \
+                + (("    #{source}: #{source}\n" for source in sources).reduce (a, b) -> a + b)
+            fs.writeFile 'src/cg.coffee', srcstr, (error) ->
+                if error
+                    process.stderr.write 'Error writing file', error
+                else
+                    print 'Wrote cg.coffee'
+                    callback?()
 
 buildCoffee = (callback) ->
     coffee = spawn 'coffee', ['-c', '-o', outdir, 'src']
@@ -28,8 +46,10 @@ buildRequireJS = (callback) ->
 
 buildDocco = (callback) ->
     pattern = /\.coffee$/
-    files = fs.readdirSync 'src'
-    params = ('src/' + file for file in files when pattern.test file)
+    srcfiles = fs.readdirSync 'src'
+    cgfiles = fs.readdirSync 'src/cg'
+    params = ('src/' + file for file in srcfiles when pattern.test file)\
+        .concat('src/cg/' + file for file in cgfiles when pattern.test file)
         
     docco = spawn 'docco', params
     writeProcessData docco
@@ -38,11 +58,12 @@ buildDocco = (callback) ->
     return
 
 task 'build', "Build #{outdir} from src/", ->
-    buildCoffee buildRequireJS buildDocco
+    bootstrapLib buildCoffee buildRequireJS buildDocco
     return
 
 task 'watch', 'Watch src/ for changes', ->
-    coffee = spawn 'coffee', ['-w', '-c', '-o', outdir, 'src']
-    writeProcessData coffee
+    bootstrapLib ->
+        coffee = spawn 'coffee', ['-w', '-c', '-o', outdir, 'src']
+        writeProcessData coffee
     return
 

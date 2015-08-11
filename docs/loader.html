@@ -1,92 +1,216 @@
-<!DOCTYPE html>  <html> <head>   <title>loader.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="audio.html">                 audio.coffee               </a>                                           <a class="source" href="demo.html">                 demo.coffee               </a>                                           <a class="source" href="entity.html">                 entity.coffee               </a>                                           <a class="source" href="game.html">                 game.coffee               </a>                                           <a class="source" href="geometry.html">                 geometry.coffee               </a>                                           <a class="source" href="input.html">                 input.coffee               </a>                                           <a class="source" href="loader.html">                 loader.coffee               </a>                                           <a class="source" href="main.html">                 main.coffee               </a>                                           <a class="source" href="map.html">                 map.coffee               </a>                                           <a class="source" href="physics.html">                 physics.coffee               </a>                                           <a class="source" href="sprite.html">                 sprite.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               loader.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="p">[</span><span class="s1">&#39;./map&#39;</span><span class="p">,</span> <span class="s1">&#39;./sprite&#39;</span><span class="p">,</span> <span class="s1">&#39;./audio&#39;</span><span class="p">],</span> <span class="nf">(map, sprite, audio) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>A scene for loading resources. Pass in an object of the form:</p>
+<!DOCTYPE html>
 
-<pre><code>{
-    maps:
-        MAPVAR: { name: MAPNAME, script: MAPSCRIPT },
-        ...
-    sprites:
-        SPRITEVAR: SPRITENAME,
-        ...
-    sounds:
-        SOUNDVAR: SOUNDNAME,
-        ...
-}
-</code></pre>
-
-<p>The resources will load into an object of the form:</p>
-
-<pre><code>{
-    maps:
-        MAPVAR: MAP,
-        ...
-    sprites:
-        SPRITEVAR: SPRITE,
-        ...
-    sounds:
-        SOUNDVAR: SOUND,
-        ...
-}
-</code></pre>
-
-<p>This object will be passed into the <code>@onload</code> callback, which
-will be a good time for setting up a new scene to switch into.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">LoaderScene: </span><span class="k">class</span>
-        <span class="nv">constructor: </span><span class="nf">(@resources, @onload) -&gt;</span>
-            <span class="vi">@loaded =</span>
-                <span class="nv">maps: </span><span class="p">{}</span>
-                <span class="nv">sprites: </span><span class="p">{}</span>
-                <span class="nv">sounds: </span><span class="p">{}</span>
-            
-            <span class="nv">resource_count = </span><span class="mi">0</span>
-            <span class="k">for</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">obj</span> <span class="k">of</span> <span class="nx">@resources</span>
-                <span class="nx">resource_count</span> <span class="o">+=</span> <span class="p">(</span><span class="nb">Object</span><span class="p">.</span><span class="nx">keys</span> <span class="nx">obj</span><span class="p">).</span><span class="nx">length</span>
-            <span class="vi">@resource_count = </span><span class="nx">resource_count</span>
-            
-            <span class="k">if</span> <span class="nx">resource_count</span> <span class="o">&lt;=</span> <span class="mi">0</span>
-                <span class="k">throw</span> <span class="s2">&quot;invalid resource count (#{resource_count})&quot;</span>
-            <span class="k">return</span>
-        
-        <span class="nv">start: </span><span class="o">-&gt;</span>
-            <span class="p">{</span><span class="nx">Map</span><span class="p">}</span> <span class="o">=</span> <span class="nx">map</span>
-            <span class="p">{</span><span class="nx">Sprite</span><span class="p">}</span> <span class="o">=</span> <span class="nx">sprite</span>
-            <span class="p">{</span><span class="nx">Sound</span><span class="p">}</span> <span class="o">=</span> <span class="nx">audio</span>
-            
-            <span class="nv">load_count = </span><span class="mi">0</span>
-            <span class="nv">loader = </span><span class="k">this</span>
-            <span class="vi">@progress = </span><span class="mi">0</span>
-            <span class="vi">@finished = </span><span class="kc">false</span>
-            
-            <span class="nv">callback = </span><span class="o">-&gt;</span>
-                <span class="o">++</span><span class="nx">load_count</span>
-                <span class="nv">loader.progress = </span><span class="nx">load_count</span> <span class="err">/ loader.resource_count</span>
-                <span class="k">if</span> <span class="nx">load_count</span> <span class="o">is</span> <span class="nx">loader</span><span class="p">.</span><span class="nx">resource_count</span>
-                    <span class="nv">loader.finished = </span><span class="kc">true</span>
-                    <span class="nx">loader</span><span class="p">.</span><span class="nx">onload</span><span class="o">?</span> <span class="nx">loader</span><span class="p">.</span><span class="nx">loaded</span>
-                <span class="k">return</span>
-            
-            <span class="k">for</span> <span class="nx">type</span><span class="p">,</span> <span class="nx">obj</span> <span class="k">of</span> <span class="nx">@resources</span>
-                <span class="nv">target = </span><span class="nx">@loaded</span><span class="p">[</span><span class="nx">type</span><span class="p">]</span>
+<html>
+<head>
+  <title>loader.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
                 
-                <span class="k">if</span> <span class="nx">type</span> <span class="o">is</span> <span class="s1">&#39;maps&#39;</span>
-                    <span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">res</span> <span class="k">of</span> <span class="nx">obj</span>
-                        <span class="nx">target</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Map</span> <span class="nx">res</span><span class="p">.</span><span class="nx">name</span><span class="p">,</span> <span class="nx">res</span><span class="p">.</span><span class="nx">script</span><span class="p">,</span>
-                            <span class="nx">callback</span>
-                <span class="k">else</span> <span class="k">if</span> <span class="nx">type</span> <span class="o">is</span> <span class="s1">&#39;sprites&#39;</span>
-                    <span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">res</span> <span class="k">of</span> <span class="nx">obj</span>
-                        <span class="nx">target</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Sprite</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">callback</span>
-                <span class="k">else</span> <span class="k">if</span> <span class="nx">type</span> <span class="o">is</span> <span class="s1">&#39;sounds&#39;</span>
-                    <span class="k">for</span> <span class="nx">key</span><span class="p">,</span> <span class="nx">res</span> <span class="k">of</span> <span class="nx">obj</span>
-                        <span class="nx">target</span><span class="p">[</span><span class="nx">key</span><span class="p">]</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Sound</span> <span class="nx">res</span><span class="p">,</span> <span class="nx">callback</span>
-                <span class="k">else</span>
-                    <span class="k">throw</span> <span class="s2">&quot;attempting to load unknown type #{type}&quot;</span>
-            <span class="k">return</span>
+                <a class="source" href="cg.html">
+                  cg.coffee
+                </a>
+              
+                
+                <a class="source" href="audio.html">
+                  audio.coffee
+                </a>
+              
+                
+                <a class="source" href="entity.html">
+                  entity.coffee
+                </a>
+              
+                
+                <a class="source" href="game.html">
+                  game.coffee
+                </a>
+              
+                
+                <a class="source" href="geometry.html">
+                  geometry.coffee
+                </a>
+              
+                
+                <a class="source" href="input.html">
+                  input.coffee
+                </a>
+              
+                
+                <a class="source" href="loader.html">
+                  loader.coffee
+                </a>
+              
+                
+                <a class="source" href="map.html">
+                  map.coffee
+                </a>
+              
+                
+                <a class="source" href="physics.html">
+                  physics.coffee
+                </a>
+              
+                
+                <a class="source" href="sprite.html">
+                  sprite.coffee
+                </a>
+              
+                
+                <a class="source" href="util.html">
+                  util.coffee
+                </a>
+              
+                
+                <a class="source" href="demo.html">
+                  demo.coffee
+                </a>
+              
+                
+                <a class="source" href="main.html">
+                  main.coffee
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
         
-        <span class="nv">end: </span><span class="o">-&gt;</span>
-            <span class="k">return</span>
+          <li id="title">
+              <div class="annotation">
+                  <h1>loader.coffee</h1>
+              </div>
+          </li>
         
-        <span class="nv">update: </span><span class="nf">(dt) -&gt;</span>
-            <span class="k">return</span>
         
-        <span class="nv">draw: </span><span class="nf">(context) -&gt;</span>
-            <span class="k">return</span>
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>define [<span class="hljs-string">'./map'</span>, <span class="hljs-string">'./sprite'</span>, <span class="hljs-string">'./audio'</span>], <span class="hljs-function"><span class="hljs-params">(map, sprite, audio)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>A scene for loading resources. Pass in an object of the form:</p>
+<pre><code>{
+    <span class="hljs-attribute">maps</span>:
+        <span class="hljs-attribute">MAPVAR</span>: { <span class="hljs-attribute">name</span>: MAPNAME, <span class="hljs-attribute">script</span>: MAPSCRIPT },
+        ...
+    <span class="hljs-attribute">sprites</span>:
+        <span class="hljs-attribute">SPRITEVAR</span>: SPRITENAME,
+        ...
+    <span class="hljs-attribute">sounds</span>:
+        <span class="hljs-attribute">SOUNDVAR</span>: SOUNDNAME,
+        ...
+}
+</code></pre><p>The resources will load into an object of the form:</p>
+<pre><code>{
+    <span class="hljs-attribute">maps</span>:
+        <span class="hljs-attribute">MAPVAR</span>: MAP,
+        ...
+    <span class="hljs-attribute">sprites</span>:
+        <span class="hljs-attribute">SPRITEVAR</span>: SPRITE,
+        ...
+    <span class="hljs-attribute">sounds</span>:
+        <span class="hljs-attribute">SOUNDVAR</span>: SOUND,
+        ...
+}
+</code></pre><p>This object will be passed into the <code>@onload</code> callback, which
+will be a good time for setting up a new scene to switch into.</p>
 
-</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">LoaderScene</span>: <span class="hljs-class"><span class="hljs-keyword">class</span></span>
+        <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@resources</span>, <span class="hljs-property">@onload</span>)</span> -&gt;</span>
+            <span class="hljs-property">@loaded</span> =
+                <span class="hljs-attribute">maps</span>: {}
+                <span class="hljs-attribute">sprites</span>: {}
+                <span class="hljs-attribute">sounds</span>: {}
+            
+            resource_count = <span class="hljs-number">0</span>
+            <span class="hljs-keyword">for</span> type, obj <span class="hljs-keyword">of</span> <span class="hljs-property">@resources</span>
+                resource_count += (Object.keys obj).length
+            <span class="hljs-property">@resource_count</span> = resource_count
+            
+            <span class="hljs-keyword">if</span> resource_count &lt;= <span class="hljs-number">0</span>
+                <span class="hljs-keyword">throw</span> <span class="hljs-string">"invalid resource count (<span class="hljs-subst">#{resource_count}</span>)"</span>
+            <span class="hljs-keyword">return</span>
+        
+        <span class="hljs-attribute">start</span>: <span class="hljs-function">-&gt;</span>
+            {Map} = map
+            {Sprite} = sprite
+            {Sound} = audio
+            
+            load_count = <span class="hljs-number">0</span>
+            loader = <span class="hljs-keyword">this</span>
+            <span class="hljs-property">@progress</span> = <span class="hljs-number">0</span>
+            <span class="hljs-property">@finished</span> = <span class="hljs-literal">false</span>
+<span class="hljs-function">            
+            <span class="hljs-title">callback</span> = -&gt;</span>
+                ++load_count
+                loader.progress = load_count / loader.resource_count
+                <span class="hljs-keyword">if</span> load_count <span class="hljs-keyword">is</span> loader.resource_count
+                    loader.finished = <span class="hljs-literal">true</span>
+                    loader.onload? loader.loaded
+                <span class="hljs-keyword">return</span>
+            
+            <span class="hljs-keyword">for</span> type, obj <span class="hljs-keyword">of</span> <span class="hljs-property">@resources</span>
+                target = <span class="hljs-property">@loaded</span>[type]
+                
+                <span class="hljs-keyword">if</span> type <span class="hljs-keyword">is</span> <span class="hljs-string">'maps'</span>
+                    <span class="hljs-keyword">for</span> key, res <span class="hljs-keyword">of</span> obj
+                        target[key] = <span class="hljs-keyword">new</span> Map res.name, res.script,
+                            callback
+                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> type <span class="hljs-keyword">is</span> <span class="hljs-string">'sprites'</span>
+                    <span class="hljs-keyword">for</span> key, res <span class="hljs-keyword">of</span> obj
+                        target[key] = <span class="hljs-keyword">new</span> Sprite res, callback
+                <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> type <span class="hljs-keyword">is</span> <span class="hljs-string">'sounds'</span>
+                    <span class="hljs-keyword">for</span> key, res <span class="hljs-keyword">of</span> obj
+                        target[key] = <span class="hljs-keyword">new</span> Sound res, callback
+                <span class="hljs-keyword">else</span>
+                    <span class="hljs-keyword">throw</span> <span class="hljs-string">"attempting to load unknown type <span class="hljs-subst">#{type}</span>"</span>
+            <span class="hljs-keyword">return</span>
+        
+        <span class="hljs-attribute">end</span>: <span class="hljs-function">-&gt;</span>
+            <span class="hljs-keyword">return</span>
+        
+        <span class="hljs-attribute">update</span>: <span class="hljs-function"><span class="hljs-params">(dt)</span> -&gt;</span>
+            <span class="hljs-keyword">return</span>
+        
+        <span class="hljs-attribute">draw</span>: <span class="hljs-function"><span class="hljs-params">(context)</span> -&gt;</span>
+            <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

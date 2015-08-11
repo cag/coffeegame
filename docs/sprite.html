@@ -1,43 +1,175 @@
-<!DOCTYPE html>  <html> <head>   <title>sprite.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="audio.html">                 audio.coffee               </a>                                           <a class="source" href="demo.html">                 demo.coffee               </a>                                           <a class="source" href="entity.html">                 entity.coffee               </a>                                           <a class="source" href="game.html">                 game.coffee               </a>                                           <a class="source" href="geometry.html">                 geometry.coffee               </a>                                           <a class="source" href="input.html">                 input.coffee               </a>                                           <a class="source" href="loader.html">                 loader.coffee               </a>                                           <a class="source" href="main.html">                 main.coffee               </a>                                           <a class="source" href="map.html">                 map.coffee               </a>                                           <a class="source" href="physics.html">                 physics.coffee               </a>                                           <a class="source" href="sprite.html">                 sprite.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               sprite.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="p">[</span><span class="s1">&#39;jquery&#39;</span><span class="p">],</span> <span class="nf">($) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Similar to the map module, sprites are loaded via JSON from
-a url constructed from @name.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">url_prefix = </span><span class="s1">&#39;assets/&#39;</span>
-    <span class="nv">url_suffix = </span><span class="s1">&#39;.json&#39;</span>
-    
-    <span class="nv">Sprite: </span><span class="k">class</span>
-        <span class="nv">constructor: </span><span class="nf">(@name, onload) -&gt;</span>
-            <span class="vi">@loaded = </span><span class="kc">false</span>
-            <span class="nv">cb_target = </span><span class="k">this</span>
-            <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span> <span class="nx">url_prefix</span> <span class="o">+</span> <span class="nx">@name</span> <span class="o">+</span> <span class="nx">url_suffix</span><span class="p">,</span> <span class="nf">(data) -&gt;</span>
-                <span class="k">try</span>
-                    <span class="nx">cb_target</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span> <span class="nx">onload</span><span class="p">)</span>
-                <span class="k">catch</span> <span class="nx">e</span>
-                    <span class="k">throw</span> <span class="s1">&#39;could not load sprite &#39;</span> <span class="o">+</span>
-                        <span class="nx">url_prefix</span> <span class="o">+</span> <span class="nx">cb_target</span><span class="p">.</span><span class="nx">name</span> <span class="o">+</span> <span class="nx">url_suffix</span>
-                <span class="k">return</span>
-            <span class="k">return</span>
-        </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>The sprite JSON format is as follows:</p>
+<!DOCTYPE html>
 
+<html>
+<head>
+  <title>sprite.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="cg.html">
+                  cg.coffee
+                </a>
+              
+                
+                <a class="source" href="audio.html">
+                  audio.coffee
+                </a>
+              
+                
+                <a class="source" href="entity.html">
+                  entity.coffee
+                </a>
+              
+                
+                <a class="source" href="game.html">
+                  game.coffee
+                </a>
+              
+                
+                <a class="source" href="geometry.html">
+                  geometry.coffee
+                </a>
+              
+                
+                <a class="source" href="input.html">
+                  input.coffee
+                </a>
+              
+                
+                <a class="source" href="loader.html">
+                  loader.coffee
+                </a>
+              
+                
+                <a class="source" href="map.html">
+                  map.coffee
+                </a>
+              
+                
+                <a class="source" href="physics.html">
+                  physics.coffee
+                </a>
+              
+                
+                <a class="source" href="sprite.html">
+                  sprite.coffee
+                </a>
+              
+                
+                <a class="source" href="util.html">
+                  util.coffee
+                </a>
+              
+                
+                <a class="source" href="demo.html">
+                  demo.coffee
+                </a>
+              
+                
+                <a class="source" href="main.html">
+                  main.coffee
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>sprite.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>define [<span class="hljs-string">'jquery'</span>], <span class="hljs-function"><span class="hljs-params">($)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Similar to the map module, sprites are loaded via JSON from
+a url constructed from @name.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    url_prefix = <span class="hljs-string">'assets/'</span>
+    url_suffix = <span class="hljs-string">'.json'</span>
+    
+    <span class="hljs-attribute">Sprite</span>: <span class="hljs-class"><span class="hljs-keyword">class</span></span>
+        <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@name</span>, onload)</span> -&gt;</span>
+            <span class="hljs-property">@loaded</span> = <span class="hljs-literal">false</span>
+            cb_target = <span class="hljs-keyword">this</span>
+            $.getJSON url_prefix + <span class="hljs-property">@name</span> + url_suffix, <span class="hljs-function"><span class="hljs-params">(data)</span> -&gt;</span>
+                <span class="hljs-keyword">try</span>
+                    cb_target.load(data, onload)
+                <span class="hljs-keyword">catch</span> e
+                    <span class="hljs-keyword">throw</span> <span class="hljs-string">'could not load sprite '</span> +
+                        url_prefix + cb_target.name + url_suffix
+                <span class="hljs-keyword">return</span>
+            <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>The sprite JSON format is as follows:</p>
 <pre><code>{
-  "spritesheet": FILENAME,
-  "offset": [SOFFX, SOFFY],
-  "frames": [
+  <span class="hljs-string">"spritesheet"</span>: FILENAME,
+  <span class="hljs-string">"offset"</span>: [SOFFX, SOFFY],
+  <span class="hljs-string">"frames"</span>: [
     {
-      "pos": [X, Y],
-      "size": [W, H],
-      "offset": [FOFFX, FOFFY]
+      <span class="hljs-string">"pos"</span>: [X, Y],
+      <span class="hljs-string">"size"</span>: [W, H],
+      <span class="hljs-string">"offset"</span>: [FOFFX, FOFFY]
     },
     ...
   ],
-  "animations": {
-    NAME: {
-      "frames": [[INDEX, DURATION], ...],
-      "loop": LOOP
+  <span class="hljs-string">"animations"</span>: {
+    <span class="hljs-attribute">NAME</span>: {
+      <span class="hljs-string">"frames"</span>: [[INDEX, DURATION], ...],
+      <span class="hljs-string">"loop"</span>: LOOP
     },
     ...
   }
 }
-</code></pre>
-
-<p>Note: <code>FILENAME</code> is a string containing the name of the
+</code></pre><p>Note: <code>FILENAME</code> is a string containing the name of the
 image which contains the spritesheet, <code>[SOFFX, SOFFY]</code> is
 the offset of the spritesheet in the image, <code>[X, Y]</code> is the
 top-left corner of the frame described in the spritesheet,
@@ -47,86 +179,95 @@ of the sprite (around which drawing flipped versions will
 be based), <code>NAME</code> is a string naming an animation, <code>INDEX</code>
 refers to the index of a frame, <code>DURATION</code> is how long that
 frame should stay onscreen in seconds, and <code>LOOP</code> is true
-or false depending on whether the animation should loop.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nv">load: </span><span class="nf">(json_data, onload) -&gt;</span>
-            <span class="p">{</span><span class="nx">offset</span><span class="p">,</span> <span class="nx">frames</span><span class="p">,</span> <span class="nx">animations</span><span class="p">}</span> <span class="o">=</span> <span class="nx">json_data</span>
-            
-            <span class="k">for</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">animation</span> <span class="k">of</span> <span class="nx">animations</span>
-                <span class="nv">duration = </span><span class="mi">0</span>
-                <span class="k">for</span> <span class="nx">frame</span> <span class="k">in</span> <span class="nx">animation</span><span class="p">.</span><span class="nx">frames</span>
-                    <span class="nx">duration</span> <span class="o">+=</span> <span class="nx">frame</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                <span class="nx">animations</span><span class="p">[</span><span class="nx">name</span><span class="p">].</span><span class="nv">duration = </span><span class="nx">duration</span>
-            
-            <span class="vi">@animations = </span><span class="nx">animations</span>
-            <span class="nv">sprite = </span><span class="k">this</span>
-            
-            <span class="nv">image = </span><span class="k">new</span> <span class="nx">Image</span><span class="p">()</span>
-            <span class="nv">image.onload = </span><span class="o">-&gt;</span>
-                <span class="nx">sprite</span><span class="p">.</span><span class="nx">setupFrames</span> <span class="nx">image</span><span class="p">,</span> <span class="nx">offset</span><span class="p">,</span> <span class="nx">frames</span>
-                <span class="vi">@loaded = </span><span class="kc">true</span>
-                <span class="nx">onload</span><span class="o">?</span><span class="p">()</span>
-                <span class="k">return</span>
-            <span class="nv">image.src = </span><span class="nx">url_prefix</span> <span class="o">+</span> <span class="nx">json_data</span><span class="p">.</span><span class="nx">spritesheet</span>
-            <span class="k">return</span>
-        
-        <span class="nv">setupFrames: </span><span class="nf">(img, offset, frames) -&gt;</span>
-            <span class="nv">grabFrame = </span><span class="nf">(frame) -&gt;</span>
-                <span class="nv">fw = </span><span class="nx">frame</span><span class="p">.</span><span class="nx">size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="nv">fh = </span><span class="nx">frame</span><span class="p">.</span><span class="nx">size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                <span class="nv">fcanvas = </span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span> <span class="s1">&#39;canvas&#39;</span>
-                <span class="nv">fcanvas.width = </span><span class="nx">fw</span>
-                <span class="nv">fcanvas.height = </span><span class="nx">fh</span>
-                <span class="nv">fctx = </span><span class="nx">fcanvas</span><span class="p">.</span><span class="nx">getContext</span> <span class="s1">&#39;2d&#39;</span>
-                <span class="nx">fctx</span><span class="p">.</span><span class="nx">drawImage</span> <span class="nx">img</span><span class="p">,</span>
-                    <span class="nx">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nx">frame</span><span class="p">.</span><span class="nx">pos</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                    <span class="nx">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nx">frame</span><span class="p">.</span><span class="nx">pos</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                    <span class="nx">fw</span><span class="p">,</span> <span class="nx">fh</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">fw</span><span class="p">,</span> <span class="nx">fh</span>
-                
-                <span class="k">return</span> <span class="nx">fcanvas</span>
-            
-            <span class="vi">@frames = </span><span class="p">(</span><span class="nx">grabFrame</span> <span class="nx">frame</span> <span class="k">for</span> <span class="nx">frame</span> <span class="k">in</span> <span class="nx">frames</span><span class="p">)</span>
-            <span class="vi">@frame_offsets = </span><span class="p">(</span><span class="nx">frame</span><span class="p">.</span><span class="nx">offset</span> <span class="k">for</span> <span class="nx">frame</span> <span class="k">in</span> <span class="nx">frames</span><span class="p">)</span>
-            <span class="k">return</span>
-        
-        <span class="nv">startAnimation: </span><span class="nf">(anim_name, anim_speed = 1) -&gt;</span>
-            <span class="vi">@current_animation = </span><span class="nx">@animations</span><span class="p">[</span><span class="nx">anim_name</span><span class="p">]</span>
-            <span class="vi">@animation_time = </span><span class="mi">0</span>
-            <span class="vi">@animation_speed = </span><span class="nx">anim_speed</span>
-            <span class="k">return</span>
-        
-        <span class="nv">update: </span><span class="nf">(dt) -&gt;</span>
-            <span class="nx">@animation_time</span> <span class="o">+=</span> <span class="nx">dt</span> <span class="o">*</span> <span class="nx">@animation_speed</span>
-            <span class="k">return</span>
-        
-        <span class="nv">draw: </span><span class="nf">(context, x, y, flip_h) -&gt;</span>
-            <span class="nv">cur_anim = </span><span class="nx">@current_animation</span>
-            <span class="nv">cur_anim_dur = </span><span class="nx">cur_anim</span><span class="p">.</span><span class="nx">duration</span>
-            <span class="nv">frame_index = </span><span class="o">-</span><span class="mi">1</span>
-            <span class="nv">anim_time = </span><span class="nx">@animation_time</span>
-            
-            <span class="k">if</span> <span class="nx">cur_anim</span><span class="p">.</span><span class="nx">loop</span>
-                <span class="nx">anim_time</span> <span class="o">%=</span> <span class="nx">cur_anim_dur</span>
-            <span class="k">else</span> <span class="k">if</span> <span class="nx">anim_time</span> <span class="o">&gt;</span> <span class="nx">cur_anim_dur</span>
-                <span class="nv">anim_time = </span><span class="nx">cur_anim_dur</span>
-            
-            <span class="k">for</span> <span class="nx">frame</span> <span class="k">in</span> <span class="nx">cur_anim</span><span class="p">.</span><span class="nx">frames</span>
-                <span class="nx">anim_time</span> <span class="o">-=</span> <span class="nx">frame</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                <span class="k">if</span> <span class="nx">anim_time</span> <span class="o">&lt;=</span> <span class="mi">0</span>
-                    <span class="nv">frame_index = </span><span class="nx">frame</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="k">break</span>
-            
-            <span class="nv">frame_img = </span><span class="nx">@frames</span><span class="p">[</span><span class="nx">frame_index</span><span class="p">]</span>
-            <span class="nv">frame_offset = </span><span class="nx">@frame_offsets</span><span class="p">[</span><span class="nx">frame_index</span><span class="p">]</span>
-            
-            <span class="nx">context</span><span class="p">.</span><span class="nx">save</span><span class="p">()</span>
-            
-            <span class="nx">context</span><span class="p">.</span><span class="nx">translate</span> <span class="p">(</span><span class="nx">x</span> <span class="o">+</span> <span class="p">.</span><span class="mi">5</span><span class="p">)</span> <span class="o">|</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="p">(</span><span class="nx">y</span> <span class="o">+</span> <span class="p">.</span><span class="mi">5</span><span class="p">)</span> <span class="o">|</span> <span class="mi">0</span>
-            <span class="nx">context</span><span class="p">.</span><span class="nx">transform</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="k">if</span> <span class="nx">flip_h</span>
-            <span class="nx">context</span><span class="p">.</span><span class="nx">drawImage</span> <span class="nx">frame_img</span><span class="p">,</span>
-                <span class="nx">frame_offset</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">frame_offset</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            
-            <span class="nx">context</span><span class="p">.</span><span class="nx">restore</span><span class="p">()</span>
-            
-            <span class="k">return</span>
+or false depending on whether the animation should loop.</p>
 
-</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-attribute">load</span>: <span class="hljs-function"><span class="hljs-params">(json_data, onload)</span> -&gt;</span>
+            {offset, frames, animations} = json_data
+            
+            <span class="hljs-keyword">for</span> name, animation <span class="hljs-keyword">of</span> animations
+                duration = <span class="hljs-number">0</span>
+                <span class="hljs-keyword">for</span> frame <span class="hljs-keyword">in</span> animation.frames
+                    duration += frame[<span class="hljs-number">1</span>]
+                animations[name].duration = duration
+            
+            <span class="hljs-property">@animations</span> = animations
+            sprite = <span class="hljs-keyword">this</span>
+            
+            image = <span class="hljs-keyword">new</span> Image()
+            image.onload = <span class="hljs-function">-&gt;</span>
+                sprite.setupFrames image, offset, frames
+                <span class="hljs-property">@loaded</span> = <span class="hljs-literal">true</span>
+                onload?()
+                <span class="hljs-keyword">return</span>
+            image.src = url_prefix + json_data.spritesheet
+            <span class="hljs-keyword">return</span>
+        
+        <span class="hljs-attribute">setupFrames</span>: <span class="hljs-function"><span class="hljs-params">(img, offset, frames)</span> -&gt;</span>
+<span class="hljs-function">            <span class="hljs-title">grabFrame</span> = <span class="hljs-params">(frame)</span> -&gt;</span>
+                fw = frame.size[<span class="hljs-number">0</span>]
+                fh = frame.size[<span class="hljs-number">1</span>]
+                fcanvas = <span class="hljs-built_in">document</span>.createElement <span class="hljs-string">'canvas'</span>
+                fcanvas.width = fw
+                fcanvas.height = fh
+                fctx = fcanvas.getContext <span class="hljs-string">'2d'</span>
+                fctx.drawImage img,
+                    offset[<span class="hljs-number">0</span>] + frame.pos[<span class="hljs-number">0</span>],
+                    offset[<span class="hljs-number">1</span>] + frame.pos[<span class="hljs-number">1</span>],
+                    fw, fh, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, fw, fh
+                
+                <span class="hljs-keyword">return</span> fcanvas
+            
+            <span class="hljs-property">@frames</span> = (grabFrame frame <span class="hljs-keyword">for</span> frame <span class="hljs-keyword">in</span> frames)
+            <span class="hljs-property">@frame_offsets</span> = (frame.offset <span class="hljs-keyword">for</span> frame <span class="hljs-keyword">in</span> frames)
+            <span class="hljs-keyword">return</span>
+        
+        <span class="hljs-attribute">startAnimation</span>: <span class="hljs-function"><span class="hljs-params">(anim_name, anim_speed = <span class="hljs-number">1</span>)</span> -&gt;</span>
+            <span class="hljs-property">@current_animation</span> = <span class="hljs-property">@animations</span>[anim_name]
+            <span class="hljs-property">@animation_time</span> = <span class="hljs-number">0</span>
+            <span class="hljs-property">@animation_speed</span> = anim_speed
+            <span class="hljs-keyword">return</span>
+        
+        <span class="hljs-attribute">update</span>: <span class="hljs-function"><span class="hljs-params">(dt)</span> -&gt;</span>
+            <span class="hljs-property">@animation_time</span> += dt * <span class="hljs-property">@animation_speed</span>
+            <span class="hljs-keyword">return</span>
+        
+        <span class="hljs-attribute">draw</span>: <span class="hljs-function"><span class="hljs-params">(context, x, y, flip_h)</span> -&gt;</span>
+            cur_anim = <span class="hljs-property">@current_animation</span>
+            cur_anim_dur = cur_anim.duration
+            frame_index = -<span class="hljs-number">1</span>
+            anim_time = <span class="hljs-property">@animation_time</span>
+            
+            <span class="hljs-keyword">if</span> cur_anim.<span class="hljs-keyword">loop</span>
+                anim_time %= cur_anim_dur
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> anim_time &gt; cur_anim_dur
+                anim_time = cur_anim_dur
+            
+            <span class="hljs-keyword">for</span> frame <span class="hljs-keyword">in</span> cur_anim.frames
+                anim_time -= frame[<span class="hljs-number">1</span>]
+                <span class="hljs-keyword">if</span> anim_time &lt;= <span class="hljs-number">0</span>
+                    frame_index = frame[<span class="hljs-number">0</span>]
+                    <span class="hljs-keyword">break</span>
+            
+            frame_img = <span class="hljs-property">@frames</span>[frame_index]
+            frame_offset = <span class="hljs-property">@frame_offsets</span>[frame_index]
+            
+            context.save()
+            
+            context.translate (x + <span class="hljs-number">.5</span>) | <span class="hljs-number">0</span>,
+                (y + <span class="hljs-number">.5</span>) | <span class="hljs-number">0</span>
+            context.transform -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> flip_h
+            context.drawImage frame_img,
+                frame_offset[<span class="hljs-number">0</span>], frame_offset[<span class="hljs-number">1</span>]
+            
+            context.restore()
+            
+            <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

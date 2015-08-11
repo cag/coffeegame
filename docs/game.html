@@ -1,103 +1,386 @@
-<!DOCTYPE html>  <html> <head>   <title>game.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="audio.html">                 audio.coffee               </a>                                           <a class="source" href="demo.html">                 demo.coffee               </a>                                           <a class="source" href="entity.html">                 entity.coffee               </a>                                           <a class="source" href="game.html">                 game.coffee               </a>                                           <a class="source" href="geometry.html">                 geometry.coffee               </a>                                           <a class="source" href="input.html">                 input.coffee               </a>                                           <a class="source" href="loader.html">                 loader.coffee               </a>                                           <a class="source" href="main.html">                 main.coffee               </a>                                           <a class="source" href="map.html">                 map.coffee               </a>                                           <a class="source" href="physics.html">                 physics.coffee               </a>                                           <a class="source" href="sprite.html">                 sprite.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               game.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="p">[</span><span class="s1">&#39;./util&#39;</span><span class="p">,</span> <span class="s1">&#39;./input&#39;</span><span class="p">,</span> <span class="s1">&#39;./audio&#39;</span><span class="p">],</span> <span class="nf">(util, input, audio) -&gt;</span>
-    <span class="nv">canvas = </span><span class="kc">null</span>
-    <span class="nv">context = </span><span class="kc">null</span>
-    <span class="nv">canvas_w = </span><span class="mi">0</span>
-    <span class="nv">canvas_h = </span><span class="mi">0</span>
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>game.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
     
-    <span class="nv">current_scene = </span><span class="kc">null</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>Stores the last delta time</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">last_dt = </span><span class="kc">null</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>If delta time is fixed, this is set</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">fixed_dt = </span><span class="kc">null</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>A clamp is placed on delta time so tunneling may be avoided with
-some careful planning by the developer.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">dt_clamp = </span><span class="mi">50</span>
-    <span class="nv">paused = </span><span class="kc">true</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Callbacks for keys are delegated to the input module.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">handleKeyDown = </span><span class="nf">(event) -&gt;</span>
-        <span class="nx">input</span><span class="p">.</span><span class="nx">handleKeyDown</span> <span class="nx">event</span><span class="p">.</span><span class="nx">keyCode</span>
-        <span class="k">return</span>
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="cg.html">
+                  cg.coffee
+                </a>
+              
+                
+                <a class="source" href="audio.html">
+                  audio.coffee
+                </a>
+              
+                
+                <a class="source" href="entity.html">
+                  entity.coffee
+                </a>
+              
+                
+                <a class="source" href="game.html">
+                  game.coffee
+                </a>
+              
+                
+                <a class="source" href="geometry.html">
+                  geometry.coffee
+                </a>
+              
+                
+                <a class="source" href="input.html">
+                  input.coffee
+                </a>
+              
+                
+                <a class="source" href="loader.html">
+                  loader.coffee
+                </a>
+              
+                
+                <a class="source" href="map.html">
+                  map.coffee
+                </a>
+              
+                
+                <a class="source" href="physics.html">
+                  physics.coffee
+                </a>
+              
+                
+                <a class="source" href="sprite.html">
+                  sprite.coffee
+                </a>
+              
+                
+                <a class="source" href="util.html">
+                  util.coffee
+                </a>
+              
+                
+                <a class="source" href="demo.html">
+                  demo.coffee
+                </a>
+              
+                
+                <a class="source" href="main.html">
+                  main.coffee
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
     
-    <span class="nv">handleKeyUp = </span><span class="nf">(event) -&gt;</span>
-        <span class="nx">input</span><span class="p">.</span><span class="nx">handleKeyUp</span> <span class="nx">event</span><span class="p">.</span><span class="nx">keyCode</span>
-        <span class="k">return</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>Update call.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">update = </span><span class="nf">(dt) -&gt;</span>
-        <span class="nx">input</span><span class="p">.</span><span class="nx">update</span><span class="p">()</span>
-        <span class="nx">current_scene</span><span class="p">.</span><span class="nx">update</span> <span class="nx">dt</span>
-        <span class="k">return</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>Draw call.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">draw = </span><span class="o">-&gt;</span>
-        <span class="nx">current_scene</span><span class="p">.</span><span class="nx">draw</span> <span class="nx">context</span>
-        <span class="k">return</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>Canvas instance.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">canvas: </span><span class="o">-&gt;</span> <span class="nx">canvas</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>Canvas dimensions.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">width: </span><span class="o">-&gt;</span> <span class="nx">canvas_w</span>
-    <span class="nv">height: </span><span class="o">-&gt;</span> <span class="nx">canvas_h</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>Last delta time.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">lastDt: </span><span class="o">-&gt;</span> <span class="nx">last_dt</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <p>Switch scene to new scene.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">switchScene: </span><span class="nf">(new_scene) -&gt;</span>
-        <span class="k">throw</span> <span class="s1">&#39;cannot switch to nonexistent scene&#39;</span> <span class="nx">unless</span> <span class="nx">new_scene</span><span class="o">?</span>
-        <span class="nx">current_scene</span><span class="p">.</span><span class="nx">end</span><span class="p">()</span>
-        <span class="nv">current_scene = </span><span class="nx">new_scene</span>
-        <span class="nx">current_scene</span><span class="p">.</span><span class="nx">start</span><span class="p">()</span>
-        <span class="k">return</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <p>Initialize the game with the specified parameters. Pass in null
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>game.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>define [<span class="hljs-string">'./util'</span>, <span class="hljs-string">'./input'</span>, <span class="hljs-string">'./audio'</span>], <span class="hljs-function"><span class="hljs-params">(util, input, audio)</span> -&gt;</span>
+    canvas = <span class="hljs-literal">null</span>
+    context = <span class="hljs-literal">null</span>
+    canvas_w = <span class="hljs-number">0</span>
+    canvas_h = <span class="hljs-number">0</span>
+    
+    current_scene = <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>Stores the last delta time</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    last_dt = <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>If delta time is fixed, this is set</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    fixed_dt = <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>A clamp is placed on delta time so tunneling may be avoided with
+some careful planning by the developer.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    dt_clamp = <span class="hljs-number">50</span>
+    paused = <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Callbacks for keys are delegated to the input module.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">    <span class="hljs-title">handleKeyDown</span> = <span class="hljs-params">(event)</span> -&gt;</span>
+        input.handleKeyDown event.keyCode
+        <span class="hljs-keyword">return</span>
+<span class="hljs-function">    
+    <span class="hljs-title">handleKeyUp</span> = <span class="hljs-params">(event)</span> -&gt;</span>
+        input.handleKeyUp event.keyCode
+        <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Update call.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">    <span class="hljs-title">update</span> = <span class="hljs-params">(dt)</span> -&gt;</span>
+        input.update()
+        current_scene.update dt
+        <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Draw call.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">    <span class="hljs-title">draw</span> = -&gt;</span>
+        current_scene.draw context
+        <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Canvas instance.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">canvas</span>: <span class="hljs-function">-&gt;</span> canvas</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Canvas dimensions.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">width</span>: <span class="hljs-function">-&gt;</span> canvas_w
+    <span class="hljs-attribute">height</span>: <span class="hljs-function">-&gt;</span> canvas_h</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Last delta time.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">lastDt</span>: <span class="hljs-function">-&gt;</span> last_dt</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Switch scene to new scene.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">switchScene</span>: <span class="hljs-function"><span class="hljs-params">(new_scene)</span> -&gt;</span>
+        <span class="hljs-keyword">throw</span> <span class="hljs-string">'cannot switch to nonexistent scene'</span> <span class="hljs-keyword">unless</span> new_scene?
+        current_scene.end()
+        current_scene = new_scene
+        current_scene.start()
+        <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>Initialize the game with the specified parameters. Pass in null
 for <code>fdt</code> (fixed delta-time) in order to initialize in variable
 delta-time mode. <code>dtc</code> clamps the delta time, and <code>initial_scene</code>
-is the first scene to start the game with.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">init: </span><span class="nf">(width, height, fdt, dtc, initial_scene) -&gt;</span>
-        <span class="nv">current_scene = </span><span class="nx">initial_scene</span>
-        
-        <span class="k">if</span> <span class="nx">fdt</span><span class="o">?</span>
-            <span class="nv">fixed_dt = </span><span class="nx">fdt</span>
-            <span class="nv">last_dt = </span><span class="nx">fdt</span>
-        <span class="k">else</span> <span class="k">if</span> <span class="nx">dtc</span><span class="o">?</span>
-            <span class="nv">dt_clamp = </span><span class="nx">dtc</span>
-            <span class="nv">last_dt = </span><span class="nx">dtc</span>
-        <span class="k">else</span>
-            <span class="nv">last_dt = </span><span class="mi">1</span> <span class="o">/</span> <span class="mi">60</span>
-        
-        <span class="nv">container = </span><span class="p">(</span><span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span> <span class="s1">&#39;game&#39;</span><span class="p">)</span> <span class="o">or</span> <span class="nb">document</span><span class="p">.</span><span class="nx">body</span>
-        <span class="nv">canvas = </span><span class="nb">document</span><span class="p">.</span><span class="nx">createElement</span> <span class="s1">&#39;canvas&#39;</span>
-        
-        <span class="nv">canvas.width = canvas_w = </span><span class="nx">width</span>
-        <span class="nv">canvas.height = canvas_h = </span><span class="nx">height</span>
-        
-        <span class="nx">container</span><span class="p">.</span><span class="nx">appendChild</span> <span class="nx">canvas</span>
-        
-        <span class="nv">context = </span><span class="nx">canvas</span><span class="p">.</span><span class="nx">getContext</span> <span class="s1">&#39;2d&#39;</span>
-        
-        <span class="nv">container.tabIndex = </span><span class="mi">0</span>
-        <span class="nx">container</span><span class="p">.</span><span class="nx">focus</span><span class="p">()</span>
-        
-        <span class="nx">input</span><span class="p">.</span><span class="nx">init</span><span class="p">()</span>
-        
-        <span class="nx">container</span><span class="p">.</span><span class="nx">addEventListener</span> <span class="s1">&#39;keydown&#39;</span><span class="p">,</span> <span class="nx">handleKeyDown</span><span class="p">,</span> <span class="kc">false</span>
-        <span class="nx">container</span><span class="p">.</span><span class="nx">addEventListener</span> <span class="s1">&#39;keyup&#39;</span><span class="p">,</span> <span class="nx">handleKeyUp</span><span class="p">,</span> <span class="kc">false</span>
-        
-        <span class="nx">audio</span><span class="p">.</span><span class="nx">init</span><span class="p">()</span>
-        <span class="k">return</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <p>Runs the game loop, starting the scene and calling update and
-draw when appropriate.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">run: </span><span class="nf">() -&gt;</span>
-        <span class="k">throw</span> <span class="s1">&#39;no current scene!&#39;</span> <span class="nx">unless</span> <span class="nx">current_scene</span><span class="o">?</span>
-        
-        <span class="p">{</span><span class="nx">requestAnimationFrame</span><span class="p">}</span> <span class="o">=</span> <span class="nb">window</span>
-        <span class="p">{</span><span class="nx">time</span><span class="p">}</span> <span class="o">=</span> <span class="nx">util</span>
-        
-        <span class="nv">last_frame = </span><span class="nx">time</span><span class="p">()</span>
-        <span class="nv">dt_accumulator = </span><span class="mi">0</span>
-        <span class="nv">paused = </span><span class="kc">false</span>
-        
-        <span class="nv">gameLoop = </span><span class="o">-&gt;</span>
-            <span class="nx">requestAnimationFrame</span> <span class="nx">gameLoop</span> <span class="nx">unless</span> <span class="nx">paused</span>
-            <span class="nv">now = </span><span class="nx">time</span><span class="p">()</span>
-            <span class="nv">dt = </span><span class="nx">now</span> <span class="o">-</span> <span class="nx">last_frame</span>
-            <span class="nv">dt = </span><span class="k">if</span> <span class="nx">dt</span> <span class="o">&gt;</span> <span class="nx">dt_clamp</span> <span class="k">then</span> <span class="nx">dt_clamp</span> <span class="k">else</span> <span class="nx">dt</span>
-            <span class="nv">last_frame = </span><span class="nx">now</span>
-            <span class="k">if</span> <span class="nx">fixed_dt</span><span class="o">?</span>
-                <span class="nx">dt_accumulator</span> <span class="o">+=</span> <span class="nx">dt</span>
-                <span class="k">while</span> <span class="nx">dt_accumulator</span> <span class="o">&gt;</span> <span class="nx">fixed_dt</span>
-                    <span class="nx">update</span> <span class="nx">fixed_dt</span>
-                    <span class="nx">dt_accumulator</span> <span class="o">-=</span> <span class="nx">fixed_dt</span>
-            <span class="k">else</span>
-                <span class="nx">update</span> <span class="nx">dt</span>
-                <span class="nv">last_dt = </span><span class="nx">dt</span>
-            <span class="nx">draw</span><span class="p">()</span>
-        
-        <span class="nx">current_scene</span><span class="p">.</span><span class="nx">start</span><span class="p">()</span>
-        <span class="nx">gameLoop</span><span class="p">()</span>
-        <span class="k">return</span>
+is the first scene to start the game with.</p>
 
-</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">init</span>: <span class="hljs-function"><span class="hljs-params">(width, height, fdt, dtc, initial_scene)</span> -&gt;</span>
+        current_scene = initial_scene
+        
+        <span class="hljs-keyword">if</span> fdt?
+            fixed_dt = fdt
+            last_dt = fdt
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> dtc?
+            dt_clamp = dtc
+            last_dt = dtc
+        <span class="hljs-keyword">else</span>
+            last_dt = <span class="hljs-number">1</span> / <span class="hljs-number">60</span>
+        
+        container = (<span class="hljs-built_in">document</span>.getElementById <span class="hljs-string">'game'</span>) <span class="hljs-keyword">or</span> <span class="hljs-built_in">document</span>.body
+        canvas = <span class="hljs-built_in">document</span>.createElement <span class="hljs-string">'canvas'</span>
+        
+        canvas.width = canvas_w = width
+        canvas.height = canvas_h = height
+        
+        container.appendChild canvas
+        
+        context = canvas.getContext <span class="hljs-string">'2d'</span>
+        
+        container.tabIndex = <span class="hljs-number">0</span>
+        container.focus()
+        
+        input.init()
+        
+        container.addEventListener <span class="hljs-string">'keydown'</span>, handleKeyDown, <span class="hljs-literal">false</span>
+        container.addEventListener <span class="hljs-string">'keyup'</span>, handleKeyUp, <span class="hljs-literal">false</span>
+        
+        audio.init()
+        <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>Runs the game loop, starting the scene and calling update and
+draw when appropriate.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">run</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+        <span class="hljs-keyword">throw</span> <span class="hljs-string">'no current scene!'</span> <span class="hljs-keyword">unless</span> current_scene?
+        
+        {requestAnimationFrame} = <span class="hljs-built_in">window</span>
+        {time} = util
+        
+        last_frame = time()
+        dt_accumulator = <span class="hljs-number">0</span>
+        paused = <span class="hljs-literal">false</span>
+<span class="hljs-function">        
+        <span class="hljs-title">gameLoop</span> = -&gt;</span>
+            requestAnimationFrame gameLoop <span class="hljs-keyword">unless</span> paused
+            now = time()
+            dt = now - last_frame
+            dt = <span class="hljs-keyword">if</span> dt &gt; dt_clamp <span class="hljs-keyword">then</span> dt_clamp <span class="hljs-keyword">else</span> dt
+            last_frame = now
+            <span class="hljs-keyword">if</span> fixed_dt?
+                dt_accumulator += dt
+                <span class="hljs-keyword">while</span> dt_accumulator &gt; fixed_dt
+                    update fixed_dt
+                    dt_accumulator -= fixed_dt
+            <span class="hljs-keyword">else</span>
+                update dt
+                last_dt = dt
+            draw()
+        
+        current_scene.start()
+        gameLoop()
+        <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

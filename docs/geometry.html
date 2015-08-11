@@ -1,327 +1,611 @@
-<!DOCTYPE html>  <html> <head>   <title>geometry.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="audio.html">                 audio.coffee               </a>                                           <a class="source" href="demo.html">                 demo.coffee               </a>                                           <a class="source" href="entity.html">                 entity.coffee               </a>                                           <a class="source" href="game.html">                 game.coffee               </a>                                           <a class="source" href="geometry.html">                 geometry.coffee               </a>                                           <a class="source" href="input.html">                 input.coffee               </a>                                           <a class="source" href="loader.html">                 loader.coffee               </a>                                           <a class="source" href="main.html">                 main.coffee               </a>                                           <a class="source" href="map.html">                 map.coffee               </a>                                           <a class="source" href="physics.html">                 physics.coffee               </a>                                           <a class="source" href="sprite.html">                 sprite.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               geometry.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="o">-&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>These constants determine how debug drawing is rendered when
-shape subpaths are being created.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">POINT_RADIUS = </span><span class="mi">2</span>
-    <span class="nv">NORMAL_OFFSET = </span><span class="mi">4</span>
-    <span class="nv">NORMAL_LENGTH = </span><span class="mi">2</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>This is currently the epsilon used to detect small differences
-in normals.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">EPSILON = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Some basic linear algebra.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">dotProduct = </span><span class="nf">(u, v) -&gt;</span>
-        <span class="k">return</span> <span class="nx">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nx">v</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nx">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nx">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-    
-    <span class="nv">normalize = </span><span class="nf">(v) -&gt;</span>
-        <span class="nv">invnorm = </span><span class="mi">1</span> <span class="o">/</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">sqrt</span> <span class="p">(</span><span class="nx">dotProduct</span> <span class="nx">v</span><span class="p">,</span> <span class="nx">v</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">[</span><span class="nx">invnorm</span> <span class="o">*</span> <span class="nx">v</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">invnorm</span> <span class="o">*</span> <span class="nx">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Axis is assumed to be normalized so only a dot product is used
-in the projection.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">projectShapeOntoAxis = </span><span class="nf">(shape, axis) -&gt;</span>
-        <span class="nv">min = </span><span class="nb">Number</span><span class="p">.</span><span class="nx">POSITIVE_INFINITY</span>
-        <span class="nv">max = </span><span class="nb">Number</span><span class="p">.</span><span class="nx">NEGATIVE_INFINITY</span>
-        
-        <span class="nv">stype = </span><span class="nx">shape</span><span class="p">.</span><span class="nx">type</span>
-        
-        <span class="k">if</span> <span class="nx">stype</span> <span class="o">==</span> <span class="s1">&#39;Point&#39;</span>
-            <span class="nv">min = </span><span class="mi">0</span>
-            <span class="nv">max = </span><span class="mi">0</span>
-        <span class="k">else</span> <span class="k">if</span> <span class="nx">stype</span> <span class="o">==</span> <span class="s1">&#39;Aabb&#39;</span>
-            <span class="nv">hw_proj = </span><span class="nx">dotProduct</span> <span class="nx">shape</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">,</span> <span class="nx">axis</span>
-            <span class="k">if</span> <span class="nx">hw_proj</span> <span class="o">&lt;</span> <span class="mi">0</span>
-                <span class="nv">min = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">min</span><span class="p">,</span> <span class="nx">hw_proj</span>
-                <span class="nv">max = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="nx">max</span><span class="p">,</span> <span class="o">-</span><span class="nx">hw_proj</span>
-            <span class="k">else</span>
-                <span class="nv">min = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">min</span><span class="p">,</span> <span class="o">-</span><span class="nx">hw_proj</span>
-                <span class="nv">max = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="nx">max</span><span class="p">,</span> <span class="nx">hw_proj</span>
-            
-            <span class="nv">hw_proj = </span><span class="nx">dotProduct</span> <span class="p">[</span>
-                    <span class="nx">shape</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="nx">shape</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                <span class="p">],</span> <span class="nx">axis</span>
-            <span class="k">if</span> <span class="nx">hw_proj</span> <span class="o">&lt;</span> <span class="mi">0</span>
-                <span class="nv">min = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">min</span><span class="p">,</span> <span class="nx">hw_proj</span>
-                <span class="nv">max = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="nx">max</span><span class="p">,</span> <span class="o">-</span><span class="nx">hw_proj</span>
-            <span class="k">else</span>
-                <span class="nv">min = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">min</span><span class="p">,</span> <span class="o">-</span><span class="nx">hw_proj</span>
-                <span class="nv">max = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="nx">max</span><span class="p">,</span> <span class="nx">hw_proj</span>
-            
-        <span class="k">else</span> <span class="k">if</span> <span class="nx">stype</span> <span class="o">==</span> <span class="s1">&#39;Polygon&#39;</span>
-            <span class="nv">pts = </span><span class="nx">shape</span><span class="p">.</span><span class="nx">points</span>
-            <span class="k">for</span> <span class="nx">point</span> <span class="k">in</span> <span class="nx">pts</span>
-                <span class="nv">pt_proj = </span><span class="nx">dotProduct</span> <span class="nx">point</span><span class="p">,</span> <span class="nx">axis</span>
-                <span class="nv">min = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">min</span><span class="p">,</span> <span class="nx">pt_proj</span>
-                <span class="nv">max = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="nx">max</span><span class="p">,</span> <span class="nx">pt_proj</span>
-        
-        <span class="k">return</span> <span class="p">[</span><span class="nx">min</span><span class="p">,</span> <span class="nx">max</span><span class="p">]</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>This returns how much interval <code>b</code> should be displaced to render
-the intervals disjoint (except maybe at a point).</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">intervalsIntersect = </span><span class="nf">(a, b) -&gt;</span>
-        <span class="k">return</span> <span class="kc">false</span> <span class="k">if</span> <span class="nx">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nx">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">or</span> <span class="nx">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="nx">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        
-        <span class="nv">aoff = </span><span class="nx">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="nx">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="nv">boff = </span><span class="nx">a</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="nx">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        
-        <span class="k">return</span> <span class="o">-</span><span class="nx">aoff</span> <span class="k">if</span> <span class="nx">aoff</span> <span class="o">&lt;</span> <span class="nx">boff</span>
-        <span class="k">return</span> <span class="nx">boff</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>Figures out how much shape is penetrating polygon. A penetration
-amount and direction may be passed in order to continue a test
-with data from prior analysis.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">calcShapePolygonMinimumPenetrationVector = </span><span class="nf">(s, sx, sy, p, px, py,</span>
-<span class="nf">      pen_amt = Number.POSITIVE_INFINITY,</span>
-<span class="nf">      pen_dir,</span>
-<span class="nf">      negate = false) -&gt;</span>
-        <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">p</span><span class="p">.</span><span class="nx">normals</span><span class="p">.</span><span class="nx">length</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span>
-            <span class="nv">normal = </span><span class="nx">p</span><span class="p">.</span><span class="nx">normals</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
-            <span class="nv">p_bounds = </span><span class="nx">p</span><span class="p">.</span><span class="nx">bounds_on_normals</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
-            
-            <span class="nv">proj_s_pos = </span><span class="nx">dotProduct</span> <span class="p">[</span><span class="nx">sx</span><span class="p">,</span> <span class="nx">sy</span><span class="p">],</span> <span class="nx">normal</span>
-            <span class="nv">proj_p_pos = </span><span class="nx">dotProduct</span> <span class="p">[</span><span class="nx">px</span><span class="p">,</span> <span class="nx">py</span><span class="p">],</span> <span class="nx">normal</span>
-            
-            <span class="nv">s_bounds = </span><span class="nx">projectShapeOntoAxis</span> <span class="nx">s</span><span class="p">,</span> <span class="nx">normal</span>
-            
-            <span class="nv">intersects = </span><span class="nx">intervalsIntersect</span> <span class="p">[</span>
-                <span class="nx">s_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nx">proj_s_pos</span><span class="p">,</span> <span class="nx">s_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nx">proj_s_pos</span><span class="p">],</span> <span class="p">[</span>
-                <span class="nx">p_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nx">proj_p_pos</span><span class="p">,</span> <span class="nx">p_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nx">proj_p_pos</span><span class="p">]</span>
-            
-            <span class="k">return</span> <span class="kc">false</span> <span class="nx">unless</span> <span class="nx">intersects</span>
-            
-            <span class="nv">abs_intersects = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span> <span class="nx">intersects</span>
-            
-            <span class="k">if</span> <span class="nx">abs_intersects</span> <span class="o">&lt;</span> <span class="nx">pen_amt</span>
-                <span class="nv">pen_amt = </span><span class="nx">abs_intersects</span>
-                <span class="k">if</span> <span class="nx">negate</span> <span class="o">is</span> <span class="p">(</span><span class="nx">intersects</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
-                    <span class="nv">pen_dir = </span><span class="nx">normal</span>
-                <span class="k">else</span>
-                    <span class="nv">pen_dir = </span><span class="p">[</span><span class="o">-</span><span class="nx">normal</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="nx">normal</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
-        
-        <span class="k">return</span> <span class="p">[</span><span class="nx">pen_amt</span><span class="p">,</span> <span class="nx">pen_dir</span><span class="p">]</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>Finds bounds of the polygon. Equivalent to concatenating the
-results of a polygon projection onto [1, 0] and [0, 1].</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">calcPolyBounds = </span><span class="nf">(points) -&gt;</span>
-            <span class="nv">minx = </span><span class="nx">points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="nv">maxx = </span><span class="nx">points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-            <span class="nv">miny = </span><span class="nx">points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-            <span class="nv">maxy = </span><span class="nx">points</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">for</span> <span class="nx">point</span> <span class="k">in</span> <span class="nx">points</span>
-                <span class="nv">minx = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">minx</span><span class="p">,</span> <span class="nx">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="nv">maxx = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="nx">maxx</span><span class="p">,</span> <span class="nx">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="nv">miny = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">min</span> <span class="nx">miny</span><span class="p">,</span> <span class="nx">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                <span class="nv">maxy = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="nx">maxy</span><span class="p">,</span> <span class="nx">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">return</span> <span class="p">[</span><span class="nx">minx</span><span class="p">,</span> <span class="nx">maxx</span><span class="p">,</span> <span class="nx">miny</span><span class="p">,</span> <span class="nx">maxy</span><span class="p">]</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>A whole bunch of individual types of shape intersection tests.
-Polygons are assumed to be convex and use the hyperplane
-separation theorem. Points and AABBs are simply special cases.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">testPointPointIntersection = </span><span class="nf">(p1, p1x, p1y, p2, p2x, p2y) -&gt;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
-    
-    <span class="nv">testPointAabbIntersection = </span><span class="nf">(p, px, py, a, ax, ay) -&gt;</span>
-        <span class="nv">pen_amt = </span><span class="nx">ax</span> <span class="o">+</span> <span class="nx">a</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="nx">px</span>
-        <span class="nv">pen_dir = </span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        
-        <span class="nv">next_proj = </span><span class="nx">ay</span> <span class="o">+</span> <span class="nx">a</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="nx">py</span>
-        <span class="k">if</span> <span class="nx">next_proj</span> <span class="o">&lt;</span> <span class="nx">pen_amt</span>
-            <span class="nv">pen_amt = </span><span class="nx">next_proj</span>
-            <span class="nv">pen_dir = </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        
-        <span class="nv">next_proj = </span><span class="nx">px</span> <span class="o">-</span> <span class="p">(</span><span class="nx">ax</span> <span class="o">-</span> <span class="nx">a</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">if</span> <span class="nx">next_proj</span> <span class="o">&lt;</span> <span class="nx">pen_amt</span>
-            <span class="nv">pen_amt = </span><span class="nx">next_proj</span>
-            <span class="nv">pen_dir = </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        
-        <span class="nv">next_proj = </span><span class="nx">py</span> <span class="o">-</span> <span class="p">(</span><span class="nx">ay</span> <span class="o">-</span> <span class="nx">a</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">if</span> <span class="nx">next_proj</span> <span class="o">&lt;</span> <span class="nx">pen_amt</span>
-            <span class="nv">pen_amt = </span><span class="nx">next_proj</span>
-            <span class="nv">pen_dir = </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-        
-        <span class="k">return</span> <span class="p">[</span><span class="nx">pen_amt</span><span class="p">,</span> <span class="nx">pen_dir</span><span class="p">]</span>
-    
-    <span class="nv">testPointPolygonIntersection = </span><span class="nf">(p1, p1x, p1y, p2, p2x, p2y) -&gt;</span>
-        <span class="k">return</span> <span class="nx">calcShapePolygonMinimumPenetrationVector</span> <span class="o">\</span>
-            <span class="nx">p1</span><span class="p">,</span> <span class="nx">p1x</span><span class="p">,</span> <span class="nx">p1y</span><span class="p">,</span>
-            <span class="nx">p2</span><span class="p">,</span> <span class="nx">p2x</span><span class="p">,</span> <span class="nx">p2y</span>
-    
-    <span class="nv">testAabbAabbIntersection = </span><span class="nf">(a1, a1x, a1y, a2, a2x, a2y) -&gt;</span>
-        <span class="nv">pen_amt = </span><span class="nx">a2x</span> <span class="o">+</span> <span class="nx">a2</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="nx">a1x</span> <span class="o">-</span> <span class="nx">a1</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="nv">pen_dir = </span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        
-        <span class="nv">next_proj = </span><span class="nx">a2y</span> <span class="o">+</span> <span class="nx">a2</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="nx">a1y</span> <span class="o">-</span> <span class="nx">a1</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">if</span> <span class="nx">next_proj</span> <span class="o">&lt;</span> <span class="nx">pen_amt</span>
-            <span class="nv">pen_amt = </span><span class="nx">next_proj</span>
-            <span class="nv">pen_dir = </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        
-        <span class="nv">next_proj = </span><span class="nx">a1x</span> <span class="o">+</span> <span class="nx">a1</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="nx">a2x</span> <span class="o">-</span> <span class="nx">a2</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">if</span> <span class="nx">next_proj</span> <span class="o">&lt;</span> <span class="nx">pen_amt</span>
-            <span class="nv">pen_amt = </span><span class="nx">next_proj</span>
-            <span class="nv">pen_dir = </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        
-        <span class="nv">next_proj = </span><span class="nx">a1y</span> <span class="o">+</span> <span class="nx">a1</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="nx">a2y</span> <span class="o">-</span> <span class="nx">a2</span><span class="p">.</span><span class="nx">halfwidth</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">if</span> <span class="nx">next_proj</span> <span class="o">&lt;</span> <span class="nx">pen_amt</span>
-            <span class="nv">pen_amt = </span><span class="nx">next_proj</span>
-            <span class="nv">pen_dir = </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-        
-        <span class="k">return</span> <span class="p">[</span><span class="nx">pen_amt</span><span class="p">,</span> <span class="nx">pen_dir</span><span class="p">]</span>
-    
-    <span class="nv">testAabbPolygonIntersection = </span><span class="nf">(a, ax, ay, p, px, py) -&gt;</span>
-        <span class="nv">intersects = </span><span class="nx">intervalsIntersect</span> <span class="p">[</span>
-            <span class="nx">ax</span> <span class="o">+</span> <span class="nx">a</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">ax</span> <span class="o">+</span> <span class="nx">a</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span> <span class="p">[</span>
-            <span class="nx">px</span> <span class="o">+</span> <span class="nx">p</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">px</span> <span class="o">+</span> <span class="nx">p</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
-        
-        <span class="k">if</span> <span class="nx">intersects</span> <span class="o">&lt;</span> <span class="mi">0</span>
-            <span class="nv">pen_amt = </span><span class="o">-</span><span class="nx">intersects</span>
-            <span class="nv">pen_dir = </span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="k">else</span>
-            <span class="nv">pen_amt = </span><span class="nx">intersects</span>
-            <span class="nv">pen_dir = </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-        
-        <span class="nv">intersects = </span><span class="nx">intervalsIntersect</span> <span class="p">[</span>
-            <span class="nx">ay</span> <span class="o">+</span> <span class="nx">a</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nx">ay</span> <span class="o">+</span> <span class="nx">a</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">3</span><span class="p">]],</span> <span class="p">[</span>
-            <span class="nx">py</span> <span class="o">+</span> <span class="nx">p</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="nx">py</span> <span class="o">+</span> <span class="nx">p</span><span class="p">.</span><span class="nx">bounds_offsets</span><span class="p">[</span><span class="mi">3</span><span class="p">]]</span>
-        
-        <span class="k">if</span> <span class="nx">intersects</span> <span class="o">&lt;</span> <span class="mi">0</span>
-            <span class="nv">pen_amt = </span><span class="o">-</span><span class="nx">intersects</span>
-            <span class="nv">pen_dir = </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">else</span>
-            <span class="nv">pen_amt = </span><span class="nx">intersects</span>
-            <span class="nv">pen_dir = </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
-        
-        <span class="k">return</span> <span class="nx">calcShapePolygonMinimumPenetrationVector</span> <span class="o">\</span>
-            <span class="nx">a</span><span class="p">,</span> <span class="nx">ax</span><span class="p">,</span> <span class="nx">ay</span><span class="p">,</span>
-            <span class="nx">p</span><span class="p">,</span> <span class="nx">px</span><span class="p">,</span> <span class="nx">py</span><span class="p">,</span>
-            <span class="nx">pen_amt</span><span class="p">,</span> <span class="nx">pen_dir</span>
-    
-    <span class="nv">testPolygonPolygonIntersection = </span><span class="nf">(p1, p1x, p1y, p2, p2x, p2y) -&gt;</span>
-        <span class="nv">ret = </span><span class="nx">calcShapePolygonMinimumPenetrationVector</span> <span class="o">\</span>
-            <span class="nx">p1</span><span class="p">,</span> <span class="nx">p1x</span><span class="p">,</span> <span class="nx">p1y</span><span class="p">,</span>
-            <span class="nx">p2</span><span class="p">,</span> <span class="nx">p2x</span><span class="p">,</span> <span class="nx">p2y</span>
-        
-        <span class="k">if</span> <span class="nx">ret</span>
-            <span class="p">[</span><span class="nx">pen_amt</span><span class="p">,</span> <span class="nx">pen_dir</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ret</span>
-        <span class="k">else</span>
-            <span class="k">return</span> <span class="kc">false</span>
-        
-        <span class="k">return</span> <span class="nx">calcShapePolygonMinimumPenetrationVector</span> <span class="o">\</span>
-            <span class="nx">p2</span><span class="p">,</span> <span class="nx">p2x</span><span class="p">,</span> <span class="nx">p2y</span><span class="p">,</span>
-            <span class="nx">p1</span><span class="p">,</span> <span class="nx">p1x</span><span class="p">,</span> <span class="nx">p1y</span><span class="p">,</span>
-            <span class="nx">pen_amt</span><span class="p">,</span> <span class="nx">pen_dir</span><span class="p">,</span> <span class="kc">true</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>A mapping from pairs of shape types to the appropriate hit test.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">intersection_test_map =</span>
-        <span class="nv">Point:</span>
-            <span class="nv">Point: </span><span class="nx">testPointPointIntersection</span>
-            <span class="nv">Aabb: </span><span class="nx">testPointAabbIntersection</span>
-            <span class="nv">Polygon: </span><span class="nx">testPointPolygonIntersection</span>
-        <span class="nv">Aabb:</span>
-            <span class="nv">Aabb: </span><span class="nx">testAabbAabbIntersection</span>
-            <span class="nv">Polygon: </span><span class="nx">testAabbPolygonIntersection</span>
-        <span class="nv">Polygon:</span>
-            <span class="nv">Polygon: </span><span class="nx">testPolygonPolygonIntersection</span>
-    
-    <span class="nv">dotProduct: </span><span class="nx">dotProduct</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <p>A point.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">Point: </span><span class="k">class</span>
-        <span class="nv">constructor: </span><span class="nf">() -&gt;</span>
-            <span class="vi">@type = </span><span class="s1">&#39;Point&#39;</span>
-            <span class="vi">@bounds_offsets = </span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-            
-        <span class="nv">subpath: </span><span class="nf">(context, offx, offy) -&gt;</span>
-            <span class="nx">context</span><span class="p">.</span><span class="nx">moveTo</span> <span class="nx">offx</span> <span class="o">+</span> <span class="nx">POINT_RADIUS</span><span class="p">,</span> <span class="nx">offy</span>
-            <span class="nx">context</span><span class="p">.</span><span class="nx">arc</span> <span class="nx">offx</span><span class="p">,</span> <span class="nx">offy</span><span class="p">,</span> <span class="nx">POINT_RADIUS</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span>
-            <span class="k">return</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <p>An axis-aligned bounding box.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">Aabb: </span><span class="k">class</span>
-        <span class="nv">constructor: </span><span class="nf">(@halfwidth) -&gt;</span>
-            <span class="vi">@type = </span><span class="s1">&#39;Aabb&#39;</span>
-            <span class="nv">hw = </span><span class="nx">@halfwidth</span>
-            <span class="vi">@bounds_offsets = </span><span class="p">[</span><span class="o">-</span><span class="nx">hw</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">hw</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="nx">hw</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">hw</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
-            <span class="k">return</span>
-        
-        <span class="nv">subpath: </span><span class="nf">(context, offx, offy) -&gt;</span>
-            <span class="nv">hw = </span><span class="nx">@halfwidth</span>
-            <span class="nx">context</span><span class="p">.</span><span class="nx">rect</span> <span class="nx">offx</span> <span class="o">-</span> <span class="nx">hw</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nx">offy</span> <span class="o">-</span> <span class="nx">hw</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                <span class="mi">2</span> <span class="o">*</span> <span class="nx">hw</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">hw</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">return</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <p>A <em>convex</em> polygon.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">Polygon: </span><span class="k">class</span>
-        <span class="nv">constructor: </span><span class="nf">(points) -&gt;</span>
-            <span class="vi">@type = </span><span class="s1">&#39;Polygon&#39;</span>
-            <span class="vi">@bounds_offsets = </span><span class="nx">calcPolyBounds</span> <span class="nx">points</span>
-            
-            <span class="nv">sumx = </span><span class="mi">0</span>
-            <span class="nv">sumy = </span><span class="mi">0</span>
-            <span class="nv">num_vertices = </span><span class="nx">points</span><span class="p">.</span><span class="nx">length</span>
-            <span class="k">for</span> <span class="nx">pt</span> <span class="k">in</span> <span class="nx">points</span>
-                <span class="nx">sumx</span> <span class="o">+=</span> <span class="nx">pt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="nx">sumy</span> <span class="o">+=</span> <span class="nx">pt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="vi">@center_offset = </span><span class="p">[</span><span class="nx">sumx</span> <span class="sr">/ num_vertices, sumy /</span> <span class="nx">num_vertices</span><span class="p">]</span>
-            
-            <span class="nv">ccw = </span><span class="kc">null</span>
-            <span class="nv">ptslen = </span><span class="nx">points</span><span class="p">.</span><span class="nx">length</span>
-            <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">ptslen</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span>
-                <span class="nv">j = </span><span class="p">(</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nx">ptslen</span>
-                <span class="nv">k = </span><span class="p">(</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="nx">ptslen</span>
-                <span class="nv">edge1 = </span><span class="p">[</span><span class="nx">points</span><span class="p">[</span><span class="nx">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="nx">points</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
-                    <span class="nx">points</span><span class="p">[</span><span class="nx">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="nx">points</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
-                <span class="nv">edge2 = </span><span class="p">[</span><span class="nx">points</span><span class="p">[</span><span class="nx">k</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="nx">points</span><span class="p">[</span><span class="nx">j</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
-                    <span class="nx">points</span><span class="p">[</span><span class="nx">k</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="nx">points</span><span class="p">[</span><span class="nx">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]]</span>
-                <span class="nv">cross = </span><span class="nx">edge1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nx">edge2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="nx">edge2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nx">edge1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                
-                <span class="k">if</span> <span class="nx">ccw</span><span class="o">?</span>
-                    <span class="k">if</span> <span class="nx">ccw</span> <span class="o">and</span> <span class="nx">cross</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">or</span> <span class="o">not</span> <span class="nx">ccw</span> <span class="o">and</span> <span class="nx">cross</span> <span class="o">&lt;</span> <span class="mi">0</span>
-                        <span class="k">throw</span> <span class="s1">&#39;tried to construct non-convex polygon&#39;</span>
-                <span class="k">else</span>
-                    <span class="nv">ccw = </span><span class="nx">cross</span> <span class="o">&lt;</span> <span class="mi">0</span>
-            
-            <span class="k">if</span> <span class="nx">ccw</span>
-                <span class="vi">@points = </span><span class="nx">points</span><span class="p">.</span><span class="nx">reverse</span><span class="p">()</span>
-            <span class="k">else</span>
-                <span class="vi">@points = </span><span class="nx">points</span>
-            
-            <span class="nv">normals = </span><span class="p">[]</span>
-            <span class="nv">bounds_on_normals = </span><span class="p">[]</span>
-            <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">...</span><span class="nx">ptslen</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span>
-                <span class="nv">j = </span><span class="p">(</span><span class="nx">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="nx">ptslen</span>
-                <span class="nv">normal = </span><span class="nx">normalize</span> <span class="p">[</span><span class="nx">@points</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="nx">@points</span><span class="p">[</span><span class="nx">j</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
-                    <span class="nx">@points</span><span class="p">[</span><span class="nx">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="nx">@points</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span>
-                
-                <span class="nv">skip = </span><span class="kc">false</span>
-                <span class="k">for</span> <span class="nx">other</span> <span class="k">in</span> <span class="nx">normals</span>
-                    <span class="k">if</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">dotProduct</span> <span class="nx">normal</span><span class="p">,</span> <span class="nx">other</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">-</span> <span class="nx">EPSILON</span>
-                        <span class="nv">skip = </span><span class="kc">true</span>
-                        <span class="k">continue</span>
-                
-                <span class="k">continue</span> <span class="k">if</span> <span class="nx">skip</span>
-                
-                <span class="nv">bounds_on_normal = </span><span class="nx">projectShapeOntoAxis</span> <span class="k">this</span><span class="p">,</span> <span class="nx">normal</span>
-                
-                <span class="nx">normals</span><span class="p">.</span><span class="nx">push</span> <span class="nx">normal</span>
-                <span class="nx">bounds_on_normals</span><span class="p">.</span><span class="nx">push</span> <span class="nx">bounds_on_normal</span>
-            
-            <span class="vi">@normals = </span><span class="nx">normals</span>
-            <span class="vi">@bounds_on_normals = </span><span class="nx">bounds_on_normals</span>
-            
-            <span class="k">return</span>
-        
-        <span class="nv">subpath: </span><span class="nf">(context, offx, offy) -&gt;</span>
-            <span class="nv">pts = </span><span class="nx">@points</span>
-            <span class="nx">context</span><span class="p">.</span><span class="nx">moveTo</span> <span class="nx">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nx">offx</span><span class="p">,</span> <span class="nx">pts</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nx">offy</span>
-            <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">...</span><span class="nx">pts</span><span class="p">.</span><span class="nx">length</span><span class="p">]</span> <span class="k">by</span> <span class="mi">1</span>
-                <span class="nx">context</span><span class="p">.</span><span class="nx">lineTo</span> <span class="nx">pts</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nx">offx</span><span class="p">,</span> <span class="nx">pts</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nx">offy</span>
-            <span class="nx">context</span><span class="p">.</span><span class="nx">closePath</span><span class="p">()</span>
-            
-            <span class="nv">coffx = </span><span class="nx">offx</span> <span class="o">+</span> <span class="nx">@center_offset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="nv">coffy = </span><span class="nx">offy</span> <span class="o">+</span> <span class="nx">@center_offset</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="nx">context</span><span class="p">.</span><span class="nx">moveTo</span> <span class="nx">coffx</span> <span class="o">+</span> <span class="nx">POINT_RADIUS</span><span class="p">,</span> <span class="nx">coffy</span>
-            <span class="nx">context</span><span class="p">.</span><span class="nx">arc</span> <span class="nx">coffx</span><span class="p">,</span> <span class="nx">coffy</span><span class="p">,</span> <span class="nx">POINT_RADIUS</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span>
-            
-            <span class="k">for</span> <span class="nx">normal</span> <span class="k">in</span> <span class="nx">@normals</span>
-                <span class="nx">context</span><span class="p">.</span><span class="nx">moveTo</span> <span class="nx">coffx</span> <span class="o">+</span> <span class="nx">NORMAL_OFFSET</span> <span class="o">*</span> <span class="nx">normal</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                    <span class="nx">coffy</span> <span class="o">+</span> <span class="nx">NORMAL_OFFSET</span> <span class="o">*</span> <span class="nx">normal</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-                <span class="nx">context</span><span class="p">.</span><span class="nx">lineTo</span> <span class="nx">coffx</span> <span class="o">+</span>
-                    <span class="p">(</span><span class="nx">NORMAL_LENGTH</span> <span class="o">+</span> <span class="nx">NORMAL_OFFSET</span><span class="p">)</span> <span class="o">*</span> <span class="nx">normal</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                    <span class="nx">coffy</span> <span class="o">+</span> <span class="p">(</span><span class="nx">NORMAL_LENGTH</span> <span class="o">+</span> <span class="nx">NORMAL_OFFSET</span><span class="p">)</span> <span class="o">*</span> <span class="nx">normal</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            
-            <span class="k">return</span>
-    
-    <span class="nv">intersects: </span><span class="nf">(x_a, x_b, y_a, y_b, shape_a, shape_b) -&gt;</span>
-        <span class="nv">test = </span><span class="nx">intersection_test_map</span><span class="p">[</span><span class="nx">shape_a</span><span class="p">.</span><span class="nx">type</span><span class="p">]</span><span class="o">?</span><span class="p">[</span><span class="nx">shape_b</span><span class="p">.</span><span class="nx">type</span><span class="p">]</span>
-        
-        <span class="k">if</span> <span class="nx">test</span><span class="o">?</span>
-            <span class="k">return</span> <span class="nx">test</span> <span class="nx">shape_a</span><span class="p">,</span> <span class="nx">x_a</span><span class="p">,</span> <span class="nx">y_a</span><span class="p">,</span> <span class="nx">shape_b</span><span class="p">,</span> <span class="nx">x_b</span><span class="p">,</span> <span class="nx">y_b</span>
-        <span class="k">else</span>
-            <span class="nv">test = </span><span class="nx">intersection_test_map</span><span class="p">[</span><span class="nx">shape_b</span><span class="p">.</span><span class="nx">type</span><span class="p">]</span><span class="o">?</span><span class="p">[</span><span class="nx">shape_a</span><span class="p">.</span><span class="nx">type</span><span class="p">]</span>
-            <span class="k">if</span> <span class="nx">test</span><span class="o">?</span>
-                <span class="nv">result = </span><span class="nx">test</span> <span class="nx">shape_b</span><span class="p">,</span> <span class="nx">x_b</span><span class="p">,</span> <span class="nx">y_b</span><span class="p">,</span> <span class="nx">shape_a</span><span class="p">,</span> <span class="nx">x_a</span><span class="p">,</span> <span class="nx">y_a</span>
-                <span class="k">if</span> <span class="nx">result</span>
-                    <span class="k">return</span> <span class="p">[</span><span class="nx">result</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="nx">result</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="nx">result</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]]]</span>
-                <span class="k">else</span>
-                    <span class="k">return</span> <span class="kc">false</span>
-        
-        <span class="k">throw</span> <span class="s2">&quot;can&#39;t test #{shape_a.type} against #{shape_b.type}&quot;</span>
-        <span class="k">return</span> <span class="kc">false</span>
+<!DOCTYPE html>
 
-</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
+<html>
+<head>
+  <title>geometry.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="cg.html">
+                  cg.coffee
+                </a>
+              
+                
+                <a class="source" href="audio.html">
+                  audio.coffee
+                </a>
+              
+                
+                <a class="source" href="entity.html">
+                  entity.coffee
+                </a>
+              
+                
+                <a class="source" href="game.html">
+                  game.coffee
+                </a>
+              
+                
+                <a class="source" href="geometry.html">
+                  geometry.coffee
+                </a>
+              
+                
+                <a class="source" href="input.html">
+                  input.coffee
+                </a>
+              
+                
+                <a class="source" href="loader.html">
+                  loader.coffee
+                </a>
+              
+                
+                <a class="source" href="map.html">
+                  map.coffee
+                </a>
+              
+                
+                <a class="source" href="physics.html">
+                  physics.coffee
+                </a>
+              
+                
+                <a class="source" href="sprite.html">
+                  sprite.coffee
+                </a>
+              
+                
+                <a class="source" href="util.html">
+                  util.coffee
+                </a>
+              
+                
+                <a class="source" href="demo.html">
+                  demo.coffee
+                </a>
+              
+                
+                <a class="source" href="main.html">
+                  main.coffee
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>geometry.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>define -&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>These constants determine how debug drawing is rendered when
+shape subpaths are being created.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    POINT_RADIUS = <span class="hljs-number">2</span>
+    NORMAL_OFFSET = <span class="hljs-number">4</span>
+    NORMAL_LENGTH = <span class="hljs-number">2</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>This is currently the epsilon used to detect small differences
+in normals.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    EPSILON = Math.pow <span class="hljs-number">2</span>, -<span class="hljs-number">50</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Some basic linear algebra.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">    <span class="hljs-title">dotProduct</span> = <span class="hljs-params">(u, v)</span> -&gt;</span>
+        <span class="hljs-keyword">return</span> u[<span class="hljs-number">0</span>] * v[<span class="hljs-number">0</span>] + u[<span class="hljs-number">1</span>] * v[<span class="hljs-number">1</span>]
+<span class="hljs-function">    
+    <span class="hljs-title">normalize</span> = <span class="hljs-params">(v)</span> -&gt;</span>
+        invnorm = <span class="hljs-number">1</span> / Math.sqrt (dotProduct v, v)
+        <span class="hljs-keyword">return</span> [invnorm * v[<span class="hljs-number">0</span>], invnorm * v[<span class="hljs-number">1</span>]]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Axis is assumed to be normalized so only a dot product is used
+in the projection.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">    <span class="hljs-title">projectShapeOntoAxis</span> = <span class="hljs-params">(shape, axis)</span> -&gt;</span>
+        min = Number.POSITIVE_INFINITY
+        max = Number.NEGATIVE_INFINITY
+        
+        stype = shape.type
+        
+        <span class="hljs-keyword">if</span> stype == <span class="hljs-string">'Point'</span>
+            min = <span class="hljs-number">0</span>
+            max = <span class="hljs-number">0</span>
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> stype == <span class="hljs-string">'Aabb'</span>
+            hw_proj = dotProduct shape.halfwidth, axis
+            <span class="hljs-keyword">if</span> hw_proj &lt; <span class="hljs-number">0</span>
+                min = Math.min min, hw_proj
+                max = Math.max max, -hw_proj
+            <span class="hljs-keyword">else</span>
+                min = Math.min min, -hw_proj
+                max = Math.max max, hw_proj
+            
+            hw_proj = dotProduct [
+                    shape.halfwidth[<span class="hljs-number">0</span>], -shape.halfwidth[<span class="hljs-number">1</span>]
+                ], axis
+            <span class="hljs-keyword">if</span> hw_proj &lt; <span class="hljs-number">0</span>
+                min = Math.min min, hw_proj
+                max = Math.max max, -hw_proj
+            <span class="hljs-keyword">else</span>
+                min = Math.min min, -hw_proj
+                max = Math.max max, hw_proj
+            
+        <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> stype == <span class="hljs-string">'Polygon'</span>
+            pts = shape.points
+            <span class="hljs-keyword">for</span> point <span class="hljs-keyword">in</span> pts
+                pt_proj = dotProduct point, axis
+                min = Math.min min, pt_proj
+                max = Math.max max, pt_proj
+        
+        <span class="hljs-keyword">return</span> [min, max]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>This returns how much interval <code>b</code> should be displaced to render
+the intervals disjoint (except maybe at a point).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">    <span class="hljs-title">intervalsIntersect</span> = <span class="hljs-params">(a, b)</span> -&gt;</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">if</span> a[<span class="hljs-number">1</span>] &lt; b[<span class="hljs-number">0</span>] <span class="hljs-keyword">or</span> b[<span class="hljs-number">1</span>] &lt; a[<span class="hljs-number">0</span>]
+        
+        aoff = b[<span class="hljs-number">1</span>] - a[<span class="hljs-number">0</span>]
+        boff = a[<span class="hljs-number">1</span>] - b[<span class="hljs-number">0</span>]
+        
+        <span class="hljs-keyword">return</span> -aoff <span class="hljs-keyword">if</span> aoff &lt; boff
+        <span class="hljs-keyword">return</span> boff</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Figures out how much shape is penetrating polygon. A penetration
+amount and direction may be passed in order to continue a test
+with data from prior analysis.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    calcShapePolygonMinimumPenetrationVector = (s, sx, sy, p, px, py,
+      pen_amt = Number.POSITIVE_INFINITY,
+      pen_dir,
+      negate = <span class="hljs-literal">false</span>) -&gt;
+        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..p.normals.length] <span class="hljs-keyword">by</span> <span class="hljs-number">1</span>
+            normal = p.normals[i]
+            p_bounds = p.bounds_on_normals[i]
+            
+            proj_s_pos = dotProduct [sx, sy], normal
+            proj_p_pos = dotProduct [px, py], normal
+            
+            s_bounds = projectShapeOntoAxis s, normal
+            
+            intersects = intervalsIntersect [
+                s_bounds[<span class="hljs-number">0</span>] + proj_s_pos, s_bounds[<span class="hljs-number">1</span>] + proj_s_pos], [
+                p_bounds[<span class="hljs-number">0</span>] + proj_p_pos, p_bounds[<span class="hljs-number">1</span>] + proj_p_pos]
+            
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span> <span class="hljs-keyword">unless</span> intersects
+            
+            abs_intersects = Math.abs intersects
+            
+            <span class="hljs-keyword">if</span> abs_intersects &lt; pen_amt
+                pen_amt = abs_intersects
+                <span class="hljs-keyword">if</span> negate <span class="hljs-keyword">is</span> (intersects &lt; <span class="hljs-number">0</span>)
+                    pen_dir = normal
+                <span class="hljs-keyword">else</span>
+                    pen_dir = [-normal[<span class="hljs-number">0</span>], -normal[<span class="hljs-number">1</span>]]
+        
+        <span class="hljs-keyword">return</span> [pen_amt, pen_dir]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Finds bounds of the polygon. Equivalent to concatenating the
+results of a polygon projection onto [1, 0] and [0, 1].</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">    <span class="hljs-title">calcPolyBounds</span> = <span class="hljs-params">(points)</span> -&gt;</span>
+            minx = points[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]
+            maxx = points[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>]
+            miny = points[<span class="hljs-number">0</span>][<span class="hljs-number">1</span>]
+            maxy = points[<span class="hljs-number">0</span>][<span class="hljs-number">1</span>]
+            <span class="hljs-keyword">for</span> point <span class="hljs-keyword">in</span> points
+                minx = Math.min minx, point[<span class="hljs-number">0</span>]
+                maxx = Math.max maxx, point[<span class="hljs-number">0</span>]
+                miny = Math.min miny, point[<span class="hljs-number">1</span>]
+                maxy = Math.max maxy, point[<span class="hljs-number">1</span>]
+            <span class="hljs-keyword">return</span> [minx, maxx, miny, maxy]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>A whole bunch of individual types of shape intersection tests.
+Polygons are assumed to be convex and use the hyperplane
+separation theorem. Points and AABBs are simply special cases.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">    <span class="hljs-title">testPointPointIntersection</span> = <span class="hljs-params">(p1, p1x, p1y, p2, p2x, p2y)</span> -&gt;</span>
+        <span class="hljs-keyword">return</span> [<span class="hljs-number">0</span>, [<span class="hljs-number">1</span>, <span class="hljs-number">0</span>]]
+<span class="hljs-function">    
+    <span class="hljs-title">testPointAabbIntersection</span> = <span class="hljs-params">(p, px, py, a, ax, ay)</span> -&gt;</span>
+        pen_amt = ax + a.halfwidth[<span class="hljs-number">0</span>] - px
+        pen_dir = [-<span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+        
+        next_proj = ay + a.halfwidth[<span class="hljs-number">1</span>] - py
+        <span class="hljs-keyword">if</span> next_proj &lt; pen_amt
+            pen_amt = next_proj
+            pen_dir = [<span class="hljs-number">0</span>, -<span class="hljs-number">1</span>]
+        
+        next_proj = px - (ax - a.halfwidth[<span class="hljs-number">0</span>])
+        <span class="hljs-keyword">if</span> next_proj &lt; pen_amt
+            pen_amt = next_proj
+            pen_dir = [<span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+        
+        next_proj = py - (ay - a.halfwidth[<span class="hljs-number">1</span>])
+        <span class="hljs-keyword">if</span> next_proj &lt; pen_amt
+            pen_amt = next_proj
+            pen_dir = [<span class="hljs-number">0</span>, <span class="hljs-number">1</span>]
+        
+        <span class="hljs-keyword">return</span> [pen_amt, pen_dir]
+<span class="hljs-function">    
+    <span class="hljs-title">testPointPolygonIntersection</span> = <span class="hljs-params">(p1, p1x, p1y, p2, p2x, p2y)</span> -&gt;</span>
+        <span class="hljs-keyword">return</span> calcShapePolygonMinimumPenetrationVector \
+            p1, p1x, p1y,
+            p2, p2x, p2y
+<span class="hljs-function">    
+    <span class="hljs-title">testAabbAabbIntersection</span> = <span class="hljs-params">(a1, a1x, a1y, a2, a2x, a2y)</span> -&gt;</span>
+        pen_amt = a2x + a2.halfwidth[<span class="hljs-number">0</span>] - (a1x - a1.halfwidth[<span class="hljs-number">0</span>])
+        pen_dir = [-<span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+        
+        next_proj = a2y + a2.halfwidth[<span class="hljs-number">1</span>] - (a1y - a1.halfwidth[<span class="hljs-number">1</span>])
+        <span class="hljs-keyword">if</span> next_proj &lt; pen_amt
+            pen_amt = next_proj
+            pen_dir = [<span class="hljs-number">0</span>, -<span class="hljs-number">1</span>]
+        
+        next_proj = a1x + a1.halfwidth[<span class="hljs-number">0</span>] - (a2x - a2.halfwidth[<span class="hljs-number">0</span>])
+        <span class="hljs-keyword">if</span> next_proj &lt; pen_amt
+            pen_amt = next_proj
+            pen_dir = [<span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+        
+        next_proj = a1y + a1.halfwidth[<span class="hljs-number">1</span>] - (a2y - a2.halfwidth[<span class="hljs-number">1</span>])
+        <span class="hljs-keyword">if</span> next_proj &lt; pen_amt
+            pen_amt = next_proj
+            pen_dir = [<span class="hljs-number">0</span>, <span class="hljs-number">1</span>]
+        
+        <span class="hljs-keyword">return</span> [pen_amt, pen_dir]
+<span class="hljs-function">    
+    <span class="hljs-title">testAabbPolygonIntersection</span> = <span class="hljs-params">(a, ax, ay, p, px, py)</span> -&gt;</span>
+        intersects = intervalsIntersect [
+            ax + a.bounds_offsets[<span class="hljs-number">0</span>], ax + a.bounds_offsets[<span class="hljs-number">1</span>]], [
+            px + p.bounds_offsets[<span class="hljs-number">0</span>], px + p.bounds_offsets[<span class="hljs-number">1</span>]]
+        
+        <span class="hljs-keyword">if</span> intersects &lt; <span class="hljs-number">0</span>
+            pen_amt = -intersects
+            pen_dir = [-<span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+        <span class="hljs-keyword">else</span>
+            pen_amt = intersects
+            pen_dir = [<span class="hljs-number">1</span>, <span class="hljs-number">0</span>]
+        
+        intersects = intervalsIntersect [
+            ay + a.bounds_offsets[<span class="hljs-number">2</span>], ay + a.bounds_offsets[<span class="hljs-number">3</span>]], [
+            py + p.bounds_offsets[<span class="hljs-number">2</span>], py + p.bounds_offsets[<span class="hljs-number">3</span>]]
+        
+        <span class="hljs-keyword">if</span> intersects &lt; <span class="hljs-number">0</span>
+            pen_amt = -intersects
+            pen_dir = [<span class="hljs-number">0</span>, -<span class="hljs-number">1</span>]
+        <span class="hljs-keyword">else</span>
+            pen_amt = intersects
+            pen_dir = [<span class="hljs-number">0</span>, <span class="hljs-number">1</span>]
+        
+        <span class="hljs-keyword">return</span> calcShapePolygonMinimumPenetrationVector \
+            a, ax, ay,
+            p, px, py,
+            pen_amt, pen_dir
+<span class="hljs-function">    
+    <span class="hljs-title">testPolygonPolygonIntersection</span> = <span class="hljs-params">(p1, p1x, p1y, p2, p2x, p2y)</span> -&gt;</span>
+        ret = calcShapePolygonMinimumPenetrationVector \
+            p1, p1x, p1y,
+            p2, p2x, p2y
+        
+        <span class="hljs-keyword">if</span> ret
+            [pen_amt, pen_dir] = ret
+        <span class="hljs-keyword">else</span>
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+        
+        <span class="hljs-keyword">return</span> calcShapePolygonMinimumPenetrationVector \
+            p2, p2x, p2y,
+            p1, p1x, p1y,
+            pen_amt, pen_dir, <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>A mapping from pairs of shape types to the appropriate hit test.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    intersection_test_map =
+        <span class="hljs-attribute">Point</span>:
+            <span class="hljs-attribute">Point</span>: testPointPointIntersection
+            <span class="hljs-attribute">Aabb</span>: testPointAabbIntersection
+            <span class="hljs-attribute">Polygon</span>: testPointPolygonIntersection
+        <span class="hljs-attribute">Aabb</span>:
+            <span class="hljs-attribute">Aabb</span>: testAabbAabbIntersection
+            <span class="hljs-attribute">Polygon</span>: testAabbPolygonIntersection
+        <span class="hljs-attribute">Polygon</span>:
+            <span class="hljs-attribute">Polygon</span>: testPolygonPolygonIntersection
+    
+    <span class="hljs-attribute">dotProduct</span>: dotProduct</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>A point.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">Point</span>: <span class="hljs-class"><span class="hljs-keyword">class</span></span>
+        <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">()</span> -&gt;</span>
+            <span class="hljs-property">@type</span> = <span class="hljs-string">'Point'</span>
+            <span class="hljs-property">@bounds_offsets</span> = [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>]
+            
+        <span class="hljs-attribute">subpath</span>: <span class="hljs-function"><span class="hljs-params">(context, offx, offy)</span> -&gt;</span>
+            context.moveTo offx + POINT_RADIUS, offy
+            context.arc offx, offy, POINT_RADIUS, <span class="hljs-number">0</span>, <span class="hljs-number">2</span> * Math.PI
+            <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-12">&#182;</a>
+              </div>
+              <p>An axis-aligned bounding box.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">Aabb</span>: <span class="hljs-class"><span class="hljs-keyword">class</span></span>
+        <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@halfwidth</span>)</span> -&gt;</span>
+            <span class="hljs-property">@type</span> = <span class="hljs-string">'Aabb'</span>
+            hw = <span class="hljs-property">@halfwidth</span>
+            <span class="hljs-property">@bounds_offsets</span> = [-hw[<span class="hljs-number">0</span>], hw[<span class="hljs-number">0</span>], -hw[<span class="hljs-number">1</span>], hw[<span class="hljs-number">1</span>]]
+            <span class="hljs-keyword">return</span>
+        
+        <span class="hljs-attribute">subpath</span>: <span class="hljs-function"><span class="hljs-params">(context, offx, offy)</span> -&gt;</span>
+            hw = <span class="hljs-property">@halfwidth</span>
+            context.rect offx - hw[<span class="hljs-number">0</span>], offy - hw[<span class="hljs-number">1</span>],
+                <span class="hljs-number">2</span> * hw[<span class="hljs-number">0</span>], <span class="hljs-number">2</span> * hw[<span class="hljs-number">1</span>]
+            <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-13">&#182;</a>
+              </div>
+              <p>A <em>convex</em> polygon.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">Polygon</span>: <span class="hljs-class"><span class="hljs-keyword">class</span></span>
+        <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(points)</span> -&gt;</span>
+            <span class="hljs-property">@type</span> = <span class="hljs-string">'Polygon'</span>
+            <span class="hljs-property">@bounds_offsets</span> = calcPolyBounds points
+            
+            sumx = <span class="hljs-number">0</span>
+            sumy = <span class="hljs-number">0</span>
+            num_vertices = points.length
+            <span class="hljs-keyword">for</span> pt <span class="hljs-keyword">in</span> points
+                sumx += pt[<span class="hljs-number">0</span>]
+                sumy += pt[<span class="hljs-number">1</span>]
+            <span class="hljs-property">@center_offset</span> = [sumx / num_vertices, sumy / num_vertices]
+            
+            ccw = <span class="hljs-literal">null</span>
+            ptslen = points.length
+            <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..ptslen] <span class="hljs-keyword">by</span> <span class="hljs-number">1</span>
+                j = (i + <span class="hljs-number">1</span>) % ptslen
+                k = (i + <span class="hljs-number">2</span>) % ptslen
+                edge1 = [points[j][<span class="hljs-number">0</span>] - points[i][<span class="hljs-number">0</span>],
+                    points[j][<span class="hljs-number">1</span>] - points[i][<span class="hljs-number">1</span>]]
+                edge2 = [points[k][<span class="hljs-number">0</span>] - points[j][<span class="hljs-number">0</span>],
+                    points[k][<span class="hljs-number">1</span>] - points[j][<span class="hljs-number">1</span>]]
+                cross = edge1[<span class="hljs-number">0</span>] * edge2[<span class="hljs-number">1</span>] - edge2[<span class="hljs-number">0</span>] * edge1[<span class="hljs-number">1</span>]
+                
+                <span class="hljs-keyword">if</span> ccw?
+                    <span class="hljs-keyword">if</span> ccw <span class="hljs-keyword">and</span> cross &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">or</span> <span class="hljs-keyword">not</span> ccw <span class="hljs-keyword">and</span> cross &lt; <span class="hljs-number">0</span>
+                        <span class="hljs-keyword">throw</span> <span class="hljs-string">'tried to construct non-convex polygon'</span>
+                <span class="hljs-keyword">else</span>
+                    ccw = cross &lt; <span class="hljs-number">0</span>
+            
+            <span class="hljs-keyword">if</span> ccw
+                <span class="hljs-property">@points</span> = points.reverse()
+            <span class="hljs-keyword">else</span>
+                <span class="hljs-property">@points</span> = points
+            
+            normals = []
+            bounds_on_normals = []
+            <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">0.</span>..ptslen] <span class="hljs-keyword">by</span> <span class="hljs-number">1</span>
+                j = (i + <span class="hljs-number">1</span>) % ptslen
+                normal = normalize [<span class="hljs-property">@points</span>[i][<span class="hljs-number">1</span>] - <span class="hljs-property">@points</span>[j][<span class="hljs-number">1</span>],
+                    <span class="hljs-property">@points</span>[j][<span class="hljs-number">0</span>] - <span class="hljs-property">@points</span>[i][<span class="hljs-number">0</span>]]
+                
+                skip = <span class="hljs-literal">false</span>
+                <span class="hljs-keyword">for</span> other <span class="hljs-keyword">in</span> normals
+                    <span class="hljs-keyword">if</span> Math.abs(dotProduct normal, other) &gt; <span class="hljs-number">1</span> - EPSILON
+                        skip = <span class="hljs-literal">true</span>
+                        <span class="hljs-keyword">continue</span>
+                
+                <span class="hljs-keyword">continue</span> <span class="hljs-keyword">if</span> skip
+                
+                bounds_on_normal = projectShapeOntoAxis <span class="hljs-keyword">this</span>, normal
+                
+                normals.push normal
+                bounds_on_normals.push bounds_on_normal
+            
+            <span class="hljs-property">@normals</span> = normals
+            <span class="hljs-property">@bounds_on_normals</span> = bounds_on_normals
+            
+            <span class="hljs-keyword">return</span>
+        
+        <span class="hljs-attribute">subpath</span>: <span class="hljs-function"><span class="hljs-params">(context, offx, offy)</span> -&gt;</span>
+            pts = <span class="hljs-property">@points</span>
+            context.moveTo pts[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>] + offx, pts[<span class="hljs-number">0</span>][<span class="hljs-number">1</span>] + offy
+            <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">1.</span>..pts.length] <span class="hljs-keyword">by</span> <span class="hljs-number">1</span>
+                context.lineTo pts[i][<span class="hljs-number">0</span>] + offx, pts[i][<span class="hljs-number">1</span>] + offy
+            context.closePath()
+            
+            coffx = offx + <span class="hljs-property">@center_offset</span>[<span class="hljs-number">0</span>]
+            coffy = offy + <span class="hljs-property">@center_offset</span>[<span class="hljs-number">1</span>]
+            context.moveTo coffx + POINT_RADIUS, coffy
+            context.arc coffx, coffy, POINT_RADIUS, <span class="hljs-number">0</span>, <span class="hljs-number">2</span> * Math.PI
+            
+            <span class="hljs-keyword">for</span> normal <span class="hljs-keyword">in</span> <span class="hljs-property">@normals</span>
+                context.moveTo coffx + NORMAL_OFFSET * normal[<span class="hljs-number">0</span>],
+                    coffy + NORMAL_OFFSET * normal[<span class="hljs-number">1</span>]
+                context.lineTo coffx +
+                    (NORMAL_LENGTH + NORMAL_OFFSET) * normal[<span class="hljs-number">0</span>],
+                    coffy + (NORMAL_LENGTH + NORMAL_OFFSET) * normal[<span class="hljs-number">1</span>]
+            
+            <span class="hljs-keyword">return</span>
+    
+    <span class="hljs-attribute">intersects</span>: <span class="hljs-function"><span class="hljs-params">(x_a, x_b, y_a, y_b, shape_a, shape_b)</span> -&gt;</span>
+        test = intersection_test_map[shape_a.type]?[shape_b.type]
+        
+        <span class="hljs-keyword">if</span> test?
+            <span class="hljs-keyword">return</span> test shape_a, x_a, y_a, shape_b, x_b, y_b
+        <span class="hljs-keyword">else</span>
+            test = intersection_test_map[shape_b.type]?[shape_a.type]
+            <span class="hljs-keyword">if</span> test?
+                result = test shape_b, x_b, y_b, shape_a, x_a, y_a
+                <span class="hljs-keyword">if</span> result
+                    <span class="hljs-keyword">return</span> [result[<span class="hljs-number">0</span>], [-result[<span class="hljs-number">1</span>][<span class="hljs-number">0</span>], -result[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>]]]
+                <span class="hljs-keyword">else</span>
+                    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>
+        
+        <span class="hljs-keyword">throw</span> <span class="hljs-string">"can't test <span class="hljs-subst">#{shape_a.type}</span> against <span class="hljs-subst">#{shape_b.type}</span>"</span>
+        <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

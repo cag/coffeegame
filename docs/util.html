@@ -1,74 +1,332 @@
-<!DOCTYPE html>  <html> <head>   <title>util.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="audio.html">                 audio.coffee               </a>                                           <a class="source" href="demo.html">                 demo.coffee               </a>                                           <a class="source" href="entity.html">                 entity.coffee               </a>                                           <a class="source" href="game.html">                 game.coffee               </a>                                           <a class="source" href="geometry.html">                 geometry.coffee               </a>                                           <a class="source" href="input.html">                 input.coffee               </a>                                           <a class="source" href="loader.html">                 loader.coffee               </a>                                           <a class="source" href="main.html">                 main.coffee               </a>                                           <a class="source" href="map.html">                 map.coffee               </a>                                           <a class="source" href="physics.html">                 physics.coffee               </a>                                           <a class="source" href="sprite.html">                 sprite.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               util.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="o">-&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>An implementation of insertion sort</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">insertionSort = </span><span class="p">(</span><span class="nx">ary</span><span class="p">,</span> <span class="nv">cmp = </span><span class="nf">(a, b) -&gt;</span>
-                    <span class="k">if</span> <span class="nx">a</span> <span class="o">&lt;</span> <span class="nx">b</span> <span class="k">then</span> <span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="k">if</span> <span class="nx">a</span> <span class="o">==</span> <span class="nx">b</span> <span class="k">then</span> <span class="mi">0</span> <span class="k">else</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span>
-        <span class="k">for</span> <span class="nx">i</span> <span class="k">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">...</span><span class="nx">ary</span><span class="p">.</span><span class="nx">length</span><span class="p">]</span>
-            <span class="nv">tmp = </span><span class="nx">ary</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
-            <span class="nv">j = </span><span class="nx">i</span>
-            <span class="k">while</span> <span class="nx">j</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="o">and</span> <span class="p">(</span><span class="nx">cmp</span> <span class="nx">ary</span><span class="p">[</span><span class="nx">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="nx">tmp</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
-                <span class="nx">ary</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="o">=</span> <span class="nx">ary</span><span class="p">[</span><span class="nx">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
-                <span class="o">--</span><span class="nx">j</span>
-            <span class="nx">ary</span><span class="p">[</span><span class="nx">j</span><span class="p">]</span> <span class="o">=</span> <span class="nx">tmp</span>
-        <span class="k">return</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>requestAnimationFrame shim by Erik Möller
-with fixes from Paul Irish and Tino Zijdel.</p>
+<!DOCTYPE html>
 
-<p>CoffeeScript port by Jacob Rus</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">do</span> <span class="o">-&gt;</span>
-        <span class="nv">w = </span><span class="nb">window</span>
-        <span class="k">for</span> <span class="nx">vendor</span> <span class="k">in</span> <span class="p">[</span><span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;moz&#39;</span><span class="p">,</span> <span class="s1">&#39;webkit&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">]</span>
-            <span class="k">break</span> <span class="k">if</span> <span class="nx">w</span><span class="p">.</span><span class="nx">requestAnimationFrame</span>
-            <span class="nv">w.requestAnimationFrame = </span><span class="nx">w</span><span class="p">[</span><span class="nx">vendor</span> <span class="o">+</span>
-                <span class="s1">&#39;RequestAnimationFrame&#39;</span><span class="p">]</span>
-            <span class="nv">w.cancelAnimationFrame = </span><span class="p">(</span><span class="nx">w</span><span class="p">[</span><span class="nx">vendor</span> <span class="o">+</span>
-                <span class="s1">&#39;CancelAnimationFrame&#39;</span><span class="p">]</span> <span class="o">or</span>
-                <span class="nx">w</span><span class="p">[</span><span class="s2">&quot;#{vendor}CancelRequestAnimationFrame&quot;</span><span class="p">])</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Deal with the case where rAF is built in but cAF is not.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">if</span> <span class="nx">w</span><span class="p">.</span><span class="nx">requestAnimationFrame</span>
-            <span class="k">return</span> <span class="k">if</span> <span class="nx">w</span><span class="p">.</span><span class="nx">cancelAnimationFrame</span>
-            <span class="nv">browserRaf = </span><span class="nx">w</span><span class="p">.</span><span class="nx">requestAnimationFrame</span>
-            <span class="nv">canceled = </span><span class="p">{}</span>
-            <span class="nv">w.requestAnimationFrame = </span><span class="nf">(callback) -&gt;</span>
-                <span class="nv">id = </span><span class="nx">browserRaf</span> <span class="nf">(time) -&gt;</span>
-                    <span class="k">if</span> <span class="nx">id</span> <span class="k">of</span> <span class="nx">canceled</span> <span class="k">then</span> <span class="k">delete</span> <span class="nx">canceled</span><span class="p">[</span><span class="nx">id</span><span class="p">]</span>
-                    <span class="k">else</span> <span class="nx">callback</span> <span class="nx">time</span>
-            <span class="nv">w.cancelAnimationFrame = </span><span class="nf">(id) -&gt;</span> <span class="nx">canceled</span><span class="p">[</span><span class="nx">id</span><span class="p">]</span> <span class="o">=</span> <span class="kc">true</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>Handle legacy browsers which don’t implement rAF.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="k">else</span>
-            <span class="nv">targetTime = </span><span class="mi">0</span>
-            <span class="nv">w.requestAnimationFrame = </span><span class="nf">(callback) -&gt;</span>
-                <span class="nv">targetTime = </span><span class="nb">Math</span><span class="p">.</span><span class="nx">max</span> <span class="nx">targetTime</span> <span class="o">+</span> <span class="mi">16</span><span class="p">,</span> <span class="nv">currentTime = </span><span class="o">+</span><span class="k">new</span> <span class="nb">Date</span>
-                <span class="nx">w</span><span class="p">.</span><span class="nx">setTimeout</span> <span class="p">(</span><span class="o">-&gt;</span> <span class="nx">callback</span> <span class="o">+</span><span class="k">new</span> <span class="nb">Date</span><span class="p">),</span> <span class="nx">targetTime</span> <span class="o">-</span> <span class="nx">currentTime</span>
-
-            <span class="nv">w.cancelAnimationFrame = </span><span class="nf">(id) -&gt;</span> <span class="nx">clearTimeout</span> <span class="nx">id</span>
-        
-        <span class="k">return</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>Performance.now polyfill.
-Thanks Tony Gentilcore for the <a href="http://gent.ilcore.com/2012/06/better-timer-for-javascript.html">heads up</a>.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">pNow = </span><span class="nx">do</span> <span class="o">-&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>A monotonic but slightly inaccurate timer in seconds.
-Referenced Kevin Reid's implementation.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nv">time_offset = </span><span class="mi">0</span>
-        <span class="nv">time_seen = </span><span class="mi">0</span>
-        <span class="nv">fallback = </span><span class="nf">() -&gt;</span>
-            <span class="nv">t = </span><span class="nb">Date</span><span class="p">.</span><span class="nx">now</span><span class="p">()</span>
-            <span class="nx">time_offset</span> <span class="o">+=</span> <span class="nx">time_seen</span> <span class="o">-</span> <span class="nx">t</span> <span class="k">if</span> <span class="nx">t</span> <span class="o">&lt;</span> <span class="nx">time_seen</span>
-            <span class="nv">time_seen = </span><span class="nx">t</span>
-            <span class="k">return</span> <span class="p">(</span><span class="nx">t</span> <span class="o">+</span> <span class="nx">time_offset</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="nx">performance</span><span class="o">?</span>
-            <span class="k">return</span> <span class="nx">performance</span><span class="p">.</span><span class="nx">now</span> <span class="k">if</span> <span class="nx">performance</span><span class="p">.</span><span class="nx">now</span><span class="o">?</span>
-            
-            <span class="k">for</span> <span class="nx">vendor</span> <span class="k">in</span> <span class="p">[</span><span class="s1">&#39;ms&#39;</span><span class="p">,</span> <span class="s1">&#39;moz&#39;</span><span class="p">,</span> <span class="s1">&#39;webkit&#39;</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">]</span>
-                <span class="nv">pNow = </span><span class="nx">performance</span><span class="p">[</span><span class="nx">vendor</span> <span class="o">+</span> <span class="s1">&#39;Now&#39;</span><span class="p">]</span>
-                <span class="k">return</span> <span class="nx">pNow</span> <span class="k">if</span> <span class="nx">pNow</span><span class="o">?</span>
-        
-        <span class="k">return</span> <span class="nx">fallback</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>An epsilon for things involving real numbers and convergence.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">EPSILON: </span><span class="nb">Math</span><span class="p">.</span><span class="nx">pow</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">50</span><span class="p">)</span>
+<html>
+<head>
+  <title>util.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
     
-    <span class="nv">time: </span><span class="o">-&gt;</span> <span class="p">.</span><span class="mi">001</span> <span class="o">*</span> <span class="nx">pNow</span><span class="p">.</span><span class="nx">call</span> <span class="nb">window</span><span class="p">.</span><span class="nx">performance</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>Insertion sort is used as a sort for arrays which don't change
-order much between frames.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">persistentSort: </span><span class="nx">insertionSort</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <p>Constructs a 32-bit bitmask from an array of values ranging from
-0 to 31 inclusive.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">constructBitmask: </span><span class="nf">(group_array) -&gt;</span>
-        <span class="nv">mask = </span><span class="mi">0</span>
-        <span class="k">for</span> <span class="nx">group</span> <span class="k">in</span> <span class="nx">group_array</span>
-            <span class="nx">mask</span> <span class="o">|=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="nx">group</span>
-        <span class="k">return</span> <span class="nx">mask</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <p>Turns an RGB tuple into a web-friendly hex representation.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">rgbToHex: </span><span class="nf">(r, g, b) -&gt;</span>
-        <span class="nv">toTwoDigitHex = </span><span class="nf">(v) -&gt;</span> <span class="s2">&quot;00#{</span>
-<span class="s2">            (Math.min (Math.max (Math.round v * 256), 0), 255).</span>
-<span class="s2">                toString 16}&quot;</span><span class="p">.</span><span class="nx">substr</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span>
-        <span class="s2">&quot;##{toTwoDigitHex r}#{toTwoDigitHex g}#{toTwoDigitHex b}&quot;</span>
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="cg.html">
+                  cg.coffee
+                </a>
+              
+                
+                <a class="source" href="audio.html">
+                  audio.coffee
+                </a>
+              
+                
+                <a class="source" href="entity.html">
+                  entity.coffee
+                </a>
+              
+                
+                <a class="source" href="game.html">
+                  game.coffee
+                </a>
+              
+                
+                <a class="source" href="geometry.html">
+                  geometry.coffee
+                </a>
+              
+                
+                <a class="source" href="input.html">
+                  input.coffee
+                </a>
+              
+                
+                <a class="source" href="loader.html">
+                  loader.coffee
+                </a>
+              
+                
+                <a class="source" href="map.html">
+                  map.coffee
+                </a>
+              
+                
+                <a class="source" href="physics.html">
+                  physics.coffee
+                </a>
+              
+                
+                <a class="source" href="sprite.html">
+                  sprite.coffee
+                </a>
+              
+                
+                <a class="source" href="util.html">
+                  util.coffee
+                </a>
+              
+                
+                <a class="source" href="demo.html">
+                  demo.coffee
+                </a>
+              
+                
+                <a class="source" href="main.html">
+                  main.coffee
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>util.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>define -&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>An implementation of insertion sort</p>
 
-</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-function">    <span class="hljs-title">insertionSort</span> = <span class="hljs-params">(ary, cmp = (a, b) -&gt;
+                    <span class="hljs-keyword">if</span> a &lt; b <span class="hljs-keyword">then</span> -<span class="hljs-number">1</span> <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> a == b <span class="hljs-keyword">then</span> <span class="hljs-number">0</span> <span class="hljs-keyword">else</span> <span class="hljs-number">1</span>)</span> -&gt;</span>
+        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [<span class="hljs-number">1.</span>..ary.length]
+            tmp = ary[i]
+            j = i
+            <span class="hljs-keyword">while</span> j &gt; <span class="hljs-number">0</span> <span class="hljs-keyword">and</span> (cmp ary[j - <span class="hljs-number">1</span>], tmp) &gt; <span class="hljs-number">0</span>
+                ary[j] = ary[j - <span class="hljs-number">1</span>]
+                --j
+            ary[j] = tmp
+        <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>requestAnimationFrame shim by Erik Möller
+with fixes from Paul Irish and Tino Zijdel.</p>
+<p>CoffeeScript port by Jacob Rus</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">do</span> -&gt;
+        w = <span class="hljs-built_in">window</span>
+        <span class="hljs-keyword">for</span> vendor <span class="hljs-keyword">in</span> [<span class="hljs-string">'ms'</span>, <span class="hljs-string">'moz'</span>, <span class="hljs-string">'webkit'</span>, <span class="hljs-string">'o'</span>]
+            <span class="hljs-keyword">break</span> <span class="hljs-keyword">if</span> w.requestAnimationFrame
+            w.requestAnimationFrame = w[vendor +
+                <span class="hljs-string">'RequestAnimationFrame'</span>]
+            w.cancelAnimationFrame = (w[vendor +
+                <span class="hljs-string">'CancelAnimationFrame'</span>] <span class="hljs-keyword">or</span>
+                w[<span class="hljs-string">"<span class="hljs-subst">#{vendor}</span>CancelRequestAnimationFrame"</span>])</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Deal with the case where rAF is built in but cAF is not.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> w.requestAnimationFrame
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">if</span> w.cancelAnimationFrame
+            browserRaf = w.requestAnimationFrame
+            canceled = {}
+            w.requestAnimationFrame = <span class="hljs-function"><span class="hljs-params">(callback)</span> -&gt;</span>
+                id = browserRaf (time) -&gt;
+                    <span class="hljs-keyword">if</span> id <span class="hljs-keyword">of</span> canceled <span class="hljs-keyword">then</span> <span class="hljs-keyword">delete</span> canceled[id]
+                    <span class="hljs-keyword">else</span> callback time
+            w.cancelAnimationFrame = <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span> canceled[id] = <span class="hljs-literal">true</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>Handle legacy browsers which don’t implement rAF.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">else</span>
+            targetTime = <span class="hljs-number">0</span>
+            w.requestAnimationFrame = <span class="hljs-function"><span class="hljs-params">(callback)</span> -&gt;</span>
+                targetTime = Math.max targetTime + <span class="hljs-number">16</span>, currentTime = +<span class="hljs-keyword">new</span> Date
+                w.setTimeout (<span class="hljs-function">-&gt;</span> callback +<span class="hljs-keyword">new</span> Date), targetTime - currentTime
+
+            w.cancelAnimationFrame = <span class="hljs-function"><span class="hljs-params">(id)</span> -&gt;</span> clearTimeout id
+        
+        <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>Performance.now polyfill.
+Thanks Tony Gentilcore for the <a href="http://gent.ilcore.com/2012/06/better-timer-for-javascript.html">heads up</a>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    pNow = <span class="hljs-keyword">do</span> -&gt;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>A monotonic but slightly inaccurate timer in seconds.
+Referenced Kevin Reid’s implementation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        time_offset = <span class="hljs-number">0</span>
+        time_seen = <span class="hljs-number">0</span>
+<span class="hljs-function">        <span class="hljs-title">fallback</span> = <span class="hljs-params">()</span> -&gt;</span>
+            t = Date.now()
+            time_offset += time_seen - t <span class="hljs-keyword">if</span> t &lt; time_seen
+            time_seen = t
+            <span class="hljs-keyword">return</span> (t + time_offset)
+        
+        <span class="hljs-keyword">if</span> performance?
+            <span class="hljs-keyword">return</span> performance.now <span class="hljs-keyword">if</span> performance.now?
+            
+            <span class="hljs-keyword">for</span> vendor <span class="hljs-keyword">in</span> [<span class="hljs-string">'ms'</span>, <span class="hljs-string">'moz'</span>, <span class="hljs-string">'webkit'</span>, <span class="hljs-string">'o'</span>]
+                pNow = performance[vendor + <span class="hljs-string">'Now'</span>]
+                <span class="hljs-keyword">return</span> pNow <span class="hljs-keyword">if</span> pNow?
+        
+        <span class="hljs-keyword">return</span> fallback</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>An epsilon for things involving real numbers and convergence.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">EPSILON</span>: Math.pow(<span class="hljs-number">2</span>, -<span class="hljs-number">50</span>)
+    
+    <span class="hljs-attribute">time</span>: <span class="hljs-function">-&gt;</span> <span class="hljs-number">.001</span> * pNow.call <span class="hljs-built_in">window</span>.performance</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Insertion sort is used as a sort for arrays which don’t change
+order much between frames.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">persistentSort</span>: insertionSort</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-10">&#182;</a>
+              </div>
+              <p>Constructs a 32-bit bitmask from an array of values ranging from
+0 to 31 inclusive.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">constructBitmask</span>: <span class="hljs-function"><span class="hljs-params">(group_array)</span> -&gt;</span>
+        mask = <span class="hljs-number">0</span>
+        <span class="hljs-keyword">for</span> group <span class="hljs-keyword">in</span> group_array
+            mask |= <span class="hljs-number">1</span> &lt;&lt; group
+        <span class="hljs-keyword">return</span> mask</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-11">&#182;</a>
+              </div>
+              <p>Turns an RGB tuple into a web-friendly hex representation.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">rgbToHex</span>: <span class="hljs-function"><span class="hljs-params">(r, g, b)</span> -&gt;</span>
+<span class="hljs-function">        <span class="hljs-title">toTwoDigitHex</span> = <span class="hljs-params">(v)</span> -&gt;</span> <span class="hljs-string">"00<span class="hljs-subst">#{
+            (Math.min (Math.max (Math.round v * <span class="hljs-number">256</span>), <span class="hljs-number">0</span>), <span class="hljs-number">255</span>).
+                toString <span class="hljs-number">16</span>}</span>"</span>.substr(-<span class="hljs-number">2</span>)
+        <span class="hljs-string">"#<span class="hljs-subst">#{toTwoDigitHex r}</span><span class="hljs-subst">#{toTwoDigitHex g}</span><span class="hljs-subst">#{toTwoDigitHex b}</span>"</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

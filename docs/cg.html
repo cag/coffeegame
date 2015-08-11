@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>physics.coffee</title>
+  <title>cg.coffee</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -93,7 +93,7 @@
         
           <li id="title">
               <div class="annotation">
-                  <h1>physics.coffee</h1>
+                  <h1>cg.coffee</h1>
               </div>
           </li>
         
@@ -105,42 +105,21 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>define [<span class="hljs-string">'./game'</span>], <span class="hljs-function"><span class="hljs-params">(game)</span> -&gt;</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-2">&#182;</a>
-              </div>
-              <p>Using ye old midpoint method</p>
+              <p>This is an auto-generated source file.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">integrate</span>: <span class="hljs-function"><span class="hljs-params">(obj, dt)</span> -&gt;</span>
-        v = obj.velocity <span class="hljs-keyword">or</span> [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>]
-        a = obj.acceleration <span class="hljs-keyword">or</span> [<span class="hljs-number">0</span>, <span class="hljs-number">0</span>]
-        last_a = obj.last_acceleration <span class="hljs-keyword">or</span> a
-        
-        damping = obj.damping <span class="hljs-keyword">or</span> <span class="hljs-number">1</span>
-        
-        v[<span class="hljs-number">0</span>] *= damping
-        v[<span class="hljs-number">1</span>] *= damping
-        
-        obj.x = obj.x + v[<span class="hljs-number">0</span>] * dt + a[<span class="hljs-number">0</span>] * dt * dt
-        obj.y = obj.y + v[<span class="hljs-number">1</span>] * dt + a[<span class="hljs-number">1</span>] * dt * dt
-        
-        v[<span class="hljs-number">0</span>] = v[<span class="hljs-number">0</span>] + a[<span class="hljs-number">0</span>] * dt
-        v[<span class="hljs-number">1</span>] = v[<span class="hljs-number">1</span>] + a[<span class="hljs-number">1</span>] * dt
-        
-        obj.velocity = v
-        <span class="hljs-keyword">return</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>define [<span class="hljs-string">'cg/audio'</span>, <span class="hljs-string">'cg/entity'</span>, <span class="hljs-string">'cg/game'</span>, <span class="hljs-string">'cg/geometry'</span>, <span class="hljs-string">'cg/input'</span>, <span class="hljs-string">'cg/loader'</span>, <span class="hljs-string">'cg/map'</span>, <span class="hljs-string">'cg/physics'</span>, <span class="hljs-string">'cg/sprite'</span>, <span class="hljs-string">'cg/util'</span>], <span class="hljs-function"><span class="hljs-params">(audio, entity, game, geometry, input, loader, map, physics, sprite, util)</span> -&gt;</span>
+    <span class="hljs-attribute">audio</span>: audio
+    <span class="hljs-attribute">entity</span>: entity
+    <span class="hljs-attribute">game</span>: game
+    <span class="hljs-attribute">geometry</span>: geometry
+    <span class="hljs-attribute">input</span>: input
+    <span class="hljs-attribute">loader</span>: loader
+    <span class="hljs-attribute">map</span>: map
+    <span class="hljs-attribute">physics</span>: physics
+    <span class="hljs-attribute">sprite</span>: sprite
+    <span class="hljs-attribute">util</span>: util</pre></div></div>
             
         </li>
         

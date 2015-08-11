@@ -1,55 +1,283 @@
-<!DOCTYPE html>  <html> <head>   <title>audio.coffee</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>            <div id="jump_to">         Jump To &hellip;         <div id="jump_wrapper">           <div id="jump_page">                                           <a class="source" href="audio.html">                 audio.coffee               </a>                                           <a class="source" href="demo.html">                 demo.coffee               </a>                                           <a class="source" href="entity.html">                 entity.coffee               </a>                                           <a class="source" href="game.html">                 game.coffee               </a>                                           <a class="source" href="geometry.html">                 geometry.coffee               </a>                                           <a class="source" href="input.html">                 input.coffee               </a>                                           <a class="source" href="loader.html">                 loader.coffee               </a>                                           <a class="source" href="main.html">                 main.coffee               </a>                                           <a class="source" href="map.html">                 map.coffee               </a>                                           <a class="source" href="physics.html">                 physics.coffee               </a>                                           <a class="source" href="sprite.html">                 sprite.coffee               </a>                                           <a class="source" href="util.html">                 util.coffee               </a>                        </div>         </div>       </div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               audio.coffee             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nx">define</span> <span class="p">[</span><span class="s1">&#39;./util&#39;</span><span class="p">],</span> <span class="nf">(util) -&gt;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <p>A prefix and suffix applied to names passed into sound
-constructors so that they load from the right place.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">url_prefix = </span><span class="s1">&#39;assets/&#39;</span>
-    <span class="nv">url_suffix = </span><span class="s1">&#39;.wav&#39;</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <p>Thanks Boris Smus for the <a href="http://www.html5rocks.com/en/tutorials/webaudio/intro/">Web Audio tutorial</a>.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nx">do</span> <span class="o">-&gt;</span>
-        <span class="nv">w = </span><span class="nb">window</span>
-        <span class="nv">w.AudioContext = </span><span class="nx">w</span><span class="p">.</span><span class="nx">AudioContext</span> <span class="o">or</span> <span class="nx">w</span><span class="p">.</span><span class="nx">webkitAudioContext</span>
-        <span class="k">return</span>
-    
-    <span class="nv">audio_context = </span><span class="kc">null</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <p>Initializes the audio system.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">init: </span><span class="o">-&gt;</span>
-        <span class="k">if</span> <span class="nx">AudioContext</span><span class="o">?</span>
-            <span class="nv">audio_context = </span><span class="k">new</span> <span class="nx">AudioContext</span>
-        <span class="k">else</span>
-            <span class="nx">console</span><span class="p">.</span><span class="nx">warn</span> <span class="s1">&#39;could not initialize audio!&#39;</span>
-        <span class="k">return</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <p>See the <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web Audio API</a>
-for information on how to use the audio context.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">getAudioContext: </span><span class="o">-&gt;</span> <span class="nx">audio_context</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <p>The <code>Sound</code> class handles loading sound buffers and playing them.</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">Sound: </span><span class="k">class</span>
-        <span class="nv">constructor: </span><span class="nf">(@name, onload) -&gt;</span>
-            <span class="nx">unless</span> <span class="nx">audio_context</span><span class="o">?</span>
-                <span class="nx">onload</span><span class="o">?</span><span class="p">()</span>
-                <span class="k">return</span>
-            
-            <span class="nv">request = </span><span class="k">new</span> <span class="nx">XMLHttpRequest</span>
-            <span class="nx">request</span><span class="p">.</span><span class="nx">open</span> <span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="nx">url_prefix</span> <span class="o">+</span> <span class="nx">@name</span> <span class="o">+</span> <span class="nx">url_suffix</span><span class="p">,</span> <span class="kc">true</span>
-            <span class="nv">request.responseType = </span><span class="s1">&#39;arraybuffer&#39;</span>
-            
-            <span class="nv">obj = </span><span class="k">this</span>
-            <span class="nv">request.onload = </span><span class="o">-&gt;</span>
-                <span class="nx">audio_context</span><span class="p">.</span><span class="nx">decodeAudioData</span> <span class="nx">request</span><span class="p">.</span><span class="nx">response</span><span class="p">,</span>
-                    <span class="p">(</span><span class="nf">(buffer) -&gt;</span>
-                        <span class="nv">obj.buffer = </span><span class="nx">buffer</span>
-                        <span class="nx">onload</span><span class="o">?</span><span class="p">()</span>
-                        <span class="k">return</span>
-                    <span class="p">),</span> <span class="o">-&gt;</span>
-                        <span class="k">throw</span> <span class="s1">&#39;could not load sound buffer from &#39;</span> <span class="o">+</span> <span class="nx">url</span>
-                        <span class="k">return</span>
-            
-            <span class="nx">request</span><span class="p">.</span><span class="nx">send</span><span class="p">()</span>
-            <span class="k">return</span>
-        </pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <p>Pass in a node to connect to if not playing this sound
-straight to output.</p>             </td>             <td class="code">               <div class="highlight"><pre>        <span class="nv">play: </span><span class="nf">(delay = 0, looped = false, node) -&gt;</span>
-            <span class="k">if</span> <span class="nx">audio_context</span><span class="o">?</span> <span class="o">and</span> <span class="nx">@buffer</span><span class="o">?</span>
-                <span class="nv">source = </span><span class="nx">audio_context</span><span class="p">.</span><span class="nx">createBufferSource</span><span class="p">()</span>
-                <span class="nv">source.buffer = </span><span class="nx">@buffer</span>
-                <span class="nv">source.loop = </span><span class="nx">looped</span>
-                <span class="nx">source</span><span class="p">.</span><span class="nx">connect</span> <span class="nx">node</span> <span class="o">or</span> <span class="nx">audio_context</span><span class="p">.</span><span class="nx">destination</span>
-                <span class="nx">source</span><span class="p">.</span><span class="nx">noteOn</span> <span class="nx">delay</span> <span class="o">+</span> <span class="nx">audio_context</span><span class="p">.</span><span class="nx">currentTime</span>
-                <span class="k">return</span> <span class="nx">source</span>
-            <span class="k">return</span> <span class="kc">null</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <p>Ptolemy's intense diatonic tuning in A440 has a C4 of 264 Hz</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">ptolemy_c4: </span><span class="mi">264</span>
-    <span class="nv">ptolemy_tuning_factors: </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="o">/</span><span class="mi">8</span><span class="p">,</span> <span class="mi">5</span><span class="o">/</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span> <span class="mi">15</span><span class="o">/</span><span class="mi">8</span><span class="p">]</span>
-    </pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <p>Pythagorean tuning in A440 has a C4 of 260.741 Hz</p>             </td>             <td class="code">               <div class="highlight"><pre>    <span class="nv">pythagorean_c4: </span><span class="mf">260.741</span>
+<!DOCTYPE html>
 
-</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
+<html>
+<head>
+  <title>audio.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="cg.html">
+                  cg.coffee
+                </a>
+              
+                
+                <a class="source" href="audio.html">
+                  audio.coffee
+                </a>
+              
+                
+                <a class="source" href="entity.html">
+                  entity.coffee
+                </a>
+              
+                
+                <a class="source" href="game.html">
+                  game.coffee
+                </a>
+              
+                
+                <a class="source" href="geometry.html">
+                  geometry.coffee
+                </a>
+              
+                
+                <a class="source" href="input.html">
+                  input.coffee
+                </a>
+              
+                
+                <a class="source" href="loader.html">
+                  loader.coffee
+                </a>
+              
+                
+                <a class="source" href="map.html">
+                  map.coffee
+                </a>
+              
+                
+                <a class="source" href="physics.html">
+                  physics.coffee
+                </a>
+              
+                
+                <a class="source" href="sprite.html">
+                  sprite.coffee
+                </a>
+              
+                
+                <a class="source" href="util.html">
+                  util.coffee
+                </a>
+              
+                
+                <a class="source" href="demo.html">
+                  demo.coffee
+                </a>
+              
+                
+                <a class="source" href="main.html">
+                  main.coffee
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>audio.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>define [<span class="hljs-string">'./util'</span>], <span class="hljs-function"><span class="hljs-params">(util)</span> -&gt;</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>A prefix and suffix applied to names passed into sound
+constructors so that they load from the right place.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    url_prefix = <span class="hljs-string">'assets/'</span>
+    url_suffix = <span class="hljs-string">'.wav'</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>Thanks Boris Smus for the <a href="http://www.html5rocks.com/en/tutorials/webaudio/intro/">Web Audio tutorial</a>.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">do</span> -&gt;
+        w = <span class="hljs-built_in">window</span>
+        w.AudioContext = w.AudioContext <span class="hljs-keyword">or</span> w.webkitAudioContext
+        <span class="hljs-keyword">return</span>
+    
+    audio_context = <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-4">&#182;</a>
+              </div>
+              <p>Initializes the audio system.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">init</span>: <span class="hljs-function">-&gt;</span>
+        <span class="hljs-keyword">if</span> AudioContext?
+            audio_context = <span class="hljs-keyword">new</span> AudioContext
+        <span class="hljs-keyword">else</span>
+            <span class="hljs-built_in">console</span>.warn <span class="hljs-string">'could not initialize audio!'</span>
+        <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-5">&#182;</a>
+              </div>
+              <p>See the <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web Audio API</a>
+for information on how to use the audio context.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">getAudioContext</span>: <span class="hljs-function">-&gt;</span> audio_context</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-6">&#182;</a>
+              </div>
+              <p>The <code>Sound</code> class handles loading sound buffers and playing them.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">Sound</span>: <span class="hljs-class"><span class="hljs-keyword">class</span></span>
+        <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(<span class="hljs-property">@name</span>, onload)</span> -&gt;</span>
+            <span class="hljs-keyword">unless</span> audio_context?
+                onload?()
+                <span class="hljs-keyword">return</span>
+            
+            request = <span class="hljs-keyword">new</span> XMLHttpRequest
+            request.open <span class="hljs-string">'GET'</span>, url_prefix + <span class="hljs-property">@name</span> + url_suffix, <span class="hljs-literal">true</span>
+            request.responseType = <span class="hljs-string">'arraybuffer'</span>
+            
+            obj = <span class="hljs-keyword">this</span>
+            request.onload = <span class="hljs-function">-&gt;</span>
+                audio_context.decodeAudioData request.response,
+                    <span class="hljs-function">(<span class="hljs-params">(buffer)</span> -&gt;</span>
+                        obj.buffer = buffer
+                        onload?()
+                        <span class="hljs-keyword">return</span>
+                    ), <span class="hljs-function">-&gt;</span>
+                        <span class="hljs-keyword">throw</span> <span class="hljs-string">'could not load sound buffer from '</span> + url
+                        <span class="hljs-keyword">return</span>
+            
+            request.send()
+            <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-7">&#182;</a>
+              </div>
+              <p>Pass in a node to connect to if not playing this sound
+straight to output.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-attribute">play</span>: <span class="hljs-function"><span class="hljs-params">(delay = <span class="hljs-number">0</span>, looped = <span class="hljs-literal">false</span>, node)</span> -&gt;</span>
+            <span class="hljs-keyword">if</span> audio_context? <span class="hljs-keyword">and</span> <span class="hljs-property">@buffer</span>?
+                source = audio_context.createBufferSource()
+                source.buffer = <span class="hljs-property">@buffer</span>
+                source.<span class="hljs-keyword">loop</span> = looped
+                source.connect node <span class="hljs-keyword">or</span> audio_context.destination
+                source.noteOn delay + audio_context.currentTime
+                <span class="hljs-keyword">return</span> source
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-8">&#182;</a>
+              </div>
+              <p>Ptolemy’s intense diatonic tuning in A440 has a C4 of 264 Hz</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">ptolemy_c4</span>: <span class="hljs-number">264</span>
+    <span class="hljs-attribute">ptolemy_tuning_factors</span>: [<span class="hljs-number">1</span>, <span class="hljs-number">9</span>/<span class="hljs-number">8</span>, <span class="hljs-number">5</span>/<span class="hljs-number">4</span>, <span class="hljs-number">4</span>/<span class="hljs-number">3</span>, <span class="hljs-number">3</span>/<span class="hljs-number">2</span>, <span class="hljs-number">5</span>/<span class="hljs-number">3</span>, <span class="hljs-number">15</span>/<span class="hljs-number">8</span>]</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-9">&#182;</a>
+              </div>
+              <p>Pythagorean tuning in A440 has a C4 of 260.741 Hz</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-attribute">pythagorean_c4</span>: <span class="hljs-number">260.741</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
