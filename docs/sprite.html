@@ -80,6 +80,11 @@
                 </a>
               
                 
+                <a class="source" href="demo2.html">
+                  demo2.coffee
+                </a>
+              
+                
                 <a class="source" href="main.html">
                   main.coffee
                 </a>
@@ -163,7 +168,7 @@ a url constructed from @name.</p>
   ],
   <span class="hljs-string">"animations"</span>: {
     <span class="hljs-attribute">NAME</span>: {
-      <span class="hljs-string">"frames"</span>: [[INDEX, DURATION], ...],
+      <span class="hljs-string">"frames"</span>: [[INDEX, DURATION(, HFLIPPED)], ...],
       <span class="hljs-string">"loop"</span>: LOOP
     },
     ...
@@ -248,6 +253,7 @@ or false depending on whether the animation should loop.</p>
                 anim_time -= frame[<span class="hljs-number">1</span>]
                 <span class="hljs-keyword">if</span> anim_time &lt;= <span class="hljs-number">0</span>
                     frame_index = frame[<span class="hljs-number">0</span>]
+                    frame_hflipped = !!frame[<span class="hljs-number">2</span>]
                     <span class="hljs-keyword">break</span>
             
             frame_img = <span class="hljs-property">@frames</span>[frame_index]
@@ -255,11 +261,9 @@ or false depending on whether the animation should loop.</p>
             
             context.save()
             
-            context.translate (x + <span class="hljs-number">.5</span>) | <span class="hljs-number">0</span>,
-                (y + <span class="hljs-number">.5</span>) | <span class="hljs-number">0</span>
-            context.transform -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> flip_h
-            context.drawImage frame_img,
-                frame_offset[<span class="hljs-number">0</span>], frame_offset[<span class="hljs-number">1</span>]
+            context.translate Math.round(x), Math.round(y)
+            context.transform -<span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span> <span class="hljs-keyword">if</span> !!flip_h != frame_hflipped
+            context.drawImage frame_img, frame_offset[<span class="hljs-number">0</span>], frame_offset[<span class="hljs-number">1</span>]
             
             context.restore()
             

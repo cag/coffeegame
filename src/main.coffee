@@ -1,13 +1,21 @@
 # Configure RequireJS to load jQuery from a common URL.
-requirejs.config({
-    paths: {
-        'jquery': 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min'
-    }
-})# if false # Psyche!
+requirejs.config \
+    paths:
+        jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min'
+        screenfull: '../libs/screenfull'
 
-require ['jquery', './cg', './demo'],
-  ($, cg, demo) ->
+require ['jquery', 'screenfull', './cg', './demo', './demo2'],
+  ($, __void__, cg, demo, demo2) ->
     {game, loader, map} = cg
+
+    setupScreenfull = (game) ->
+        if screenfull?.enabled
+            fs_btn_container = (document.getElementById 'fs-btn') or document.body
+            fs_button = $('<button/>').text('Fullscreen').click ->
+                screenfull.request game.canvas()
+                return
+            fs_btn_container.appendChild fs_button[0]
+
     $ ->
         # Force jQuery to grab fresh data in its Ajax requests.
         $.ajaxSetup cache: false
@@ -16,16 +24,23 @@ require ['jquery', './cg', './demo'],
         loader_scene = new loader.LoaderScene {
                 maps:
                     demo: { name: 'demo', script: demo }
+                    demo2: { name: 'demo2', script: demo2 }
                 sprites:
                     player: 'player'
+                    demo2player: 'demo2player'
                 sounds: {}
             }, (loaded) ->
                 demo.setPlayerSprite loaded.sprites.player
                 demo_scene = new map.MapScene loaded.maps.demo
-                game.switchScene demo_scene
+
+                demo2.setPlayerMetadata new cg.geometry.Aabb([4, 4]), loaded.sprites.demo2player
+                demo_scene2 = new map.MapScene loaded.maps.demo2
+
+                game.switchScene demo_scene2
                 return
-        
-        game.init 320, 240, 1 / 60, 1 / 20, loader_scene
+
+        game.init 160, 120, 1 / 60, 1 / 20, loader_scene
+        setupScreenfull game
         game.run()
         return
     return

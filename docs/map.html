@@ -80,6 +80,11 @@
                 </a>
               
                 
+                <a class="source" href="demo2.html">
+                  demo2.coffee
+                </a>
+              
+                
                 <a class="source" href="main.html">
                   main.coffee
                 </a>
@@ -418,8 +423,8 @@ values are written to json unsigned in Tiled.</p>
                 <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> [lowbx...highbx] <span class="hljs-keyword">by</span> <span class="hljs-number">1</span>
                     <span class="hljs-keyword">for</span> j <span class="hljs-keyword">in</span> [lowby...highby] <span class="hljs-keyword">by</span> <span class="hljs-number">1</span>
                         context.drawImage cache[i][j],
-                            (<span class="hljs-number">.5</span> + destx + i * bw) | <span class="hljs-number">0</span>,
-                            (<span class="hljs-number">.5</span> + desty + j * bh) | <span class="hljs-number">0</span>
+                            Math.round(destx + i * bw),
+                            Math.round(desty + j * bh)
             <span class="hljs-keyword">else</span>
                 lowtx = Math.max <span class="hljs-number">0</span>, (mlsx / tw) | <span class="hljs-number">0</span>
                 hightx = Math.min <span class="hljs-property">@width</span>, Math.ceil((mlsx + w) / tw)
@@ -427,8 +432,8 @@ values are written to json unsigned in Tiled.</p>
                 highty = Math.min <span class="hljs-property">@height</span>, Math.ceil((mlsy + h) / th)
                 
                 <span class="hljs-property">@drawRaw</span> context, lowtx, hightx, lowty, highty,
-                    (<span class="hljs-number">.5</span> + destx + lowtx * tw) | <span class="hljs-number">0</span>,
-                    (<span class="hljs-number">.5</span> + desty + lowty * th) | <span class="hljs-number">0</span>
+                    destx + lowtx * tw,
+                    desty + lowty * th
                 
             context.restore()
             <span class="hljs-keyword">return</span>

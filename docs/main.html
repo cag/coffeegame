@@ -80,6 +80,11 @@
                 </a>
               
                 
+                <a class="source" href="demo2.html">
+                  demo2.coffee
+                </a>
+              
+                
                 <a class="source" href="main.html">
                   main.coffee
                 </a>
@@ -109,15 +114,23 @@
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>requirejs.config({
-    <span class="hljs-attribute">paths</span>: {
-        <span class="hljs-string">'jquery'</span>: <span class="hljs-string">'https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min'</span>
-    }
-})<span class="hljs-comment"># if false # Psyche!</span>
+            <div class="content"><div class='highlight'><pre>requirejs.config \
+    <span class="hljs-attribute">paths</span>:
+        <span class="hljs-attribute">jquery</span>: <span class="hljs-string">'https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min'</span>
+        <span class="hljs-attribute">screenfull</span>: <span class="hljs-string">'../libs/screenfull'</span>
 
-<span class="hljs-built_in">require</span> [<span class="hljs-string">'jquery'</span>, <span class="hljs-string">'./cg'</span>, <span class="hljs-string">'./demo'</span>],
-  <span class="hljs-function"><span class="hljs-params">($, cg, demo)</span> -&gt;</span>
+<span class="hljs-built_in">require</span> [<span class="hljs-string">'jquery'</span>, <span class="hljs-string">'screenfull'</span>, <span class="hljs-string">'./cg'</span>, <span class="hljs-string">'./demo'</span>, <span class="hljs-string">'./demo2'</span>],
+  <span class="hljs-function"><span class="hljs-params">($, __void__, cg, demo, demo2)</span> -&gt;</span>
     {game, loader, map} = cg
+<span class="hljs-function">
+    <span class="hljs-title">setupScreenfull</span> = <span class="hljs-params">(game)</span> -&gt;</span>
+        <span class="hljs-keyword">if</span> screenfull?.enabled
+            fs_btn_container = (<span class="hljs-built_in">document</span>.getElementById <span class="hljs-string">'fs-btn'</span>) <span class="hljs-keyword">or</span> <span class="hljs-built_in">document</span>.body
+            fs_button = $(<span class="hljs-string">'&lt;button/&gt;'</span>).text(<span class="hljs-string">'Fullscreen'</span>).click -&gt;
+                screenfull.request game.canvas()
+                <span class="hljs-keyword">return</span>
+            fs_btn_container.appendChild fs_button[<span class="hljs-number">0</span>]
+
     $ -&gt;</pre></div></div>
             
         </li>
@@ -151,16 +164,23 @@
             <div class="content"><div class='highlight'><pre>        loader_scene = <span class="hljs-keyword">new</span> loader.LoaderScene {
                 <span class="hljs-attribute">maps</span>:
                     <span class="hljs-attribute">demo</span>: { <span class="hljs-attribute">name</span>: <span class="hljs-string">'demo'</span>, <span class="hljs-attribute">script</span>: demo }
+                    <span class="hljs-attribute">demo2</span>: { <span class="hljs-attribute">name</span>: <span class="hljs-string">'demo2'</span>, <span class="hljs-attribute">script</span>: demo2 }
                 <span class="hljs-attribute">sprites</span>:
                     <span class="hljs-attribute">player</span>: <span class="hljs-string">'player'</span>
+                    <span class="hljs-attribute">demo2player</span>: <span class="hljs-string">'demo2player'</span>
                 <span class="hljs-attribute">sounds</span>: {}
             }, <span class="hljs-function"><span class="hljs-params">(loaded)</span> -&gt;</span>
                 demo.setPlayerSprite loaded.sprites.player
                 demo_scene = <span class="hljs-keyword">new</span> map.MapScene loaded.maps.demo
-                game.switchScene demo_scene
+
+                demo2.setPlayerMetadata <span class="hljs-keyword">new</span> cg.geometry.Aabb([<span class="hljs-number">4</span>, <span class="hljs-number">4</span>]), loaded.sprites.demo2player
+                demo_scene2 = <span class="hljs-keyword">new</span> map.MapScene loaded.maps.demo2
+
+                game.switchScene demo_scene2
                 <span class="hljs-keyword">return</span>
-        
-        game.init <span class="hljs-number">320</span>, <span class="hljs-number">240</span>, <span class="hljs-number">1</span> / <span class="hljs-number">60</span>, <span class="hljs-number">1</span> / <span class="hljs-number">20</span>, loader_scene
+
+        game.init <span class="hljs-number">160</span>, <span class="hljs-number">120</span>, <span class="hljs-number">1</span> / <span class="hljs-number">60</span>, <span class="hljs-number">1</span> / <span class="hljs-number">20</span>, loader_scene
+        setupScreenfull game
         game.run()
         <span class="hljs-keyword">return</span>
     <span class="hljs-keyword">return</span></pre></div></div>

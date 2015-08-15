@@ -58,6 +58,7 @@ define ['./map', './sprite', './audio'], (map, sprite, audio) ->
             callback = ->
                 ++load_count
                 loader.progress = load_count / loader.resource_count
+                # console.log loader.progress
                 if load_count is loader.resource_count
                     loader.finished = true
                     loader.onload? loader.loaded

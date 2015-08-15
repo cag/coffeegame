@@ -32,7 +32,7 @@ define ['jquery'], ($) ->
         #       ],
         #       "animations": {
         #         NAME: {
-        #           "frames": [[INDEX, DURATION], ...],
+        #           "frames": [[INDEX, DURATION(, HFLIPPED)], ...],
         #           "loop": LOOP
         #         },
         #         ...
@@ -115,6 +115,7 @@ define ['jquery'], ($) ->
                 anim_time -= frame[1]
                 if anim_time <= 0
                     frame_index = frame[0]
+                    frame_hflipped = !!frame[2]
                     break
             
             frame_img = @frames[frame_index]
@@ -122,11 +123,9 @@ define ['jquery'], ($) ->
             
             context.save()
             
-            context.translate (x + .5) | 0,
-                (y + .5) | 0
-            context.transform -1, 0, 0, 1, 0, 0 if flip_h
-            context.drawImage frame_img,
-                frame_offset[0], frame_offset[1]
+            context.translate Math.round(x), Math.round(y)
+            context.transform -1, 0, 0, 1, 0, 0 if !!flip_h != frame_hflipped
+            context.drawImage frame_img, frame_offset[0], frame_offset[1]
             
             context.restore()
             

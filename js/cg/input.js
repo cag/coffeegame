@@ -2,7 +2,7 @@
 (function() {
   define(function() {
     return {
-      buttons: {
+      default_buttons: {
         left: 37,
         up: 38,
         right: 39,
@@ -11,8 +11,9 @@
         jump: 90,
         debug: 192
       },
-      init: function() {
+      init: function(buttons) {
         var button, results;
+        this.buttons = buttons || this.default_buttons;
         results = [];
         for (button in this.buttons) {
           results.push(this[button] = {});

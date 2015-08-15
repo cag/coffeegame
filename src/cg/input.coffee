@@ -1,6 +1,6 @@
 define ->
-    # A map of button names to key code values.
-    buttons:
+    # A default map of button names to key code values.
+    default_buttons:
         left: 37,
         up: 38,
         right: 39,
@@ -9,7 +9,8 @@ define ->
         jump: 90,
         debug: 192
     
-    init: ->
+    init: (buttons) ->
+        @buttons = buttons or @default_buttons
         for button of @buttons
             this[button] = {}
     

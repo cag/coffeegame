@@ -96,7 +96,7 @@
         };
 
         _Class.prototype.draw = function(context, x, y, flip_h) {
-          var anim_time, cur_anim, cur_anim_dur, frame, frame_img, frame_index, frame_offset, i, len, ref;
+          var anim_time, cur_anim, cur_anim_dur, frame, frame_hflipped, frame_img, frame_index, frame_offset, i, len, ref;
           cur_anim = this.current_animation;
           cur_anim_dur = cur_anim.duration;
           frame_index = -1;
@@ -112,14 +112,15 @@
             anim_time -= frame[1];
             if (anim_time <= 0) {
               frame_index = frame[0];
+              frame_hflipped = !!frame[2];
               break;
             }
           }
           frame_img = this.frames[frame_index];
           frame_offset = this.frame_offsets[frame_index];
           context.save();
-          context.translate((x + .5) | 0, (y + .5) | 0);
-          if (flip_h) {
+          context.translate(Math.round(x), Math.round(y));
+          if (!!flip_h !== frame_hflipped) {
             context.transform(-1, 0, 0, 1, 0, 0);
           }
           context.drawImage(frame_img, frame_offset[0], frame_offset[1]);

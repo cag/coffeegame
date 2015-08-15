@@ -19,32 +19,32 @@ define ['./cg'],
         return
     
     handlePlayerStart: (obj) ->
-        actx = audio.getAudioContext()
-        if actx?
-            osc = actx.createOscillator()
-            osc.type = osc.TRIANGLE
+        # actx = audio.getAudioContext()
+        # if actx?
+        #     osc = actx.createOscillator()
+        #     osc.type = osc.TRIANGLE
             
-            gain = actx.createGain()
-            gain.gain.value = .25
+        #     gain = actx.createGain()
+        #     gain.gain.value = .25
             
-            osc.connect gain
-            gain.connect actx.destination
+        #     osc.connect gain
+        #     gain.connect actx.destination
             
-            time_ptr = actx.currentTime
-            note_dur = .25
-            for tuning_factor in audio.ptolemy_tuning_factors
-                osc.frequency.setValueAtTime \
-                    1.0 * audio.ptolemy_c4 * tuning_factor,
-                    time_ptr
-                time_ptr += note_dur
+        #     time_ptr = actx.currentTime
+        #     note_dur = .25
+        #     for tuning_factor in audio.ptolemy_tuning_factors
+        #         osc.frequency.setValueAtTime \
+        #             1.0 * audio.ptolemy_c4 * tuning_factor,
+        #             time_ptr
+        #         time_ptr += note_dur
             
-            osc.frequency.setValueAtTime \
-                audio.ptolemy_c4 * .25,
-                time_ptr
+        #     osc.frequency.setValueAtTime \
+        #         audio.ptolemy_c4 * .25,
+        #         time_ptr
             
-            time_ptr += note_dur
-            osc.start actx.currentTime
-            osc.stop time_ptr
+        #     time_ptr += note_dur
+        #     osc.start actx.currentTime
+        #     osc.stop time_ptr
         
         player = new entity.Entity obj.x, obj.y,
             new geometry.Aabb [2, 11]

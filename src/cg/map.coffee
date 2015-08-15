@@ -234,8 +234,8 @@ define ['jquery', './game', './entity', './geometry', './util'],
                 for i in [lowbx...highbx] by 1
                     for j in [lowby...highby] by 1
                         context.drawImage cache[i][j],
-                            (.5 + destx + i * bw) | 0,
-                            (.5 + desty + j * bh) | 0
+                            Math.round(destx + i * bw),
+                            Math.round(desty + j * bh)
             else
                 lowtx = Math.max 0, (mlsx / tw) | 0
                 hightx = Math.min @width, Math.ceil((mlsx + w) / tw)
@@ -243,8 +243,8 @@ define ['jquery', './game', './entity', './geometry', './util'],
                 highty = Math.min @height, Math.ceil((mlsy + h) / th)
                 
                 @drawRaw context, lowtx, hightx, lowty, highty,
-                    (.5 + destx + lowtx * tw) | 0,
-                    (.5 + desty + lowty * th) | 0
+                    destx + lowtx * tw,
+                    desty + lowty * th
                 
             context.restore()
             return
@@ -609,7 +609,7 @@ define ['jquery', './game', './entity', './geometry', './util'],
             context.beginPath()
             
             @map.draw context, hgw, hgh
-            #@map.debugDraw context, hgw, hgh
+            # @map.debugDraw context, hgw, hgh
             
             return
 

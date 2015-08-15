@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>demo2.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="cg.html">
+                  cg.coffee
+                </a>
+              
+                
+                <a class="source" href="audio.html">
+                  audio.coffee
+                </a>
+              
+                
+                <a class="source" href="entity.html">
+                  entity.coffee
+                </a>
+              
+                
+                <a class="source" href="game.html">
+                  game.coffee
+                </a>
+              
+                
+                <a class="source" href="geometry.html">
+                  geometry.coffee
+                </a>
+              
+                
+                <a class="source" href="input.html">
+                  input.coffee
+                </a>
+              
+                
+                <a class="source" href="loader.html">
+                  loader.coffee
+                </a>
+              
+                
+                <a class="source" href="map.html">
+                  map.coffee
+                </a>
+              
+                
+                <a class="source" href="physics.html">
+                  physics.coffee
+                </a>
+              
+                
+                <a class="source" href="sprite.html">
+                  sprite.coffee
+                </a>
+              
+                
+                <a class="source" href="util.html">
+                  util.coffee
+                </a>
+              
+                
+                <a class="source" href="demo.html">
+                  demo.coffee
+                </a>
+              
+                
+                <a class="source" href="demo2.html">
+                  demo2.coffee
+                </a>
+              
+                
+                <a class="source" href="main.html">
+                  main.coffee
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>demo2.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>define [<span class="hljs-string">'./cg'</span>],
+  <span class="hljs-function"><span class="hljs-params">(cg)</span> -&gt;</span>
+    {input, audio, util, game, geometry, entity, physics} = cg
+
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Character</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">entity</span>.<span class="hljs-title">Entity</span></span>
+        <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(x, y, shape, <span class="hljs-property">@sprite</span>)</span> -&gt;</span>
+            <span class="hljs-keyword">super</span> x, y, shape
+            <span class="hljs-property">@sprite</span>.startAnimation <span class="hljs-string">'look down'</span>
+
+        <span class="hljs-attribute">draw</span>: <span class="hljs-function"><span class="hljs-params">(context, offx, offy)</span> -&gt;</span>
+            <span class="hljs-property">@sprite</span>.draw context, <span class="hljs-property">@x</span> + offx, <span class="hljs-property">@y</span> + offy, <span class="hljs-property">@facing_left</span>
+            <span class="hljs-keyword">return</span>
+
+    <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PlayerCharacter</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Character</span></span>
+        <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(x, y, shape, sprite, camera)</span> -&gt;</span>
+            <span class="hljs-keyword">super</span> x, y, shape, sprite
+            <span class="hljs-property">@state</span> = <span class="hljs-string">'look down'</span>
+            <span class="hljs-property">@dir</span> = <span class="hljs-string">'down'</span>
+            player = <span class="hljs-keyword">this</span>
+            camera.post_update = <span class="hljs-function"><span class="hljs-params">(dt)</span> -&gt;</span>
+                <span class="hljs-property">@x</span> = player.x
+                <span class="hljs-property">@y</span> = player.y
+                <span class="hljs-keyword">return</span>
+
+        <span class="hljs-attribute">update</span>: <span class="hljs-function"><span class="hljs-params">(dt)</span> -&gt;</span>
+            sprite = <span class="hljs-property">@sprite</span>
+            state = <span class="hljs-property">@state</span>
+<span class="hljs-function">            <span class="hljs-title">switchStateTo</span> = <span class="hljs-params">(name)</span> -&gt;</span>
+                <span class="hljs-keyword">if</span> state <span class="hljs-keyword">isnt</span> name
+                    sprite.startAnimation name
+                    state = name
+                <span class="hljs-keyword">return</span>
+
+            vxc = <span class="hljs-number">0.0</span>
+            vyc = <span class="hljs-number">0.0</span>
+
+            <span class="hljs-keyword">if</span> input.left.state <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> input.right.state
+                <span class="hljs-property">@facing_left</span> = <span class="hljs-literal">true</span>
+                vxc = -<span class="hljs-number">1.0</span>
+                <span class="hljs-property">@dir</span> = <span class="hljs-string">'right'</span>
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> input.right.state <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> input.left.state
+                <span class="hljs-property">@facing_left</span> = <span class="hljs-literal">false</span>
+                vxc = <span class="hljs-number">1.0</span>
+                <span class="hljs-property">@dir</span> = <span class="hljs-string">'right'</span>
+
+            <span class="hljs-keyword">if</span> input.up.state <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> input.down.state
+                vyc = -<span class="hljs-number">1.0</span>
+                <span class="hljs-property">@dir</span> = <span class="hljs-string">'up'</span>
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> input.down.state <span class="hljs-keyword">and</span> <span class="hljs-keyword">not</span> input.up.state
+                vyc = <span class="hljs-number">1.0</span>
+                <span class="hljs-property">@dir</span> = <span class="hljs-string">'down'</span>
+
+            <span class="hljs-keyword">if</span> vyc == <span class="hljs-number">0.0</span>
+                <span class="hljs-keyword">if</span> vxc == <span class="hljs-number">0.0</span>
+                    switchStateTo <span class="hljs-string">'look '</span> + <span class="hljs-property">@dir</span>
+                <span class="hljs-keyword">else</span>
+                    switchStateTo <span class="hljs-string">'go right'</span>
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> vyc &lt; <span class="hljs-number">0.0</span>
+                switchStateTo <span class="hljs-string">'go up'</span>
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> vyc &gt; <span class="hljs-number">0.0</span>
+                switchStateTo <span class="hljs-string">'go down'</span>
+
+            <span class="hljs-property">@state</span> = state
+            <span class="hljs-property">@velocity</span> = [<span class="hljs-number">64.0</span> * vxc, <span class="hljs-number">64.0</span> * vyc]
+            physics.integrate <span class="hljs-keyword">this</span>, dt
+
+            sprite.update dt
+            <span class="hljs-keyword">return</span>
+
+    player = <span class="hljs-literal">null</span>
+    player_shape = <span class="hljs-literal">null</span>
+    player_sprite = <span class="hljs-literal">null</span>
+
+    <span class="hljs-attribute">setPlayerMetadata</span>: <span class="hljs-function"><span class="hljs-params">(shape, sprite)</span> -&gt;</span>
+        player_shape = shape
+        player_sprite = sprite
+        <span class="hljs-keyword">return</span>
+
+    <span class="hljs-attribute">handlePlayerStart</span>: <span class="hljs-function"><span class="hljs-params">(obj)</span> -&gt;</span>
+        player = <span class="hljs-keyword">new</span> PlayerCharacter obj.x, obj.y, player_shape, player_sprite, obj.map.camera
+        player.obstructs = util.constructBitmask [<span class="hljs-number">0</span>]
+        obj.layer.addEntity player
+        <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>

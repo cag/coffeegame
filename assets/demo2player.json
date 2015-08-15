@@ -1,0 +1,44 @@
+{
+  "spritesheet": "image2.png",
+  "offset": [0, 80],
+  "frames": [
+    { "pos": [0, 0],   "size": [8, 16],  "offset": [-4, -12] },
+    { "pos": [8, 0],   "size": [8, 16],  "offset": [-4, -12] },
+    { "pos": [16, 0],   "size": [8, 16],  "offset": [-4, -12] },
+    { "pos": [24, 0],   "size": [8, 16],  "offset": [-4, -12] },
+    { "pos": [32, 0],   "size": [8, 16],  "offset": [-4, -12] },
+    { "pos": [40, 0],   "size": [8, 16],  "offset": [-4, -12] },
+    { "pos": [48, 0],   "size": [8, 16],  "offset": [-4, -12] },
+    { "pos": [56, 0],   "size": [8, 16],  "offset": [-4, -12] },
+    { "pos": [64, 0],   "size": [8, 16],  "offset": [-4, -12] },
+    { "pos": [72, 0],   "size": [8, 16],  "offset": [-4, -12] },
+    { "pos": [80, 0],   "size": [8, 16],  "offset": [-4, -12] }
+  ],
+  "animations": {
+    "look down": {
+      "frames": [[0, 1.0]],
+      "loop": false
+    },
+    "look up": {
+      "frames": [[1, 1.0]],
+      "loop": false
+    },
+    "look right": {
+      "frames": [[6, 1.0]],
+      "loop": false
+    }, 
+    "go down": {
+      "frames": [[2, 0.125, false], [3, 0.125, false], [2, 0.125, true], [3, 0.125, true]],
+      "loop": true
+    },
+    "go up": {
+      "frames": [[4, 0.125, false], [5, 0.125, false], [4, 0.125, true], [5, 0.125, true]],
+      "loop": true
+    },
+    "go right": {
+      "frames": [[7, 0.125, false], [8, 0.125, false], [9, 0.125, false], [10, 0.125, false]],
+      "loop": true
+    }
+  }
+}
+

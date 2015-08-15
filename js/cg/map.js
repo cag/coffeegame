@@ -249,7 +249,7 @@
           highby = Math.min(this.cache_height, Math.ceil((mlsy + h) / bh));
           for (i = m = ref = lowbx, ref1 = highbx; m < ref1; i = m += 1) {
             for (j = n = ref2 = lowby, ref3 = highby; n < ref3; j = n += 1) {
-              context.drawImage(cache[i][j], (.5 + destx + i * bw) | 0, (.5 + desty + j * bh) | 0);
+              context.drawImage(cache[i][j], Math.round(destx + i * bw), Math.round(desty + j * bh));
             }
           }
         } else {
@@ -257,7 +257,7 @@
           hightx = Math.min(this.width, Math.ceil((mlsx + w) / tw));
           lowty = Math.max(0, (mlsy / th) | 0);
           highty = Math.min(this.height, Math.ceil((mlsy + h) / th));
-          this.drawRaw(context, lowtx, hightx, lowty, highty, (.5 + destx + lowtx * tw) | 0, (.5 + desty + lowty * th) | 0);
+          this.drawRaw(context, lowtx, hightx, lowty, highty, destx + lowtx * tw, desty + lowty * th);
         }
         context.restore();
       };

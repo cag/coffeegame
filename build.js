@@ -3,6 +3,7 @@
     name: "main",
     out: "game.js",
     paths: {
-        jquery: "empty:"
+        jquery: "empty:",
+        screenfull: "empty:"
     }
 })
