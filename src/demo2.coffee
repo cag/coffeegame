@@ -81,3 +81,12 @@ define ['./cg'],
         player.obstructs = util.constructBitmask [0]
         obj.layer.addEntity player
         return
+
+    handleChest1Start: (obj) ->
+        tx = (obj.x / obj.map.tilewidth) | 0
+        ty = (obj.y / obj.map.tileheight) | 0
+        layer = obj.map.getLayerByName('Ground')
+        td = layer.data[tx][ty][..]
+        td[0]++
+        layer.setTile tx, ty, td
+        return

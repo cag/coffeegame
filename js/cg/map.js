@@ -204,6 +204,22 @@
         })();
       };
 
+      TileLayer.prototype.setTile = function(txi, tyi, td) {
+        var block, bxo, byo, ci, cj, context, lcf, map;
+        this.data[txi][tyi] = td;
+        if (layers_cached) {
+          map = this.map;
+          lcf = layer_cache_factor;
+          ci = (txi / lcf) | 0;
+          cj = (tyi / lcf) | 0;
+          block = this.cache[ci][cj];
+          bxo = (txi % lcf) * map.tilewidth;
+          byo = (tyi % lcf) * map.tileheight;
+          context = block.getContext('2d');
+          map.drawTile(context, td[0], td[1], td[2], td[3], bxo, byo);
+        }
+      };
+
       TileLayer.prototype.drawRaw = function(context, lowtx, hightx, lowty, highty, dx, dy) {
         var data, datum, i, j, m, map, n, ref, ref1, ref2, ref3, th, tw;
         map = this.map;
@@ -257,7 +273,7 @@
           hightx = Math.min(this.width, Math.ceil((mlsx + w) / tw));
           lowty = Math.max(0, (mlsy / th) | 0);
           highty = Math.min(this.height, Math.ceil((mlsy + h) / th));
-          this.drawRaw(context, lowtx, hightx, lowty, highty, destx + lowtx * tw, desty + lowty * th);
+          this.drawRaw(context, lowtx, hightx, lowty, highty, Math.round(destx + lowtx * tw), Math.round(desty + lowty * th));
         }
         context.restore();
       };
@@ -576,6 +592,18 @@
               }
             }
           }
+        };
+
+        _Class.prototype.getLayerByName = function(name) {
+          var layer, len, m, ref;
+          ref = this.layers;
+          for (m = 0, len = ref.length; m < len; m++) {
+            layer = ref[m];
+            if (layer.name === name) {
+              return layer;
+            }
+          }
+          return null;
         };
 
         _Class.prototype.start = function() {

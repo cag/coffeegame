@@ -20,7 +20,7 @@
   <tile id="107" terrain="1,1,1,1"/>
   <tile id="108" terrain="1,1,1,1"/>
  </tileset>
- <layer name="Tile Layer 1" width="100" height="100">
+ <layer name="Ground" width="100" height="100">
   <data encoding="base64" compression="zlib">
    eJzt2F1Og1AQBtBrrEJ50I3oTqwbKbr/RyGZCVNejEokac/DyUWaGpjPuT/etdbufqmbDDEe//B7+Llx8jL5iOt57COHzGXvZ7wVr5NzZHCOPMa29MUQ2ez9nLfiFDnM/fEe4xg5HNvSI3s/5y2ovTFn8Bl5zPdyvuqb+eo/88h5as7hqS390UUWfdMfW3n7xqktvTGu8ji0ZX9l/dhG/t2PZcx7HyGvz5HH4+QhdM3+aks596dudS9rnfWfs7iP63k8lEz2fpdrkPWe1+XnqHOuB8eo/2PU/aGM2SM1y73f5Rp0Re5bsz+y7pnHoS3njcxmaPZXW6r7ozxLZH3v2zI31Zz6drl2yGPbPOq5rp63+/LzsPq8a5fnD+vHNmp96/8Gc+7qVvdq/Wu/yGMbdd2omaznosyhzmd9+Y75CgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4NIXnYg+Og==
   </data>
@@ -44,6 +44,8 @@
   <object name="treasure1" x="24" y="72" width="8" height="8">
    <properties>
     <property name="obstructs" value="0"/>
+    <property name="onActivate" value="openChest1"/>
+    <property name="onStart" value="handleChest1Start"/>
    </properties>
   </object>
  </objectgroup>

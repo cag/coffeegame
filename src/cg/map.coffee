@@ -177,6 +177,22 @@ define ['jquery', './game', './entity', './geometry', './util'],
             
             return
         
+        setTile: (txi, tyi, td) ->
+            @data[txi][tyi] = td
+            if layers_cached
+                map = @map
+                lcf = layer_cache_factor
+                ci = (txi / lcf) | 0
+                cj = (tyi / lcf) | 0
+                block = @cache[ci][cj]
+                bxo = (txi % lcf) * map.tilewidth
+                byo = (tyi % lcf) * map.tileheight
+                context = block.getContext '2d'
+                map.drawTile context,
+                    td[0], td[1], td[2], td[3],
+                    bxo, byo
+            return
+
         drawRaw: (context, lowtx, hightx, lowty, highty, dx, dy) ->
             map = @map
             tw = map.tilewidth
@@ -243,8 +259,8 @@ define ['jquery', './game', './entity', './geometry', './util'],
                 highty = Math.min @height, Math.ceil((mlsy + h) / th)
                 
                 @drawRaw context, lowtx, hightx, lowty, highty,
-                    destx + lowtx * tw,
-                    desty + lowty * th
+                    Math.round(destx + lowtx * tw),
+                    Math.round(desty + lowty * th)
                 
             context.restore()
             return
@@ -295,7 +311,7 @@ define ['jquery', './game', './entity', './geometry', './util'],
                 ent.onStart = tryGettingCallbackForName \
                     object.properties?.onStart
                 
-                # Object level callbacks are preferred over layer
+                # Object level callbacks take precedence over layer
                 # level callbacks.
                 
                 obj_onCollide = tryGettingCallbackForName \
@@ -535,6 +551,12 @@ define ['jquery', './game', './entity', './geometry', './util'],
                     ent_a.onObstruct? ent_b, collision_info
                     ent_b.onObstruct? ent_a, neg_collision_info
             return
+
+        # Gets a layer by name. Returns null if the layer is not found.
+        getLayerByName: (name) ->
+            for layer in @layers
+                return layer if layer.name is name
+            return null
         
         start: ->
             for layer in @layers
