@@ -105,8 +105,9 @@
                  "name":"treasure1",
                  "properties":
                     {
+                     "collides":"0",
                      "obstructs":"0",
-                     "onActivate":"openChest1",
+                     "onActivate":"tryOpeningChest1",
                      "onStart":"handleChest1Start"
                     },
                  "rotation":0,

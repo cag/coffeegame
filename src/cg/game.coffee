@@ -46,6 +46,9 @@ define ['./util', './input', './audio'], (util, input, audio) ->
     
     # Last delta time.
     lastDt: -> last_dt
+
+    # Current scene.
+    currentScene: -> current_scene
     
     # Switch scene to new scene.
     switchScene: (new_scene) ->

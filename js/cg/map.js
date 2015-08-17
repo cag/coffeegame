@@ -3,7 +3,7 @@
   var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     hasProp = {}.hasOwnProperty;
 
-  define(['jquery', './game', './entity', './geometry', './util'], function($, game, entity, geometry, util) {
+  define(['jquery', './game', './input', './entity', './geometry', './util'], function($, game, input, entity, geometry, util) {
     var Layer, ObjectLayer, TileLayer, TileSet, byBottomBound, byLeftBound, layer_cache_factor, layers_cached, url_prefix, url_suffix;
     url_prefix = 'assets/';
     url_suffix = '.json';
@@ -285,24 +285,12 @@
       extend(ObjectLayer, superClass);
 
       function ObjectLayer(json_data, map) {
-        var Aabb, Entity, Point, Polygon, Polyline, constructBitmask, ent, i, l_collides, l_obstructs, l_onCollide, l_onObstruct, len, m, mapents, n, object, objects, objh, objhwx, objhwy, objw, objx, objy, point, point_a, point_b, ref, ref1, ref2, ref3, ref4, ref5, setupEntityWithProperties, tryGettingCallbackForName, tryMakingBitmaskFromString;
+        var Aabb, Entity, Point, Polygon, Polyline, constructBitmask, ent, i, l_collides, l_obstructs, l_onCollide, l_onObstruct, len, m, mapents, n, object, objects, objh, objhwx, objhwy, objw, objx, objy, point, point_a, point_b, ref, ref1, ref2, ref3, ref4, ref5, setupEntityWithProperties, tryMakingBitmaskFromString;
         tryMakingBitmaskFromString = function(bitmask_str) {
           if (bitmask_str != null) {
             return constructBitmask(bitmask_str.split(','));
           }
           return 0;
-        };
-        tryGettingCallbackForName = function(name) {
-          var callback;
-          if (name != null) {
-            callback = map.script[name];
-            if (callback != null) {
-              return callback;
-            } else {
-              throw "missing callback " + name + "!";
-            }
-          }
-          return null;
         };
         Point = geometry.Point, Aabb = geometry.Aabb, Polyline = geometry.Polyline, Polygon = geometry.Polygon;
         Entity = entity.Entity;
@@ -315,19 +303,19 @@
         this.entities = [];
         mapents = map.entities;
         l_collides = tryMakingBitmaskFromString((ref = this.properties) != null ? ref.collides : void 0);
-        l_onCollide = tryGettingCallbackForName((ref1 = this.properties) != null ? ref1.onCollide : void 0);
+        l_onCollide = map.tryGettingCallbackForName((ref1 = this.properties) != null ? ref1.onCollide : void 0);
         l_obstructs = tryMakingBitmaskFromString((ref2 = this.properties) != null ? ref2.obstructs : void 0);
-        l_onObstruct = tryGettingCallbackForName((ref3 = this.properties) != null ? ref3.onObstruct : void 0);
+        l_onObstruct = map.tryGettingCallbackForName((ref3 = this.properties) != null ? ref3.onObstruct : void 0);
         setupEntityWithProperties = function(ent, object) {
           var obj_collides, obj_obstructs, obj_onCollide, obj_onObstruct, ref4, ref5, ref6, ref7, ref8;
-          ent.onStart = tryGettingCallbackForName((ref4 = object.properties) != null ? ref4.onStart : void 0);
-          obj_onCollide = tryGettingCallbackForName((ref5 = object.properties) != null ? ref5.onCollide : void 0);
+          ent.onStart = map.tryGettingCallbackForName((ref4 = object.properties) != null ? ref4.onStart : void 0);
+          obj_onCollide = map.tryGettingCallbackForName((ref5 = object.properties) != null ? ref5.onCollide : void 0);
           if (obj_onCollide != null) {
             ent.onCollide = obj_onCollide;
           } else {
             ent.onCollide = l_onCollide;
           }
-          obj_onObstruct = tryGettingCallbackForName((ref6 = object.properties) != null ? ref6.onObstruct : void 0);
+          obj_onObstruct = map.tryGettingCallbackForName((ref6 = object.properties) != null ? ref6.onObstruct : void 0);
           if (obj_onObstruct != null) {
             ent.onObstruct = obj_onObstruct;
           } else {
@@ -338,6 +326,7 @@
           ent.collides = l_collides | obj_collides;
           obj_obstructs = tryMakingBitmaskFromString((ref8 = object.properties) != null ? ref8.obstructs : void 0);
           ent.obstructs = l_obstructs | obj_obstructs;
+          ent.properties = object.properties;
         };
         for (m = 0, len = objects.length; m < len; m++) {
           object = objects[m];
@@ -376,7 +365,7 @@
           this.addEntity(ent);
         }
         this.entities.sort(byBottomBound);
-        this.onStart = tryGettingCallbackForName((ref5 = this.properties) != null ? ref5.onStart : void 0);
+        this.onStart = map.tryGettingCallbackForName((ref5 = this.properties) != null ? ref5.onStart : void 0);
         return;
       }
 
@@ -506,6 +495,19 @@
             return results;
           })();
           this.entities.sort(byLeftBound);
+        };
+
+        _Class.prototype.tryGettingCallbackForName = function(name) {
+          var callback;
+          if (name != null) {
+            callback = this.script[name];
+            if (callback != null) {
+              return callback;
+            } else {
+              throw "missing callback " + name + "!";
+            }
+          }
+          return null;
         };
 
         _Class.prototype.buildLayerCaches = function() {
@@ -708,6 +710,9 @@
           context.clearRect(0, 0, gw, gh);
           context.beginPath();
           this.map.draw(context, hgw, hgh);
+          if (input.debug.state) {
+            this.map.debugDraw(context, hgw, hgh);
+          }
         };
 
         return _Class;

@@ -1,5 +1,5 @@
-define ['jquery', './game', './entity', './geometry', './util'],
-  ($, game, entity, geometry, util) ->
+define ['jquery', './game', './input', './entity', './geometry', './util'],
+  ($, game, input, entity, geometry, util) ->
     # A prefix and suffix applied to names passed into map constructors
     # so that it loads from the right place.
     url_prefix = 'assets/'
@@ -275,15 +275,6 @@ define ['jquery', './game', './entity', './geometry', './util'],
                     return constructBitmask bitmask_str.split ','
                 return 0
             
-            tryGettingCallbackForName = (name) ->
-                if name?
-                    callback = map.script[name]
-                    if callback?
-                        return callback
-                    else
-                        throw "missing callback #{name}!"
-                return null
-            
             {Point, Aabb, Polyline, Polygon} = geometry
             {Entity} = entity
             {constructBitmask} = util
@@ -299,22 +290,22 @@ define ['jquery', './game', './entity', './geometry', './util'],
             
             l_collides = tryMakingBitmaskFromString \
                 @properties?.collides
-            l_onCollide = tryGettingCallbackForName \
+            l_onCollide = map.tryGettingCallbackForName \
                 @properties?.onCollide
             
             l_obstructs = tryMakingBitmaskFromString \
                 @properties?.obstructs
-            l_onObstruct = tryGettingCallbackForName \
+            l_onObstruct = map.tryGettingCallbackForName \
                 @properties?.onObstruct
             
             setupEntityWithProperties = (ent, object) ->
-                ent.onStart = tryGettingCallbackForName \
+                ent.onStart = map.tryGettingCallbackForName \
                     object.properties?.onStart
                 
                 # Object level callbacks take precedence over layer
                 # level callbacks.
                 
-                obj_onCollide = tryGettingCallbackForName \
+                obj_onCollide = map.tryGettingCallbackForName \
                     object.properties?.onCollide
                 
                 if obj_onCollide?
@@ -322,7 +313,7 @@ define ['jquery', './game', './entity', './geometry', './util'],
                 else
                     ent.onCollide = l_onCollide
                 
-                obj_onObstruct = tryGettingCallbackForName \
+                obj_onObstruct = map.tryGettingCallbackForName \
                     object.properties?.onObstruct
                 
                 if obj_onObstruct?
@@ -343,6 +334,8 @@ define ['jquery', './game', './entity', './geometry', './util'],
                     object.properties?.obstructs
                 ent.obstructs = l_obstructs | obj_obstructs
                 
+                ent.properties = object.properties
+
                 return
             
             for object in objects
@@ -379,7 +372,7 @@ define ['jquery', './game', './entity', './geometry', './util'],
                 @addEntity ent
             
             @entities.sort byBottomBound
-            @onStart = tryGettingCallbackForName @properties?.onStart
+            @onStart = map.tryGettingCallbackForName @properties?.onStart
             return
         
         addEntity: (ent) ->
@@ -478,6 +471,15 @@ define ['jquery', './game', './entity', './geometry', './util'],
             
             @entities.sort byLeftBound
             return
+        
+        tryGettingCallbackForName: (name) ->
+            if name?
+                callback = @script[name]
+                if callback?
+                    return callback
+                else
+                    throw "missing callback #{name}!"
+            return null
         
         buildLayerCaches: ->
             for layer in @layers when layer.type is 'tilelayer'
@@ -631,7 +633,7 @@ define ['jquery', './game', './entity', './geometry', './util'],
             context.beginPath()
             
             @map.draw context, hgw, hgh
-            # @map.debugDraw context, hgw, hgh
+            @map.debugDraw context, hgw, hgh if input.debug.state
             
             return
 

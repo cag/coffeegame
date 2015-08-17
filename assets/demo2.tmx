@@ -43,8 +43,9 @@
  <objectgroup name="Objects">
   <object name="treasure1" x="24" y="72" width="8" height="8">
    <properties>
+    <property name="collides" value="0"/>
     <property name="obstructs" value="0"/>
-    <property name="onActivate" value="openChest1"/>
+    <property name="onActivate" value="tryOpeningChest1"/>
     <property name="onStart" value="handleChest1Start"/>
    </properties>
   </object>

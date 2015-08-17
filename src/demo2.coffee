@@ -12,12 +12,25 @@ define ['./cg'],
             return
 
     class PlayerCharacter extends Character
-        constructor: (x, y, shape, sprite, camera) ->
+        constructor: (x, y, shape, sprite) ->
             super x, y, shape, sprite
             @state = 'look down'
             @dir = 'down'
+            map = game.currentScene().map
             player = this
-            camera.post_update = (dt) ->
+            ent_layer = map.getLayerByName 'Entities'
+
+            @activation_point_check = new entity.Entity x, y + 2 * @shape.bounds_offsets[3], new geometry.Point
+            @activation_point_check.collides = util.constructBitmask [0]
+            @activation_point_check.onCollide = (ent, info) ->
+                if input.jump.pressed
+                    if not ent.onActivate?
+                        ent.onActivate = map.tryGettingCallbackForName ent.properties?.onActivate
+                    ent.onActivate ent
+                return
+            ent_layer.addEntity @activation_point_check
+            
+            map.camera.post_update = (dt) ->
                 @x = player.x
                 @y = player.y
                 return
@@ -63,8 +76,22 @@ define ['./cg'],
             @state = state
             @velocity = [64.0 * vxc, 64.0 * vyc]
             physics.integrate this, dt
-
             sprite.update dt
+
+            # TODO: make this better
+            if @dir is 'right'
+                if @facing_left
+                    @activation_point_check.x = @x + 2 * @shape.bounds_offsets[0]
+                    @activation_point_check.y = @y
+                else
+                    @activation_point_check.x = @x + 2 * @shape.bounds_offsets[1]
+                    @activation_point_check.y = @y
+            else if @dir is 'up'
+                @activation_point_check.x = @x
+                @activation_point_check.y = @y + 2 * @shape.bounds_offsets[2]
+            else if @dir is 'down'
+                @activation_point_check.x = @x
+                @activation_point_check.y = @y + 2 * @shape.bounds_offsets[3]
             return
 
     player = null
@@ -83,6 +110,9 @@ define ['./cg'],
         return
 
     handleChest1Start: (obj) ->
+        return
+
+    tryOpeningChest1: (obj) ->
         tx = (obj.x / obj.map.tilewidth) | 0
         ty = (obj.y / obj.map.tileheight) | 0
         layer = obj.map.getLayerByName('Ground')
