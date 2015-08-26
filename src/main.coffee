@@ -41,6 +41,7 @@ require ['jquery', 'screenfull', './cg', './demo', './demo2'],
 
         game.init 160, 120, 1 / 60, 1 / 20, loader_scene
         setupScreenfull game
+        $(window).resize game.resizeCanvasToAspectRatio
         game.run()
         return
     return

@@ -7,9 +7,28 @@ define ['./cg'],
         lineStyles: 'white black 1.0 round round'
         fillStyle: 'rgb(26,47,158)'
 
-    wordWrapText = (text, width, context) ->
-        context.measureText text
-        return
+    wordWrapText: (text, width, style, context) ->
+        delimeter = ' '
+        style = style or default_style
+        context = context or game.canvas().getContext '2d'
+
+        context.save()
+
+        context.font = style.font
+        words = text.split delimeter
+        lines = []
+        current_line = ''
+        for word, i in words
+            current_line_candidate = if i is 0 then word else current_line + delimeter + word
+            if (context.measureText current_line_candidate).width > width
+                lines.push current_line
+                current_line = word
+            else
+                current_line = current_line_candidate
+        lines.push current_line if current_line isnt ''
+
+        context.restore()
+        return lines
 
     drawTextBox: (x, y, width, height, text_obj, style, context) ->
         style = style or default_style

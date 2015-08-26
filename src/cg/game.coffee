@@ -1,8 +1,10 @@
 define ['./util', './input', './audio'], (util, input, audio) ->
     canvas = null
     context = null
-    canvas_w = 0
-    canvas_h = 0
+    game_w = 0
+    game_h = 0
+    game_x_offset = 0
+    game_y_offset = 0
     
     current_scene = null
     
@@ -34,15 +36,37 @@ define ['./util', './input', './audio'], (util, input, audio) ->
     
     # Draw call.
     draw = ->
+        context.clearRect 0, 0, canvas.width, canvas.height
+        context.save()
+        context.translate game_x_offset, game_y_offset
+        context.beginPath()
+        context.rect 0, 0, game_w, game_h
+        context.clip()
         current_scene.draw context
+        context.restore()
         return
+
+    # Canvas resizing callback
+    resizeCanvasToAspectRatio = ->
+        if game_w / game_h < canvas.clientWidth / canvas.clientHeight
+            canvas.width = game_h * canvas.clientWidth / canvas.clientHeight
+            canvas.height = game_h
+            game_x_offset = (0.5 * (canvas.width - game_w)) | 0
+            game_y_offset = 0
+        else
+            canvas.width = game_w
+            canvas.height = game_w * canvas.clientHeight / canvas.clientWidth
+            game_x_offset = 0
+            game_y_offset = (0.5 * (canvas.height - game_h)) | 0
+        return
+    resizeCanvasToAspectRatio: resizeCanvasToAspectRatio
     
     # Canvas instance.
     canvas: -> canvas
     
-    # Canvas dimensions.
-    width: -> canvas_w
-    height: -> canvas_h
+    # Game dimensions.
+    width: -> game_w
+    height: -> game_h
     
     # Last delta time.
     lastDt: -> last_dt
@@ -77,10 +101,11 @@ define ['./util', './input', './audio'], (util, input, audio) ->
         container = (document.getElementById 'game') or document.body
         canvas = document.createElement 'canvas'
         
-        canvas.width = canvas_w = width
-        canvas.height = canvas_h = height
-        
+        game_w = width
+        game_h = height
+
         container.appendChild canvas
+        resizeCanvasToAspectRatio()
         
         context = canvas.getContext '2d'
         
