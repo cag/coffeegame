@@ -18,6 +18,10 @@ define ['./util', './input', './audio'], (util, input, audio) ->
     # some careful planning by the developer.
     dt_clamp = 50
     paused = true
+
+    # Lists of fibers for executing coroutines
+    update_fibers = []
+    draw_fibers = []
     
     # Callbacks for keys are delegated to the input module.
     handleKeyDown = (event) ->
@@ -28,10 +32,20 @@ define ['./util', './input', './audio'], (util, input, audio) ->
         input.handleKeyUp event.keyCode
         return
     
+    # Advances the execution state of a set of fibers with a parameter
+    advanceFibers = (fibers, arg) ->
+        for i in [fibers.length-1..0] by -1
+            fiber = fibers[i]
+            fiber.next arg
+            if fiber.done
+                fibers.splice(i, 1)
+        return
+
     # Update call.
     update = (dt) ->
         input.update()
         current_scene.update dt
+        advanceFibers update_fibers, dt
         return
     
     # Draw call.
@@ -42,7 +56,10 @@ define ['./util', './input', './audio'], (util, input, audio) ->
         context.beginPath()
         context.rect 0, 0, game_w, game_h
         context.clip()
+
         current_scene.draw context
+        advanceFibers draw_fibers, context
+
         context.restore()
         return
 
@@ -109,13 +126,13 @@ define ['./util', './input', './audio'], (util, input, audio) ->
         
         context = canvas.getContext '2d'
         
-        container.tabIndex = 0
-        container.focus()
+        document.body.tabIndex = 0
+        document.body.focus()
         
         input.init()
         
-        container.addEventListener 'keydown', handleKeyDown, false
-        container.addEventListener 'keyup', handleKeyUp, false
+        document.body.addEventListener 'keydown', handleKeyDown, false
+        document.body.addEventListener 'keyup', handleKeyUp, false
         
         audio.init()
         return
@@ -151,3 +168,10 @@ define ['./util', './input', './audio'], (util, input, audio) ->
         current_scene.start()
         gameLoop()
         return
+
+    invoke: (fiber_set) ->
+        if fiber_set.draw?
+            draw_fibers.push fiber_set.draw
+        if fiber_set.update?
+            update_fibers.push fiber_set.update
+        

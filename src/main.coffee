@@ -12,7 +12,9 @@ require ['jquery', 'screenfull', './cg', './demo', './demo2'],
         if screenfull?.enabled
             fs_btn_container = (document.getElementById 'fs-btn') or document.body
             fs_button = $('<button/>').text('Fullscreen').click ->
-                screenfull.request game.canvas()
+                game_canvas = game.canvas()
+                screenfull.request game_canvas
+                $(game_canvas).focus()
                 return
             fs_btn_container.appendChild fs_button[0]
 
@@ -34,7 +36,7 @@ require ['jquery', 'screenfull', './cg', './demo', './demo2'],
                 demo_scene = new map.MapScene loaded.maps.demo
 
                 demo2.setPlayerMetadata new cg.geometry.Aabb([4, 4]), loaded.sprites.demo2player
-                demo_scene2 = new map.MapScene loaded.maps.demo2
+                demo_scene2 = new demo2.DemoScene loaded.maps.demo2
 
                 game.switchScene demo_scene2
                 return

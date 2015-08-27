@@ -89,6 +89,11 @@
                   main.coffee
                 </a>
               
+                
+                <a class="source" href="ui.html">
+                  ui.coffee
+                </a>
+              
             </div>
           </div>
         </li>
@@ -113,8 +118,8 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>define [<span class="hljs-string">'./cg'</span>],
-  <span class="hljs-function"><span class="hljs-params">(cg)</span> -&gt;</span>
+            <div class="content"><div class='highlight'><pre>define [<span class="hljs-string">'./cg'</span>, <span class="hljs-string">'./ui'</span>],
+  <span class="hljs-function"><span class="hljs-params">(cg, ui)</span> -&gt;</span>
     {input, audio, util, game, geometry, entity, physics} = cg
 
     <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">Character</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">entity</span>.<span class="hljs-title">Entity</span></span>
@@ -123,16 +128,52 @@
             <span class="hljs-property">@sprite</span>.startAnimation <span class="hljs-string">'look down'</span>
 
         <span class="hljs-attribute">draw</span>: <span class="hljs-function"><span class="hljs-params">(context, offx, offy)</span> -&gt;</span>
-            <span class="hljs-property">@sprite</span>.draw context, <span class="hljs-property">@x</span> + offx, <span class="hljs-property">@y</span> + offy, <span class="hljs-property">@facing_left</span>
-            <span class="hljs-keyword">return</span>
+            <span class="hljs-property">@sprite</span>.draw context, <span class="hljs-property">@x</span> + offx, <span class="hljs-property">@y</span> + offy, <span class="hljs-property">@facing_left</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>ui.drawTextBox 0, 0, 190, 44,
+    spacing: 10.0
+    lines: [‘T̬͓͂̋ͧ̊͗̚o̻̰͈̼̥ͥͤ͗̊͑ͨ̈́ ͏̻̩̬̭͕̠ī͉̖̠̲̲̘͠ṋ̬̼͔͇̞͔̾͑ͭͪͯ͆v̺̫̘̩̊̓ó̼̥̖̩̖̗̣k͓͔̠̉e͙̱͍̯̽ͫ̇͠ ͚̦͉̮ͩ͆ͬ̈́ͫͭ̚t̡̺͚͙̅̈́ͪ̉h̨͔̳̬̼̲̖è͈̙̲̜̲̜ͯ̃ ̘̜̮̞ͨ̃̃̏ͦh̬̤͖̅̄ͤ̄ͨ̚íͪv̞̹̬̝̀͛ͩ͂́e̛̙̟͎̞͔̦͑-ͣ̅̌̃͂m̪̮͉̗͚ͤͨͥ͛i̘̥̜͠n̖̰̬̺̑̿̚d̶̰̳̍ͅ ̄ͦ҉̺̪̠͈r̶͔̐̏ͩ̈́ͯ͐̋ě̝̯̼̘̦͘ͅp͔̅̚ŕ̢͙͉͍̤̳̞̩̒ͯe̻̠͔̹̝͈s͙̖̰̝͇͔̮̿ͩͧe̠͙͕͉̠̱̾̑̑̈́̑ͅṅ̪͈̙ͯ̔̓̒̓t̵͍̜͇̪̀ͧͪͤ̎ͬi̲̤̣͍̪̐̄n̩͍̉ͭ̊̽̊ͧͣ͜ǧ̯̠̲̌͒̕ͅ ̦͔̾ͮͦͥ͌č̡̖͎͆ḩ̖ͥͬ̌ͥͦa̴̺͙͇̫͍ͫ͛o͔̯͈͕͎̼̾ͣ͗͊̎s̰ͧ̓͒͟.̢͕͙̲̫͓ͯͨ̾͐’
+    ‘̦̔I͍̠̘̩̳̙͊̿̿ͨͭ̊̚͟nv̨̘̜̪̞̲ͨ̾o̝͙̣͚͙͔͟k͐̊͒͛ͯ́ȋ̧͉̥͚̙̮ͭṅg̲̻͉͙͆̌̎ͥ̊ͬͧ ̆̈́́t̢̻̮̘̘̠̻͕ͯh̝̯̞̝͈ͥ̔̌̂͛͜e̫̭͚̼̪̫̪̊̚ ͈̣͇̪̳̪̜ͦͪf̪̼̫̘̲̟̮̿́ė̬̤̯̘̣͌eͣ͊͆̅̐̚͏̟͚̞̟͇̙̦l͍̹͕̆̀i̯͈͍͗̒͌ͮ̀͋̋͟n̥̞̎ͥg̺̻͇̳̪̺͎͗ͮ̓̇̃ ̶͈͕̭̫ͯͦͮ̋ͪ͂ͧő͍̞ͅf͉̗̩̙͕̹̩ͩͭͥ ̡͈̰̹̖͍̯̾̿ͩ̚c̢̞͖̳ĥ̴͗ào͙̲͇̮̭͡s͕̰͚̼̼̥̖̆̽̉́̐͊.̟̘̲̣̪͙̈́̅ͅ’
+    ‘̥̻̩̫ͬ͝W̥͎̻̘̉̓ͪ̍ͯĭ̝̙̫͓̽̎t̨͕̗̙̝̠h̤̬̟̟ͣ͒͌̋̓̽ͯͅ ͏o͚ṵ̙̗̯ͬ͌͂̾͆ͬͅt͚͉͉̲̮̅̍̕ ͇̝̜͚̙̣̈́͒ͧō̺̫̙̘͂̑̔̈ͅr̮̙̠̼̪̒͘d̮͉̲̳̟̆̋̋̈́̊e͏͇̘̩͉̤͓ͅŕ̩̜.̨͙̬̹̮ͯͨ̃’
+    ‘̡͚̬͙͒͛̃͗͗̿ͅT̰͎̥h̺͉̹̯̻͖̒ͧ̆̿ͣe̓͌̅̇̃̊͏ ̢̼̟̦͈̼ͣN̰̼̙̙͋̉̎́e̫̟̘̪̞̒͂̾̈́ͦ͌z̢̠̑̒̓͗̽ͮp̷̪ͨe̶̎̔̂͐̀̀r̗͋͑d̖̟̯̥i̗͎̙̰̜͐͂a̠̖̙̻̦n͋̓ͪͦ̒̊̀ ͍̮̞̋̀h̎ͮ͒͋͌ͪ̀îͥ́̊ͩ̐ͣ́v̹͙͇̬̋̇͂ͅe̟̜̝̜͇͓̎̈́̓̄̕-̲͖̝̇ͭͯͮ͞m̮̩̭̯͉̂ͬͯị̶͈̋̅̍ň̤̣̮͔̻̠̕d͍̩̞͙̓̏ͮͭ ̋o̘͖̽ͪ̈́̒̃̈́f͕̺̘̜̼̼̪̃͊̕ ̏̐̀c̸͍̹̗̤ͥͩ̓ͬ̓̎̚ḩ̝̊̊ͤā̻̺̪̹̀o̺̞̫͓̊ͪͩ̔̕s̭͍̞̰͆̓ͦͯͣͮ̚͜.ͥͯ͛͞ ̜̯͕͚̓ͦ̇ͪ͛Z̠̘̭̣͉̩͛̎̒̃̾ͩͅa̘̹͈̬͛l̦̭̖̠̲͕̏̓̀̽̐̊̚ǵ̸̜͇͓̻͔̰̝̾o̯ͨ̒͒ͣ̿̐͝.̩̺̩̙̙̿ͯͫ͛͊͢’
+    ‘̴͖̰͍͈̹̹̥̎H̘̿̈e̠̬ͮ ̯̌̽͑̒ͯ̎ẅ͉͇̹̞͉̹̋ͤ̄͆͆̂̕ͅh͔̫̮̱̥̓́ͣ͆͛ͅo̳̞̼̘͉̔̽̌̀̚ ̐ͫ̿̃W̲͉͞å̡͙̗̄i̦̰ͦͦt̥͋̏̏ͅs͙̮͉͎͚̮͐ͦ͆ ̵̩̞̖̩̝͖͓̑̆B̝̗̙̗͕̹͋͗ͨͮ́ĕ͕͓̞̤͜h͚̮̿̔ͬ̍i͚͇̪͉̓ͯn̢̤̜͚͕̫̪̓d̡͖͖̜̫̬͇̦̽ ͎̤̭̩̻͖̽͜T͔̲̤͖̮̟̮͗̑̒̄̈́h̼͉̲̫̘ě͆̀ ̨͍͇̹͇̻ͪͪ̈́ͣͭ͑W̌̄͗̓̂̒̾͜a͊l̸̜̩̺̫͓̞̠ͪͧl̨̝͇̰͇͒.̛̜͕̼̫̮̠̿͆ͬͅ’
+    ‘͙͎̙̩̺̪̑ͫ̎͋͋Z̛̺̻̱̍̌ͪ̓ͅA̦̻͓̹̍ͤͨ̓ͩ̈L̡̅͐ͫĜ͔͕̮ͯ̃͊̀͐O̯ͤ͂̄̒̉͟!͓̲̽ͫ͢’].map((line, index, lines)-&gt;
+            return ui.wordWrapText line, 160-6
+        ).reduce (a, b) -&gt; a.concat b</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">return</span>
 
     <span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">PlayerCharacter</span> <span class="hljs-keyword">extends</span> <span class="hljs-title">Character</span></span>
-        <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(x, y, shape, sprite, camera)</span> -&gt;</span>
+        <span class="hljs-attribute">constructor</span>: <span class="hljs-function"><span class="hljs-params">(x, y, shape, sprite)</span> -&gt;</span>
             <span class="hljs-keyword">super</span> x, y, shape, sprite
             <span class="hljs-property">@state</span> = <span class="hljs-string">'look down'</span>
             <span class="hljs-property">@dir</span> = <span class="hljs-string">'down'</span>
+            map = game.currentScene().map
             player = <span class="hljs-keyword">this</span>
-            camera.post_update = <span class="hljs-function"><span class="hljs-params">(dt)</span> -&gt;</span>
+            ent_layer = map.getLayerByName <span class="hljs-string">'Entities'</span>
+
+            <span class="hljs-property">@activation_point_check</span> = <span class="hljs-keyword">new</span> entity.Entity x, y + <span class="hljs-number">2</span> * <span class="hljs-property">@shape</span>.bounds_offsets[<span class="hljs-number">3</span>], <span class="hljs-keyword">new</span> geometry.Point
+            <span class="hljs-property">@activation_point_check</span>.collides = util.constructBitmask [<span class="hljs-number">0</span>]
+            <span class="hljs-property">@activation_point_check</span>.onCollide = <span class="hljs-function"><span class="hljs-params">(ent, info)</span> -&gt;</span>
+                <span class="hljs-keyword">if</span> input.jump.pressed
+                    <span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> ent.onActivate?
+                        ent.onActivate = map.tryGettingCallbackForName ent.properties?.onActivate
+                    ent.onActivate ent
+                <span class="hljs-keyword">return</span>
+            ent_layer.addEntity <span class="hljs-property">@activation_point_check</span>
+            
+            map.camera.post_update = <span class="hljs-function"><span class="hljs-params">(dt)</span> -&gt;</span>
                 <span class="hljs-property">@x</span> = player.x
                 <span class="hljs-property">@y</span> = player.y
                 <span class="hljs-keyword">return</span>
@@ -178,8 +219,34 @@
             <span class="hljs-property">@state</span> = state
             <span class="hljs-property">@velocity</span> = [<span class="hljs-number">64.0</span> * vxc, <span class="hljs-number">64.0</span> * vyc]
             physics.integrate <span class="hljs-keyword">this</span>, dt
+            sprite.update dt</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-3">&#182;</a>
+              </div>
+              <p>TODO: make this better</p>
 
-            sprite.update dt
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">if</span> <span class="hljs-property">@dir</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'right'</span>
+                <span class="hljs-keyword">if</span> <span class="hljs-property">@facing_left</span>
+                    <span class="hljs-property">@activation_point_check</span>.x = <span class="hljs-property">@x</span> + <span class="hljs-number">2</span> * <span class="hljs-property">@shape</span>.bounds_offsets[<span class="hljs-number">0</span>]
+                    <span class="hljs-property">@activation_point_check</span>.y = <span class="hljs-property">@y</span>
+                <span class="hljs-keyword">else</span>
+                    <span class="hljs-property">@activation_point_check</span>.x = <span class="hljs-property">@x</span> + <span class="hljs-number">2</span> * <span class="hljs-property">@shape</span>.bounds_offsets[<span class="hljs-number">1</span>]
+                    <span class="hljs-property">@activation_point_check</span>.y = <span class="hljs-property">@y</span>
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@dir</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'up'</span>
+                <span class="hljs-property">@activation_point_check</span>.x = <span class="hljs-property">@x</span>
+                <span class="hljs-property">@activation_point_check</span>.y = <span class="hljs-property">@y</span> + <span class="hljs-number">2</span> * <span class="hljs-property">@shape</span>.bounds_offsets[<span class="hljs-number">2</span>]
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> <span class="hljs-property">@dir</span> <span class="hljs-keyword">is</span> <span class="hljs-string">'down'</span>
+                <span class="hljs-property">@activation_point_check</span>.x = <span class="hljs-property">@x</span>
+                <span class="hljs-property">@activation_point_check</span>.y = <span class="hljs-property">@y</span> + <span class="hljs-number">2</span> * <span class="hljs-property">@shape</span>.bounds_offsets[<span class="hljs-number">3</span>]
             <span class="hljs-keyword">return</span>
 
     player = <span class="hljs-literal">null</span>
@@ -195,6 +262,18 @@
         player = <span class="hljs-keyword">new</span> PlayerCharacter obj.x, obj.y, player_shape, player_sprite, obj.map.camera
         player.obstructs = util.constructBitmask [<span class="hljs-number">0</span>]
         obj.layer.addEntity player
+        <span class="hljs-keyword">return</span>
+
+    <span class="hljs-attribute">handleChest1Start</span>: <span class="hljs-function"><span class="hljs-params">(obj)</span> -&gt;</span>
+        <span class="hljs-keyword">return</span>
+
+    <span class="hljs-attribute">tryOpeningChest1</span>: <span class="hljs-function"><span class="hljs-params">(obj)</span> -&gt;</span>
+        tx = (obj.x / obj.map.tilewidth) | <span class="hljs-number">0</span>
+        ty = (obj.y / obj.map.tileheight) | <span class="hljs-number">0</span>
+        layer = obj.map.getLayerByName(<span class="hljs-string">'Ground'</span>)
+        td = layer.data[tx][ty][..]
+        td[<span class="hljs-number">0</span>]++
+        layer.setTile tx, ty, td
         <span class="hljs-keyword">return</span></pre></div></div>
             
         </li>

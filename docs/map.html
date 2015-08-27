@@ -89,6 +89,11 @@
                   main.coffee
                 </a>
               
+                
+                <a class="source" href="ui.html">
+                  ui.coffee
+                </a>
+              
             </div>
           </div>
         </li>
@@ -113,8 +118,8 @@
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>define [<span class="hljs-string">'jquery'</span>, <span class="hljs-string">'./game'</span>, <span class="hljs-string">'./entity'</span>, <span class="hljs-string">'./geometry'</span>, <span class="hljs-string">'./util'</span>],
-  <span class="hljs-function"><span class="hljs-params">($, game, entity, geometry, util)</span> -&gt;</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>define [<span class="hljs-string">'jquery'</span>, <span class="hljs-string">'./game'</span>, <span class="hljs-string">'./input'</span>, <span class="hljs-string">'./entity'</span>, <span class="hljs-string">'./geometry'</span>, <span class="hljs-string">'./util'</span>],
+  <span class="hljs-function"><span class="hljs-params">($, game, input, entity, geometry, util)</span> -&gt;</span></pre></div></div>
             
         </li>
         
@@ -366,6 +371,22 @@ values are written to json unsigned in Tiled.</p>
             
             <span class="hljs-keyword">return</span>
         
+        <span class="hljs-attribute">setTile</span>: <span class="hljs-function"><span class="hljs-params">(txi, tyi, td)</span> -&gt;</span>
+            <span class="hljs-property">@data</span>[txi][tyi] = td
+            <span class="hljs-keyword">if</span> layers_cached
+                map = <span class="hljs-property">@map</span>
+                lcf = layer_cache_factor
+                ci = (txi / lcf) | <span class="hljs-number">0</span>
+                cj = (tyi / lcf) | <span class="hljs-number">0</span>
+                block = <span class="hljs-property">@cache</span>[ci][cj]
+                bxo = (txi % lcf) * map.tilewidth
+                byo = (tyi % lcf) * map.tileheight
+                context = block.getContext <span class="hljs-string">'2d'</span>
+                map.drawTile context,
+                    td[<span class="hljs-number">0</span>], td[<span class="hljs-number">1</span>], td[<span class="hljs-number">2</span>], td[<span class="hljs-number">3</span>],
+                    bxo, byo
+            <span class="hljs-keyword">return</span>
+
         <span class="hljs-attribute">drawRaw</span>: <span class="hljs-function"><span class="hljs-params">(context, lowtx, hightx, lowty, highty, dx, dy)</span> -&gt;</span>
             map = <span class="hljs-property">@map</span>
             tw = map.tilewidth
@@ -432,8 +453,8 @@ values are written to json unsigned in Tiled.</p>
                 highty = Math.min <span class="hljs-property">@height</span>, Math.ceil((mlsy + h) / th)
                 
                 <span class="hljs-property">@drawRaw</span> context, lowtx, hightx, lowty, highty,
-                    destx + lowtx * tw,
-                    desty + lowty * th
+                    Math.round(destx + lowtx * tw),
+                    Math.round(desty + lowty * th)
                 
             context.restore()
             <span class="hljs-keyword">return</span>
@@ -460,15 +481,6 @@ groups for zones and obstruction groups.</p>
                 <span class="hljs-keyword">if</span> bitmask_str?
                     <span class="hljs-keyword">return</span> constructBitmask bitmask_str.split <span class="hljs-string">','</span>
                 <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>
-<span class="hljs-function">            
-            <span class="hljs-title">tryGettingCallbackForName</span> = <span class="hljs-params">(name)</span> -&gt;</span>
-                <span class="hljs-keyword">if</span> name?
-                    callback = map.script[name]
-                    <span class="hljs-keyword">if</span> callback?
-                        <span class="hljs-keyword">return</span> callback
-                    <span class="hljs-keyword">else</span>
-                        <span class="hljs-keyword">throw</span> <span class="hljs-string">"missing callback <span class="hljs-subst">#{name}</span>!"</span>
-                <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>
             
             {Point, Aabb, Polyline, Polygon} = geometry
             {Entity} = entity
@@ -485,16 +497,16 @@ groups for zones and obstruction groups.</p>
             
             l_collides = tryMakingBitmaskFromString \
                 <span class="hljs-property">@properties</span>?.collides
-            l_onCollide = tryGettingCallbackForName \
+            l_onCollide = map.tryGettingCallbackForName \
                 <span class="hljs-property">@properties</span>?.onCollide
             
             l_obstructs = tryMakingBitmaskFromString \
                 <span class="hljs-property">@properties</span>?.obstructs
-            l_onObstruct = tryGettingCallbackForName \
+            l_onObstruct = map.tryGettingCallbackForName \
                 <span class="hljs-property">@properties</span>?.onObstruct
 <span class="hljs-function">            
             <span class="hljs-title">setupEntityWithProperties</span> = <span class="hljs-params">(ent, object)</span> -&gt;</span>
-                ent.onStart = tryGettingCallbackForName \
+                ent.onStart = map.tryGettingCallbackForName \
                     object.properties?.onStart</pre></div></div>
             
         </li>
@@ -506,13 +518,13 @@ groups for zones and obstruction groups.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <p>Object level callbacks are preferred over layer
+              <p>Object level callbacks take precedence over layer
 level callbacks.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>                
-                obj_onCollide = tryGettingCallbackForName \
+                obj_onCollide = map.tryGettingCallbackForName \
                     object.properties?.onCollide
                 
                 <span class="hljs-keyword">if</span> obj_onCollide?
@@ -520,7 +532,7 @@ level callbacks.</p>
                 <span class="hljs-keyword">else</span>
                     ent.onCollide = l_onCollide
                 
-                obj_onObstruct = tryGettingCallbackForName \
+                obj_onObstruct = map.tryGettingCallbackForName \
                     object.properties?.onObstruct
                 
                 <span class="hljs-keyword">if</span> obj_onObstruct?
@@ -565,6 +577,8 @@ may act as static obstructions/zones.</p>
                     object.properties?.obstructs
                 ent.obstructs = l_obstructs | obj_obstructs
                 
+                ent.properties = object.properties
+
                 <span class="hljs-keyword">return</span>
             
             <span class="hljs-keyword">for</span> object <span class="hljs-keyword">in</span> objects
@@ -614,7 +628,7 @@ may act as static obstructions/zones.</p>
                 <span class="hljs-property">@addEntity</span> ent
             
             <span class="hljs-property">@entities</span>.sort byBottomBound
-            <span class="hljs-property">@onStart</span> = tryGettingCallbackForName <span class="hljs-property">@properties</span>?.onStart
+            <span class="hljs-property">@onStart</span> = map.tryGettingCallbackForName <span class="hljs-property">@properties</span>?.onStart
             <span class="hljs-keyword">return</span>
         
         <span class="hljs-attribute">addEntity</span>: <span class="hljs-function"><span class="hljs-params">(ent)</span> -&gt;</span>
@@ -726,6 +740,15 @@ searched for inside of the <code>@script</code> passed.</p>
             <span class="hljs-property">@entities</span>.sort byLeftBound
             <span class="hljs-keyword">return</span>
         
+        <span class="hljs-attribute">tryGettingCallbackForName</span>: <span class="hljs-function"><span class="hljs-params">(name)</span> -&gt;</span>
+            <span class="hljs-keyword">if</span> name?
+                callback = <span class="hljs-property">@script</span>[name]
+                <span class="hljs-keyword">if</span> callback?
+                    <span class="hljs-keyword">return</span> callback
+                <span class="hljs-keyword">else</span>
+                    <span class="hljs-keyword">throw</span> <span class="hljs-string">"missing callback <span class="hljs-subst">#{name}</span>!"</span>
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>
+        
         <span class="hljs-attribute">buildLayerCaches</span>: <span class="hljs-function">-&gt;</span>
             <span class="hljs-keyword">for</span> layer <span class="hljs-keyword">in</span> <span class="hljs-property">@layers</span> <span class="hljs-keyword">when</span> layer.type <span class="hljs-keyword">is</span> <span class="hljs-string">'tilelayer'</span>
                 layer.buildCache()
@@ -810,7 +833,25 @@ dynamic objects.</p>
                     
                     ent_a.onObstruct? ent_b, collision_info
                     ent_b.onObstruct? ent_a, neg_collision_info
-            <span class="hljs-keyword">return</span>
+            <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-15">&#182;</a>
+              </div>
+              <p>Gets a layer by name. Returns null if the layer is not found.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-attribute">getLayerByName</span>: <span class="hljs-function"><span class="hljs-params">(name)</span> -&gt;</span>
+            <span class="hljs-keyword">for</span> layer <span class="hljs-keyword">in</span> <span class="hljs-property">@layers</span>
+                <span class="hljs-keyword">return</span> layer <span class="hljs-keyword">if</span> layer.name <span class="hljs-keyword">is</span> name
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>
         
         <span class="hljs-attribute">start</span>: <span class="hljs-function">-&gt;</span>
             <span class="hljs-keyword">for</span> layer <span class="hljs-keyword">in</span> <span class="hljs-property">@layers</span>
@@ -853,11 +894,11 @@ dynamic objects.</p>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-15">&#182;</a>
+                <a class="pilcrow" href="#section-16">&#182;</a>
               </div>
               <p>A scene for running a map.</p>
 
@@ -875,11 +916,11 @@ dynamic objects.</p>
         </li>
         
         
-        <li id="section-16">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
+                <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>Camera is initially positioned at the origin.</p>
 
@@ -908,22 +949,9 @@ dynamic objects.</p>
             context.clearRect <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, gw, gh
             context.beginPath()
             
-            <span class="hljs-property">@map</span>.draw context, hgw, hgh</pre></div></div>
+            <span class="hljs-property">@map</span>.draw context, hgw, hgh
+            <span class="hljs-property">@map</span>.debugDraw context, hgw, hgh <span class="hljs-keyword">if</span> input.debug.state
             
-        </li>
-        
-        
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
-              </div>
-              <p>@map.debugDraw context, hgw, hgh</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>            
             <span class="hljs-keyword">return</span></pre></div></div>
             
         </li>

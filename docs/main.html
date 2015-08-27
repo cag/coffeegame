@@ -89,6 +89,11 @@
                   main.coffee
                 </a>
               
+                
+                <a class="source" href="ui.html">
+                  ui.coffee
+                </a>
+              
             </div>
           </div>
         </li>
@@ -181,6 +186,7 @@
 
         game.init <span class="hljs-number">160</span>, <span class="hljs-number">120</span>, <span class="hljs-number">1</span> / <span class="hljs-number">60</span>, <span class="hljs-number">1</span> / <span class="hljs-number">20</span>, loader_scene
         setupScreenfull game
+        $(<span class="hljs-built_in">window</span>).resize game.resizeCanvasToAspectRatio
         game.run()
         <span class="hljs-keyword">return</span>
     <span class="hljs-keyword">return</span></pre></div></div>

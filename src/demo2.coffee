@@ -1,6 +1,34 @@
 define ['./cg', './ui'],
   (cg, ui) ->
-    {input, audio, util, game, geometry, entity, physics} = cg
+    {input, audio, util, game, geometry, entity, physics, map} = cg
+
+    fadeIn = (duration) ->
+        t_accum = 0.0
+        updateGenerator = ->
+            while t_accum < duration
+                dt = yield undefined
+                t_accum += dt
+        drawGenerator = ->
+            while t_accum < duration
+                context = yield undefined
+                alpha = 1.0 - (Math.min t_accum / duration, 1.0)
+                context.fillStyle = "rgba(0,0,0,#{alpha})"
+                context.fillRect 0, 0, game.width(), game.height()
+
+        updateGen = updateGenerator()
+        drawGen = drawGenerator()
+        updateGen.next()
+        drawGen.next()
+
+        update: updateGen
+        draw: drawGen
+
+    class DemoScene extends map.MapScene
+        start: ->
+            super
+            game.invoke fadeIn 10.0
+
+
 
     class Character extends entity.Entity
         constructor: (x, y, shape, @sprite) ->
@@ -130,3 +158,5 @@ define ['./cg', './ui'],
         td[0]++
         layer.setTile tx, ty, td
         return
+
+    DemoScene: DemoScene

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>ui.coffee</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="cg.html">
+                  cg.coffee
+                </a>
+              
+                
+                <a class="source" href="audio.html">
+                  audio.coffee
+                </a>
+              
+                
+                <a class="source" href="entity.html">
+                  entity.coffee
+                </a>
+              
+                
+                <a class="source" href="game.html">
+                  game.coffee
+                </a>
+              
+                
+                <a class="source" href="geometry.html">
+                  geometry.coffee
+                </a>
+              
+                
+                <a class="source" href="input.html">
+                  input.coffee
+                </a>
+              
+                
+                <a class="source" href="loader.html">
+                  loader.coffee
+                </a>
+              
+                
+                <a class="source" href="map.html">
+                  map.coffee
+                </a>
+              
+                
+                <a class="source" href="physics.html">
+                  physics.coffee
+                </a>
+              
+                
+                <a class="source" href="sprite.html">
+                  sprite.coffee
+                </a>
+              
+                
+                <a class="source" href="util.html">
+                  util.coffee
+                </a>
+              
+                
+                <a class="source" href="demo.html">
+                  demo.coffee
+                </a>
+              
+                
+                <a class="source" href="demo2.html">
+                  demo2.coffee
+                </a>
+              
+                
+                <a class="source" href="main.html">
+                  main.coffee
+                </a>
+              
+                
+                <a class="source" href="ui.html">
+                  ui.coffee
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+          <li id="title">
+              <div class="annotation">
+                  <h1>ui.coffee</h1>
+              </div>
+          </li>
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-1">&#182;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>define [<span class="hljs-string">'./cg'</span>],
+  <span class="hljs-function"><span class="hljs-params">(cg)</span> -&gt;</span>
+    {input, audio, util, game, geometry, entity, physics} = cg
+
+    default_style =
+        <span class="hljs-attribute">font</span>: <span class="hljs-string">'10px sans-serif'</span>
+        <span class="hljs-attribute">lineStyles</span>: <span class="hljs-string">'white black 1.0 round round'</span>
+        <span class="hljs-attribute">fillStyle</span>: <span class="hljs-string">'rgb(26,47,158)'</span>
+
+    <span class="hljs-attribute">wordWrapText</span>: <span class="hljs-function"><span class="hljs-params">(text, width, style, context)</span> -&gt;</span>
+        delimeter = <span class="hljs-string">' '</span>
+        style = style <span class="hljs-keyword">or</span> default_style
+        context = context <span class="hljs-keyword">or</span> game.canvas().getContext <span class="hljs-string">'2d'</span>
+
+        context.save()
+
+        context.font = style.font
+        words = text.split delimeter
+        lines = []
+        current_line = <span class="hljs-string">''</span>
+        <span class="hljs-keyword">for</span> word, i <span class="hljs-keyword">in</span> words
+            current_line_candidate = <span class="hljs-keyword">if</span> i <span class="hljs-keyword">is</span> <span class="hljs-number">0</span> <span class="hljs-keyword">then</span> word <span class="hljs-keyword">else</span> current_line + delimeter + word
+            <span class="hljs-keyword">if</span> (context.measureText current_line_candidate).width &gt; width
+                lines.push current_line
+                current_line = word
+            <span class="hljs-keyword">else</span>
+                current_line = current_line_candidate
+        lines.push current_line <span class="hljs-keyword">if</span> current_line <span class="hljs-keyword">isnt</span> <span class="hljs-string">''</span>
+
+        context.restore()
+        <span class="hljs-keyword">return</span> lines
+
+    <span class="hljs-attribute">drawTextBox</span>: <span class="hljs-function"><span class="hljs-params">(x, y, width, height, text_obj, style, context)</span> -&gt;</span>
+        style = style <span class="hljs-keyword">or</span> default_style
+        context = context <span class="hljs-keyword">or</span> game.canvas().getContext <span class="hljs-string">'2d'</span>
+
+        context.save()
+
+        context.font = style.font
+        context.textBaseline = <span class="hljs-string">"top"</span>
+        [
+            mainLineStrokeStyle
+            context.strokeStyle
+            context.lineWidth
+            context.lineCap
+            context.lineJoin
+        ] = style.lineStyles.split <span class="hljs-string">' '</span>
+        context.fillStyle = style.fillStyle
+
+        context.fillRect(x + <span class="hljs-number">1.0</span>, y + <span class="hljs-number">1.0</span>, width - <span class="hljs-number">2.0</span>, height - <span class="hljs-number">2.0</span>)
+        context.strokeRect(x + <span class="hljs-number">1.5</span>, y + <span class="hljs-number">1.5</span>, width - <span class="hljs-number">2.0</span>, height - <span class="hljs-number">2.0</span>)
+        context.strokeStyle = mainLineStrokeStyle
+        context.strokeRect(x + <span class="hljs-number">0.5</span>, y + <span class="hljs-number">0.5</span>, width - <span class="hljs-number">2.0</span>, height - <span class="hljs-number">2.0</span>)
+
+        context.beginPath()
+        context.rect x + <span class="hljs-number">2.0</span>, y + <span class="hljs-number">2.0</span>, width - <span class="hljs-number">4.0</span>, height - <span class="hljs-number">4.0</span>
+        context.clip()
+        context.fillStyle = mainLineStrokeStyle</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-2">&#182;</a>
+              </div>
+              <p>wordWrapText text, width - 6.0, context</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">for</span> line, i <span class="hljs-keyword">in</span> text_obj.lines
+            context.fillText line, x + <span class="hljs-number">3.0</span>, y + <span class="hljs-number">3.0</span> + i*text_obj.spacing
+
+        context.restore()
+        <span class="hljs-keyword">return</span></pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
