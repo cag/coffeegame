@@ -19,9 +19,9 @@ define ['./util', './input', './audio'], (util, input, audio) ->
     dt_clamp = 50
     paused = true
 
-    # Lists of fibers for executing coroutines
-    update_fibers = []
-    draw_fibers = []
+    # Lists of coroutines for executing coroutines
+    update_coroutines = []
+    draw_coroutines = []
     
     # Callbacks for keys are delegated to the input module.
     handleKeyDown = (event) ->
@@ -32,20 +32,20 @@ define ['./util', './input', './audio'], (util, input, audio) ->
         input.handleKeyUp event.keyCode
         return
     
-    # Advances the execution state of a set of fibers with a parameter
-    advanceFibers = (fibers, arg) ->
-        for i in [fibers.length-1..0] by -1
-            fiber = fibers[i]
-            fiber.next arg
-            if fiber.done
-                fibers.splice(i, 1)
+    # Advances the execution state of a set of coroutines with a parameter
+    advanceCoroutines = (coroutines, arg) ->
+        for i in [coroutines.length-1..0] by -1
+            coroutine = coroutines[i]
+            coroutine.next arg
+            if coroutine.done
+                coroutines.splice(i, 1)
         return
 
     # Update call.
     update = (dt) ->
         input.update()
         current_scene.update dt
-        advanceFibers update_fibers, dt
+        advanceCoroutines update_coroutines, dt
         return
     
     # Draw call.
@@ -58,7 +58,7 @@ define ['./util', './input', './audio'], (util, input, audio) ->
         context.clip()
 
         current_scene.draw context
-        advanceFibers draw_fibers, context
+        advanceCoroutines draw_coroutines, context
 
         context.restore()
         return
@@ -169,9 +169,9 @@ define ['./util', './input', './audio'], (util, input, audio) ->
         gameLoop()
         return
 
-    # Pushes a fiber set onto the invocation stack.
-    invoke: (fiber_set) ->
-        if fiber_set.draw?
-            draw_fibers.push fiber_set.draw
-        if fiber_set.update?
-            update_fibers.push fiber_set.update
+    # Pushes a coroutine set onto the invocation stack.
+    invoke: (coroutine_set) ->
+        if coroutine_set.draw?
+            draw_coroutines.push coroutine_set.draw
+        if coroutine_set.update?
+            update_coroutines.push coroutine_set.update

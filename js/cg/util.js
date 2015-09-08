@@ -120,7 +120,7 @@
         };
         return "#" + (toTwoDigitHex(r)) + (toTwoDigitHex(g)) + (toTwoDigitHex(b));
       },
-      prepareFiberSet: function(updateGenerator, drawGenerator) {
+      prepareCoroutineSet: function(updateGenerator, drawGenerator) {
         var drawGen, updateGen;
         updateGen = updateGenerator();
         drawGen = drawGenerator();

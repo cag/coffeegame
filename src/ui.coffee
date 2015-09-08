@@ -119,4 +119,4 @@ define ['./cg'],
                         lines: displayed_text
                     }, style, context
 
-        game.invoke util.prepareFiberSet updateGenerator, drawGenerator
+        game.invoke util.prepareCoroutineSet updateGenerator, drawGenerator
