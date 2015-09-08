@@ -144,7 +144,30 @@ define ['./cg', './ui'],
         td = layer.data[tx][ty][..]
         td[0]++
         layer.setTile tx, ty, td
-        ui.textBoxDialog 'T͕̜͘ò ̮͎̣i̧̭͉n͉̠̣̖vo̪̖k̢͕̫e͟ ҉͈̲t̞͈͖͚͔̀h̝e̱̥̩̣̪ ͟h̤͔̩̣̻̦͉͜i̝̩͉̜̞͔v̘͔̤͙͕e͏̻-̬͘mi̬̫̪̝̠̝͉n̳̳̼̖d͖̖̠ ̷̫̝̪r̖̯̙̮̼͠ͅe̫͖͎̲͚p͓̫r͕̜̺e̠̣̲s̥͈̻e̹͖̝̻n̵̠͖̤̦̮͈̫t̯̗i̴͓̬͈̱̪̜n̗̹̯͍͇͠g҉̰ c̩͡ͅha͉o͓̦͔̖̦͢s҉̠̣̮.̴͇̮̮ ̜̮I̴̭̣̼͍̗n͇̤̪͇̺̭̼v̪̗o̬̩̳k͏̬̫̲̣̗̙i̫͍̳̠n̸̟g͔͘ t̨ḩ̰͈̬e͔̩̮̱ ̬͈̳̟͕̼̤͝f̤͎̹̼̻̤̭e̛̲̫̙̲̦̞ͅe̩̗̝̥̣l͎͙͙͉͡i͡n̼͉̥g̙ ̥o͙̳̞f̻͠ c̦̫̤͇̬̼h̴͕̻̱͉̼ͅḁ̷̪̣o͕͓̗̦s̫̫̠.͉̱̞̳ ̪̝͔̗̙̹̀ͅW͜it͍̭̻̱̞̞h́ ̴̮̲̣̲̠̮o̠̖̯ut̴̺̦̙̙̞ ̫̜̻̫̼̖͠o̯̭̖͢ŗ̤̙̙̺̰d̫e̢̬̘r̪͜.͚̖̠̝͔͞ ͏͖̙̩T̝̤̱̭̫̭h̦é̞͚ ̠͓̖̫͢N̦̲̭e͍̦̹̼̪̪͟ͅz͟p̨̺̞͓̠̲ͅe͔͓͕͇͓̯͝r̳̯̝͈d̟i̶͎͈͉͉͚̜̭a͏̯͇̰̗̘̰͍n̙ ̫͔͉h͙̦͖͠i̴̙͚͕v̯̰͕͔̼e̦̯̗͝-̤̠͔͞m͍̙i̧n͙͙̥͖͈̫ͅd̪͇͉ ̷̠̤͎͔ͅo͏̘f ̭͚̤c͘h̢̺ͅa̢̬̪̱̳̗̝̱o̜͚̱̟̩͟ͅs̗ͅ.̤̱̯̥̻̬̝ Z̼̠̥͓̥͔ͅa̲l̦̲̭͖̗̣͜g҉͔͖̭̣̻o͖̗͇̺̣̫̥.҉͓͎͙̖̭̖ ͏̜̜̗H̺͉̯͖̭e͏͈ ͇̱̯̜w̛̤͚͎͍h͇o͔͖̱̭̻̱̱ ́W͎̙̠̬͢a̩̬̯̬̫̫̦i̡͉ț̛̭s̝͚̲̦ ̢̭̥̯B̮͚̙̝͔̙͙e̹͈ẖ̩i̷̦̙̝n̙̞̙̼̪d͠ ̝T͞h̲̜e͏̳̺̠͉̮ͅ ̛W͎͙̭̰͜a̴̩̱͎̗̰l͜l̮̖.̹̯̕ ̲͚̜Z̲̳͓͍͞A̺Ḽ̷̤̙̫̭G͖O͓̬̹͇̰͘!̪͉͇͉̤̥ͅ', 0, 0, 160, 44, 10.0, null, null, ->
+        ui.textBoxDialog 'Do not go gentle into that good night,
+Old age should burn and rave at close of day;
+Rage, rage against the dying of the light.
+
+Though wise men at their end know dark is right,
+Because their words had forked no lightning they
+Do not go gentle into that good night.
+
+Good men, the last wave by, crying how bright
+Their frail deeds might have danced in a green bay,
+Rage, rage against the dying of the light.
+
+Wild men who caught and sang the sun in flight,
+And learn, too late, they grieved it on its way,
+Do not go gentle into that good night.
+
+Grave men, near death, who see with blinding sight
+Blind eyes could blaze like meteors and be gay,
+Rage, rage against the dying of the light.
+
+And you, my father, there on the sad height,
+Curse, bless, me now with your fierce tears, I pray.
+Do not go gentle into that good night.
+Rage, rage against the dying of the light.', 0, 0, 160, 44, 10.0, null, null, ->
             game.state = 'world'
         return
 

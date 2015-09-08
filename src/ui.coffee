@@ -2,6 +2,8 @@ define ['./cg'],
   (cg) ->
     {input, audio, util, game, geometry, entity, physics} = cg
 
+    right_to_left = false
+
     default_style =
         fontSize: 10
         font: 'sans-serif'
@@ -57,9 +59,15 @@ define ['./cg'],
         context.rect x + 2.0, y + 2.0, width - 4.0, height - 4.0
         context.clip()
         context.fillStyle = mainLineStrokeStyle
-        # wordWrapText text, width - 6.0, context
+        if right_to_left
+            context.textAlign = 'end'
+        else
+            context.textAlign = 'start'
         for line, i in text_obj.lines
-            context.fillText line, x + 3.0, y + 3.0 + (i-lines_scrolled)*text_obj.spacing
+            if right_to_left
+                context.fillText line, x + width - 3.0, y + 3.0 + (i-lines_scrolled)*text_obj.spacing
+            else
+                context.fillText line, x + 3.0, y + 3.0 + (i-lines_scrolled)*text_obj.spacing
 
         context.restore()
         return
@@ -92,7 +100,7 @@ define ['./cg'],
                         new_line_progress = 0.0
                         displayed_text = word_wrapped_text[...cur_line_idx]
                     else
-                        cur_line = word_wrapped_text[cur_line_idx][...(new_line_progress | 0)]
+                        cur_line = word_wrapped_text[cur_line_idx][...(new_line_progress | 0)].trim()
 
                     displayed_text[cur_line_idx] = cur_line
                 line_progress = new_line_progress
