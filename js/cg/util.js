@@ -119,6 +119,17 @@
           return ("00" + ((Math.min(Math.max(Math.round(v * 256), 0), 255)).toString(16))).substr(-2);
         };
         return "#" + (toTwoDigitHex(r)) + (toTwoDigitHex(g)) + (toTwoDigitHex(b));
+      },
+      prepareFiberSet: function(updateGenerator, drawGenerator) {
+        var drawGen, updateGen;
+        updateGen = updateGenerator();
+        drawGen = drawGenerator();
+        updateGen.next();
+        drawGen.next();
+        return {
+          update: updateGen,
+          draw: drawGen
+        };
       }
     };
   });

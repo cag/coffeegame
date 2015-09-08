@@ -169,9 +169,9 @@ define ['./util', './input', './audio'], (util, input, audio) ->
         gameLoop()
         return
 
+    # Pushes a fiber set onto the invocation stack.
     invoke: (fiber_set) ->
         if fiber_set.draw?
             draw_fibers.push fiber_set.draw
         if fiber_set.update?
             update_fibers.push fiber_set.update
-        

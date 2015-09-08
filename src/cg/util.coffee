@@ -93,3 +93,12 @@ define ->
                 toString 16}".substr(-2)
         "##{toTwoDigitHex r}#{toTwoDigitHex g}#{toTwoDigitHex b}"
 
+    # Prepares a fiber set from generator constructors
+    prepareFiberSet: (updateGenerator, drawGenerator) ->
+        updateGen = updateGenerator()
+        drawGen = drawGenerator()
+        updateGen.next()
+        drawGen.next()
+
+        update: updateGen
+        draw: drawGen

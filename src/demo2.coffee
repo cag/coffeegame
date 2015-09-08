@@ -2,12 +2,13 @@ define ['./cg', './ui'],
   (cg, ui) ->
     {input, audio, util, game, geometry, entity, physics, map} = cg
 
-    fadeIn = (duration) ->
+    fadeIn = (duration, callback) ->
         t_accum = 0.0
         updateGenerator = ->
             while t_accum < duration
                 dt = yield undefined
                 t_accum += dt
+            callback?()
         drawGenerator = ->
             while t_accum < duration
                 context = yield undefined
@@ -15,20 +16,14 @@ define ['./cg', './ui'],
                 context.fillStyle = "rgba(0,0,0,#{alpha})"
                 context.fillRect 0, 0, game.width(), game.height()
 
-        updateGen = updateGenerator()
-        drawGen = drawGenerator()
-        updateGen.next()
-        drawGen.next()
-
-        update: updateGen
-        draw: drawGen
+        util.prepareFiberSet updateGenerator, drawGenerator
 
     class DemoScene extends map.MapScene
         start: ->
             super
-            game.invoke fadeIn 10.0
-
-
+            game.state = 'fx'
+            game.invoke fadeIn 0.5, ->
+                game.state = 'world'
 
     class Character extends entity.Entity
         constructor: (x, y, shape, @sprite) ->
@@ -37,16 +32,6 @@ define ['./cg', './ui'],
 
         draw: (context, offx, offy) ->
             @sprite.draw context, @x + offx, @y + offy, @facing_left
-            # ui.drawTextBox 0, 0, 190, 44,
-            #     spacing: 10.0
-            #     lines: ['T̬͓͂̋ͧ̊͗̚o̻̰͈̼̥ͥͤ͗̊͑ͨ̈́ ͏̻̩̬̭͕̠ī͉̖̠̲̲̘͠ṋ̬̼͔͇̞͔̾͑ͭͪͯ͆v̺̫̘̩̊̓ó̼̥̖̩̖̗̣k͓͔̠̉e͙̱͍̯̽ͫ̇͠ ͚̦͉̮ͩ͆ͬ̈́ͫͭ̚t̡̺͚͙̅̈́ͪ̉h̨͔̳̬̼̲̖è͈̙̲̜̲̜ͯ̃ ̘̜̮̞ͨ̃̃̏ͦh̬̤͖̅̄ͤ̄ͨ̚íͪv̞̹̬̝̀͛ͩ͂́e̛̙̟͎̞͔̦͑-ͣ̅̌̃͂m̪̮͉̗͚ͤͨͥ͛i̘̥̜͠n̖̰̬̺̑̿̚d̶̰̳̍ͅ ̄ͦ҉̺̪̠͈r̶͔̐̏ͩ̈́ͯ͐̋ě̝̯̼̘̦͘ͅp͔̅̚ŕ̢͙͉͍̤̳̞̩̒ͯe̻̠͔̹̝͈s͙̖̰̝͇͔̮̿ͩͧe̠͙͕͉̠̱̾̑̑̈́̑ͅṅ̪͈̙ͯ̔̓̒̓t̵͍̜͇̪̀ͧͪͤ̎ͬi̲̤̣͍̪̐̄n̩͍̉ͭ̊̽̊ͧͣ͜ǧ̯̠̲̌͒̕ͅ ̦͔̾ͮͦͥ͌č̡̖͎͆ḩ̖ͥͬ̌ͥͦa̴̺͙͇̫͍ͫ͛o͔̯͈͕͎̼̾ͣ͗͊̎s̰ͧ̓͒͟.̢͕͙̲̫͓ͯͨ̾͐'
-            #     '̦̔I͍̠̘̩̳̙͊̿̿ͨͭ̊̚͟nv̨̘̜̪̞̲ͨ̾o̝͙̣͚͙͔͟k͐̊͒͛ͯ́ȋ̧͉̥͚̙̮ͭṅg̲̻͉͙͆̌̎ͥ̊ͬͧ ̆̈́́t̢̻̮̘̘̠̻͕ͯh̝̯̞̝͈ͥ̔̌̂͛͜e̫̭͚̼̪̫̪̊̚ ͈̣͇̪̳̪̜ͦͪf̪̼̫̘̲̟̮̿́ė̬̤̯̘̣͌eͣ͊͆̅̐̚͏̟͚̞̟͇̙̦l͍̹͕̆̀i̯͈͍͗̒͌ͮ̀͋̋͟n̥̞̎ͥg̺̻͇̳̪̺͎͗ͮ̓̇̃ ̶͈͕̭̫ͯͦͮ̋ͪ͂ͧő͍̞ͅf͉̗̩̙͕̹̩ͩͭͥ ̡͈̰̹̖͍̯̾̿ͩ̚c̢̞͖̳ĥ̴͗ào͙̲͇̮̭͡s͕̰͚̼̼̥̖̆̽̉́̐͊.̟̘̲̣̪͙̈́̅ͅ'
-            #     '̥̻̩̫ͬ͝W̥͎̻̘̉̓ͪ̍ͯĭ̝̙̫͓̽̎t̨͕̗̙̝̠h̤̬̟̟ͣ͒͌̋̓̽ͯͅ ͏o͚ṵ̙̗̯ͬ͌͂̾͆ͬͅt͚͉͉̲̮̅̍̕ ͇̝̜͚̙̣̈́͒ͧō̺̫̙̘͂̑̔̈ͅr̮̙̠̼̪̒͘d̮͉̲̳̟̆̋̋̈́̊e͏͇̘̩͉̤͓ͅŕ̩̜.̨͙̬̹̮ͯͨ̃'
-            #     '̡͚̬͙͒͛̃͗͗̿ͅT̰͎̥h̺͉̹̯̻͖̒ͧ̆̿ͣe̓͌̅̇̃̊͏ ̢̼̟̦͈̼ͣN̰̼̙̙͋̉̎́e̫̟̘̪̞̒͂̾̈́ͦ͌z̢̠̑̒̓͗̽ͮp̷̪ͨe̶̎̔̂͐̀̀r̗͋͑d̖̟̯̥i̗͎̙̰̜͐͂a̠̖̙̻̦n͋̓ͪͦ̒̊̀ ͍̮̞̋̀h̎ͮ͒͋͌ͪ̀îͥ́̊ͩ̐ͣ́v̹͙͇̬̋̇͂ͅe̟̜̝̜͇͓̎̈́̓̄̕-̲͖̝̇ͭͯͮ͞m̮̩̭̯͉̂ͬͯị̶͈̋̅̍ň̤̣̮͔̻̠̕d͍̩̞͙̓̏ͮͭ ̋o̘͖̽ͪ̈́̒̃̈́f͕̺̘̜̼̼̪̃͊̕ ̏̐̀c̸͍̹̗̤ͥͩ̓ͬ̓̎̚ḩ̝̊̊ͤā̻̺̪̹̀o̺̞̫͓̊ͪͩ̔̕s̭͍̞̰͆̓ͦͯͣͮ̚͜.ͥͯ͛͞ ̜̯͕͚̓ͦ̇ͪ͛Z̠̘̭̣͉̩͛̎̒̃̾ͩͅa̘̹͈̬͛l̦̭̖̠̲͕̏̓̀̽̐̊̚ǵ̸̜͇͓̻͔̰̝̾o̯ͨ̒͒ͣ̿̐͝.̩̺̩̙̙̿ͯͫ͛͊͢'
-            #     '̴͖̰͍͈̹̹̥̎H̘̿̈e̠̬ͮ ̯̌̽͑̒ͯ̎ẅ͉͇̹̞͉̹̋ͤ̄͆͆̂̕ͅh͔̫̮̱̥̓́ͣ͆͛ͅo̳̞̼̘͉̔̽̌̀̚ ̐ͫ̿̃W̲͉͞å̡͙̗̄i̦̰ͦͦt̥͋̏̏ͅs͙̮͉͎͚̮͐ͦ͆ ̵̩̞̖̩̝͖͓̑̆B̝̗̙̗͕̹͋͗ͨͮ́ĕ͕͓̞̤͜h͚̮̿̔ͬ̍i͚͇̪͉̓ͯn̢̤̜͚͕̫̪̓d̡͖͖̜̫̬͇̦̽ ͎̤̭̩̻͖̽͜T͔̲̤͖̮̟̮͗̑̒̄̈́h̼͉̲̫̘ě͆̀ ̨͍͇̹͇̻ͪͪ̈́ͣͭ͑W̌̄͗̓̂̒̾͜a͊l̸̜̩̺̫͓̞̠ͪͧl̨̝͇̰͇͒.̛̜͕̼̫̮̠̿͆ͬͅ'
-            #     '͙͎̙̩̺̪̑ͫ̎͋͋Z̛̺̻̱̍̌ͪ̓ͅA̦̻͓̹̍ͤͨ̓ͩ̈L̡̅͐ͫĜ͔͕̮ͯ̃͊̀͐O̯ͤ͂̄̒̉͟!͓̲̽ͫ͢'].map((line, index, lines)->
-            #             return ui.wordWrapText line, 160-6
-            #         ).reduce (a, b) -> a.concat b
             return
 
     class PlayerCharacter extends Character
@@ -61,7 +46,7 @@ define ['./cg', './ui'],
             @activation_point_check = new entity.Entity x, y + 2 * @shape.bounds_offsets[3], new geometry.Point
             @activation_point_check.collides = util.constructBitmask [0]
             @activation_point_check.onCollide = (ent, info) ->
-                if input.jump.pressed
+                if game.state is 'world' and input.jump.pressed
                     if not ent.onActivate?
                         ent.onActivate = map.tryGettingCallbackForName ent.properties?.onActivate
                     ent.onActivate ent
@@ -82,54 +67,56 @@ define ['./cg', './ui'],
                     state = name
                 return
 
-            vxc = 0.0
-            vyc = 0.0
+            if game.state is 'world'
+                vxc = 0.0
+                vyc = 0.0
 
-            if input.left.state and not input.right.state
-                @facing_left = true
-                vxc = -1.0
-                @dir = 'right'
-            else if input.right.state and not input.left.state
-                @facing_left = false
-                vxc = 1.0
-                @dir = 'right'
+                if input.left.state and not input.right.state
+                    @facing_left = true
+                    vxc = -1.0
+                    @dir = 'right'
+                else if input.right.state and not input.left.state
+                    @facing_left = false
+                    vxc = 1.0
+                    @dir = 'right'
 
-            if input.up.state and not input.down.state
-                vyc = -1.0
-                @dir = 'up'
-            else if input.down.state and not input.up.state
-                vyc = 1.0
-                @dir = 'down'
+                if input.up.state and not input.down.state
+                    vyc = -1.0
+                    @dir = 'up'
+                else if input.down.state and not input.up.state
+                    vyc = 1.0
+                    @dir = 'down'
 
-            if vyc == 0.0
-                if vxc == 0.0
-                    switchStateTo 'look ' + @dir
-                else
-                    switchStateTo 'go right'
-            else if vyc < 0.0
-                switchStateTo 'go up'
-            else if vyc > 0.0
-                switchStateTo 'go down'
+                if vyc == 0.0
+                    if vxc == 0.0
+                        switchStateTo 'look ' + @dir
+                    else
+                        switchStateTo 'go right'
+                else if vyc < 0.0
+                    switchStateTo 'go up'
+                else if vyc > 0.0
+                    switchStateTo 'go down'
 
-            @state = state
-            @velocity = [64.0 * vxc, 64.0 * vyc]
-            physics.integrate this, dt
+                @state = state
+                @velocity = [64.0 * vxc, 64.0 * vyc]
+                physics.integrate this, dt
+
+                # TODO: make this better
+                if @dir is 'right'
+                    if @facing_left
+                        @activation_point_check.x = @x + 2 * @shape.bounds_offsets[0]
+                        @activation_point_check.y = @y
+                    else
+                        @activation_point_check.x = @x + 2 * @shape.bounds_offsets[1]
+                        @activation_point_check.y = @y
+                else if @dir is 'up'
+                    @activation_point_check.x = @x
+                    @activation_point_check.y = @y + 2 * @shape.bounds_offsets[2]
+                else if @dir is 'down'
+                    @activation_point_check.x = @x
+                    @activation_point_check.y = @y + 2 * @shape.bounds_offsets[3]
+
             sprite.update dt
-
-            # TODO: make this better
-            if @dir is 'right'
-                if @facing_left
-                    @activation_point_check.x = @x + 2 * @shape.bounds_offsets[0]
-                    @activation_point_check.y = @y
-                else
-                    @activation_point_check.x = @x + 2 * @shape.bounds_offsets[1]
-                    @activation_point_check.y = @y
-            else if @dir is 'up'
-                @activation_point_check.x = @x
-                @activation_point_check.y = @y + 2 * @shape.bounds_offsets[2]
-            else if @dir is 'down'
-                @activation_point_check.x = @x
-                @activation_point_check.y = @y + 2 * @shape.bounds_offsets[3]
             return
 
     player = null
@@ -157,6 +144,9 @@ define ['./cg', './ui'],
         td = layer.data[tx][ty][..]
         td[0]++
         layer.setTile tx, ty, td
+
+        ui.textBoxDialog 'T͕̜͘ò ̮͎̣i̧̭͉n͉̠̣̖vo̪̖k̢͕̫e͟ ҉͈̲t̞͈͖͚͔̀h̝e̱̥̩̣̪ ͟h̤͔̩̣̻̦͉͜i̝̩͉̜̞͔v̘͔̤͙͕e͏̻-̬͘mi̬̫̪̝̠̝͉n̳̳̼̖d͖̖̠ ̷̫̝̪r̖̯̙̮̼͠ͅe̫͖͎̲͚p͓̫r͕̜̺e̠̣̲s̥͈̻e̹͖̝̻n̵̠͖̤̦̮͈̫t̯̗i̴͓̬͈̱̪̜n̗̹̯͍͇͠g҉̰ c̩͡ͅha͉o͓̦͔̖̦͢s҉̠̣̮.̴͇̮̮ ̜̮I̴̭̣̼͍̗n͇̤̪͇̺̭̼v̪̗o̬̩̳k͏̬̫̲̣̗̙i̫͍̳̠n̸̟g͔͘ t̨ḩ̰͈̬e͔̩̮̱ ̬͈̳̟͕̼̤͝f̤͎̹̼̻̤̭e̛̲̫̙̲̦̞ͅe̩̗̝̥̣l͎͙͙͉͡i͡n̼͉̥g̙ ̥o͙̳̞f̻͠ c̦̫̤͇̬̼h̴͕̻̱͉̼ͅḁ̷̪̣o͕͓̗̦s̫̫̠.͉̱̞̳ ̪̝͔̗̙̹̀ͅW͜it͍̭̻̱̞̞h́ ̴̮̲̣̲̠̮o̠̖̯ut̴̺̦̙̙̞ ̫̜̻̫̼̖͠o̯̭̖͢ŗ̤̙̙̺̰d̫e̢̬̘r̪͜.͚̖̠̝͔͞ ͏͖̙̩T̝̤̱̭̫̭h̦é̞͚ ̠͓̖̫͢N̦̲̭e͍̦̹̼̪̪͟ͅz͟p̨̺̞͓̠̲ͅe͔͓͕͇͓̯͝r̳̯̝͈d̟i̶͎͈͉͉͚̜̭a͏̯͇̰̗̘̰͍n̙ ̫͔͉h͙̦͖͠i̴̙͚͕v̯̰͕͔̼e̦̯̗͝-̤̠͔͞m͍̙i̧n͙͙̥͖͈̫ͅd̪͇͉ ̷̠̤͎͔ͅo͏̘f ̭͚̤c͘h̢̺ͅa̢̬̪̱̳̗̝̱o̜͚̱̟̩͟ͅs̗ͅ.̤̱̯̥̻̬̝ Z̼̠̥͓̥͔ͅa̲l̦̲̭͖̗̣͜g҉͔͖̭̣̻o͖̗͇̺̣̫̥.҉͓͎͙̖̭̖ ͏̜̜̗H̺͉̯͖̭e͏͈ ͇̱̯̜w̛̤͚͎͍h͇o͔͖̱̭̻̱̱ ́W͎̙̠̬͢a̩̬̯̬̫̫̦i̡͉ț̛̭s̝͚̲̦ ̢̭̥̯B̮͚̙̝͔̙͙e̹͈ẖ̩i̷̦̙̝n̙̞̙̼̪d͠ ̝T͞h̲̜e͏̳̺̠͉̮ͅ ̛W͎͙̭̰͜a̴̩̱͎̗̰l͜l̮̖.̹̯̕ ̲͚̜Z̲̳͓͍͞A̺Ḽ̷̤̙̫̭G͖O͓̬̹͇̰͘!̪͉͇͉̤̥ͅ', 0, 0, 160, 44, 10.0, null, null, ->
+            game.state = 'world'
         return
 
     DemoScene: DemoScene
