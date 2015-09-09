@@ -11,25 +11,26 @@ define ['./cg'],
         fillStyle: 'rgb(26,47,158)'
 
     wordWrapText = (text, width, style, context) ->
-        delimeter = ' '
+        wordWrapLine = (line) ->
+            word_delimeter = ' '
+            words = line.split word_delimeter
+            lines = []
+            current_line = ''
+            for word, i in words
+                current_line_candidate = if i is 0 then word else current_line + word_delimeter + word
+                if (context.measureText current_line_candidate).width > width
+                    lines.push current_line
+                    current_line = word
+                else
+                    current_line = current_line_candidate
+            lines.push current_line if current_line isnt ''
+            return lines
+        line_delimeter = '\n'
         style = style or default_style
         context = context or game.canvas().getContext '2d'
-
         context.save()
-
         context.font = style.fontSize + 'px ' + style.font
-        words = text.split delimeter
-        lines = []
-        current_line = ''
-        for word, i in words
-            current_line_candidate = if i is 0 then word else current_line + delimeter + word
-            if (context.measureText current_line_candidate).width > width
-                lines.push current_line
-                current_line = word
-            else
-                current_line = current_line_candidate
-        lines.push current_line if current_line isnt ''
-
+        lines = [].concat (wordWrapLine line for line in text.split line_delimeter)...
         context.restore()
         return lines
 
@@ -78,7 +79,7 @@ define ['./cg'],
         context = context or game.canvas().getContext '2d'
         line_progress = 0.0
         lines_scrolled = 0.0
-        num_lines_per_screen = ((height - 4.0) / style.fontSize) | 0
+        num_lines_per_screen = ((height - 6.0) / style.fontSize) | 0
         cur_line_idx = 0
         cur_line = ''
         word_wrapped_text = wordWrapText text, width-6, style, context
@@ -104,17 +105,16 @@ define ['./cg'],
 
                     displayed_text[cur_line_idx] = cur_line
                 line_progress = new_line_progress
-
-                if input.debug.pressed
-                    console.log {
-                        num_lines_per_screen: num_lines_per_screen
-                        line_progress: line_progress
-                        lines_scrolled: lines_scrolled
-                        cur_line_idx: cur_line_idx
-                        cur_line: cur_line
-                        word_wrapped_text: word_wrapped_text
-                        displayed_text: displayed_text
-                    }
+                # if input.debug.pressed
+                #     console.log {
+                #         num_lines_per_screen: num_lines_per_screen
+                #         line_progress: line_progress
+                #         lines_scrolled: lines_scrolled
+                #         cur_line_idx: cur_line_idx
+                #         cur_line: cur_line
+                #         word_wrapped_text: word_wrapped_text
+                #         displayed_text: displayed_text
+                #     }
             displayed_text = word_wrapped_text
             dt = yield undefined until input.jump.pressed
             done = true
