@@ -2,7 +2,7 @@ define ['./cg'],
   (cg) ->
     {input, audio, util, game, geometry, entity, physics} = cg
 
-    right_to_left = false
+    right_to_left = true
 
     default_style =
         fontSize: 10
@@ -60,10 +60,7 @@ define ['./cg'],
         context.rect x + 2.0, y + 2.0, width - 4.0, height - 4.0
         context.clip()
         context.fillStyle = mainLineStrokeStyle
-        if right_to_left
-            context.textAlign = 'end'
-        else
-            context.textAlign = 'start'
+        context.textAlign = 'start'
         for line, i in text_obj.lines
             if right_to_left
                 context.fillText line, x + width - 3.0, y + 3.0 + (i-lines_scrolled)*text_obj.spacing
@@ -72,6 +69,8 @@ define ['./cg'],
 
         context.restore()
         return
+
+    isRightToLeft: -> right_to_left
 
     textBoxDialog: (text, x, y, width, height, speed, style, context, callback) ->
         game.state = 'dialog'

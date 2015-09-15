@@ -144,7 +144,7 @@ define ['./cg', './ui'],
         td = layer.data[tx][ty][..]
         td[0]++
         layer.setTile tx, ty, td
-        ui.textBoxDialog 'Do not go gentle into that good night,\nOld age should burn and rave at close of day;\nRage, rage against the dying of the light.\n\nThough wise men at their end know dark is right,\nBecause their words had forked no lightning they\nDo not go gentle into that good night.\n\nGood men, the last wave by, crying how bright\nTheir frail deeds might have danced in a green bay,\nRage, rage against the dying of the light.\n\nWild men who caught and sang the sun in flight,\nAnd learn, too late, they grieved it on its way,\nDo not go gentle into that good night.\n\nGrave men, near death, who see with blinding sight\nBlind eyes could blaze like meteors and be gay,\nRage, rage against the dying of the light.\n\nAnd you, my father, there on the sad height,\nCurse, bless, me now with your fierce tears, I pray.\nDo not go gentle into that good night.\nRage, rage against the dying of the light.', 0, 0, 160, 44, 10.0, null, null, ->
+        ui.textBoxDialog 'גורמים אמריקאים סיפרו אתמול (ראשון) כי לפחות שבעה מטוסי מטען רוסיים מדגם "קונדור" המריאו מבסיס בדרום רוסיה לאורך השבוע האחרון והשתמשו במסדרון האיראני-עיראקי בדרכם לסוריה. היעד הוא שדה תעופה מדרום ללטקיה – בסיס צבאי שעשוי להפוך בזמן הקרוב לנקודת האחיזה החדשה המשמעותית ביותר של צבא רוסיה במזרח התיכון בעשורים האחרונים.', 0, 0, 160, 44, 10.0, null, null, ->
             game.state = 'world'
         return
 

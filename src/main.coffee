@@ -4,8 +4,8 @@ requirejs.config \
         jquery: 'https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min'
         screenfull: '../libs/screenfull'
 
-require ['jquery', 'screenfull', './cg', './demo', './demo2'],
-  ($, __void__, cg, demo, demo2) ->
+require ['jquery', 'screenfull', './cg', './demo', './demo2', './ui'],
+  ($, __void__, cg, demo, demo2, ui) ->
     {game, loader, map} = cg
 
     setupScreenfull = (game) ->
@@ -44,6 +44,7 @@ require ['jquery', 'screenfull', './cg', './demo', './demo2'],
         game.init 160, 120, 1 / 60, 1 / 20, loader_scene
         setupScreenfull game
         $(window).resize game.resizeCanvasToAspectRatio
+        $(game.canvas()).attr 'dir', if ui.isRightToLeft() then 'rtl' else 'ltr'
         game.run()
         return
     return
