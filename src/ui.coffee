@@ -2,7 +2,7 @@ define ['./cg'],
   (cg) ->
     {input, audio, util, game, geometry, entity, physics} = cg
 
-    right_to_left = true
+    right_to_left = false
 
     default_style =
         fontSize: 10

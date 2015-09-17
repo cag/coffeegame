@@ -37,8 +37,8 @@ define ['./cg', './ui'],
     class PlayerCharacter extends Character
         constructor: (x, y, shape, sprite) ->
             super x, y, shape, sprite
-            @state = 'look down'
             @dir = 'down'
+            @state = 'look ' + @dir
             map = game.currentScene().map
             player = this
             ent_layer = map.getLayerByName 'Entities'
@@ -49,6 +49,7 @@ define ['./cg', './ui'],
                 if game.state is 'world' and input.jump.pressed
                     if not ent.onActivate?
                         ent.onActivate = map.tryGettingCallbackForName ent.properties?.onActivate
+                    player.sprite.startAnimation 'look ' + player.dir
                     ent.onActivate ent
                 return
             ent_layer.addEntity @activation_point_check
@@ -72,49 +73,69 @@ define ['./cg', './ui'],
                 vyc = 0.0
 
                 if input.left.state and not input.right.state
-                    @facing_left = true
                     vxc = -1.0
-                    @dir = 'right'
                 else if input.right.state and not input.left.state
-                    @facing_left = false
                     vxc = 1.0
-                    @dir = 'right'
 
                 if input.up.state and not input.down.state
                     vyc = -1.0
-                    @dir = 'up'
                 else if input.down.state and not input.up.state
                     vyc = 1.0
-                    @dir = 'down'
 
-                if vyc == 0.0
-                    if vxc == 0.0
-                        switchStateTo 'look ' + @dir
+                if vxc < 0.0
+                    if vyc < 0.0
+                        @dir = 'up-left'
+                    else if vyc > 0.0
+                        @dir = 'down-left'
                     else
-                        switchStateTo 'go right'
-                else if vyc < 0.0
-                    switchStateTo 'go up'
-                else if vyc > 0.0
-                    switchStateTo 'go down'
+                        @dir = 'left'
+                else if vxc > 0.0
+                    if vyc < 0.0
+                        @dir = 'up-right'
+                    else if vyc > 0.0
+                        @dir = 'down-right'
+                    else
+                        @dir = 'right'
+                else
+                    if vyc < 0.0
+                        @dir = 'up'
+                    else if vyc > 0.0
+                        @dir = 'down'
+
+                if vyc == 0.0 and vxc == 0.0
+                    switchStateTo 'look ' + @dir
+                else
+                    switchStateTo 'go ' + @dir
 
                 @state = state
-                @velocity = [64.0 * vxc, 64.0 * vyc]
+                inv_spd_c = if vxc == 0.0 and vyc == 0.0 then 1.0 else 1.0/Math.sqrt(vxc*vxc+vyc*vyc)
+                @velocity = [48.0 * vxc * inv_spd_c, 48.0 * vyc * inv_spd_c]
                 physics.integrate this, dt
 
-                # TODO: make this better
-                if @dir is 'right'
-                    if @facing_left
-                        @activation_point_check.x = @x + 2 * @shape.bounds_offsets[0]
-                        @activation_point_check.y = @y
-                    else
-                        @activation_point_check.x = @x + 2 * @shape.bounds_offsets[1]
-                        @activation_point_check.y = @y
+                if @dir is 'left'
+                    @activation_point_check.x = @x + 2 * @shape.bounds_offsets[0]
+                    @activation_point_check.y = @y
+                else if @dir is 'right'
+                    @activation_point_check.x = @x + 2 * @shape.bounds_offsets[1]
+                    @activation_point_check.y = @y
                 else if @dir is 'up'
                     @activation_point_check.x = @x
                     @activation_point_check.y = @y + 2 * @shape.bounds_offsets[2]
                 else if @dir is 'down'
                     @activation_point_check.x = @x
                     @activation_point_check.y = @y + 2 * @shape.bounds_offsets[3]
+                else if @dir is 'up-left'
+                    @activation_point_check.x = @x + Math.sqrt(2) * @shape.bounds_offsets[0]
+                    @activation_point_check.y = @y + Math.sqrt(2) * @shape.bounds_offsets[2]
+                else if @dir is 'up-right'
+                    @activation_point_check.x = @x + Math.sqrt(2) * @shape.bounds_offsets[1]
+                    @activation_point_check.y = @y + Math.sqrt(2) * @shape.bounds_offsets[2]
+                else if @dir is 'down-left'
+                    @activation_point_check.x = @x + Math.sqrt(2) * @shape.bounds_offsets[0]
+                    @activation_point_check.y = @y + Math.sqrt(2) * @shape.bounds_offsets[3]
+                else if @dir is 'down-right'
+                    @activation_point_check.x = @x + Math.sqrt(2) * @shape.bounds_offsets[1]
+                    @activation_point_check.y = @y + Math.sqrt(2) * @shape.bounds_offsets[3]
 
             sprite.update dt
             return
@@ -144,7 +165,7 @@ define ['./cg', './ui'],
         td = layer.data[tx][ty][..]
         td[0]++
         layer.setTile tx, ty, td
-        ui.textBoxDialog 'גורמים אמריקאים סיפרו אתמול (ראשון) כי לפחות שבעה מטוסי מטען רוסיים מדגם "קונדור" המריאו מבסיס בדרום רוסיה לאורך השבוע האחרון והשתמשו במסדרון האיראני-עיראקי בדרכם לסוריה. היעד הוא שדה תעופה מדרום ללטקיה – בסיס צבאי שעשוי להפוך בזמן הקרוב לנקודת האחיזה החדשה המשמעותית ביותר של צבא רוסיה במזרח התיכון בעשורים האחרונים.', 0, 0, 160, 44, 10.0, null, null, ->
+        ui.textBoxDialog 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.', 0, 0, 160, 44, 10.0, null, null, ->
             game.state = 'world'
         return
 
